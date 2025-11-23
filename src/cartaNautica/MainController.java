@@ -45,7 +45,7 @@ import cartaNautica.Poi;
  *
  * @author jsoler
  */
-public class FXMLDocumentController implements Initializable {
+public class MainController implements Initializable {
 
     //=======================================
     // hashmap para guardar los puntos de interes POI
