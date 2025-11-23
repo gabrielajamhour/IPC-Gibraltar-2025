@@ -32,6 +32,7 @@
                 </Menu>
               </menus>
             </MenuBar>
+            <Button fx:id="profileButton" mnemonicParsing="false" onAction="#openProfile" text="Profile" />
             <Region HBox.hgrow="ALWAYS" />
             <Label text="Zoom" />
             <Button mnemonicParsing="false" onAction="#zoomOut" text="-" />

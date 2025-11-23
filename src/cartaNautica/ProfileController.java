@@ -5,11 +5,13 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
-import model.Navigation;
 import java.io.File;
+import java.net.URL;
 import java.time.LocalDate;
-import model.NavDAOException;
+import java.util.ResourceBundle;
+import javafx.stage.Stage;
 import model.User;
+import util.SessionManager;
 
 public class ProfileController {
 
@@ -20,27 +22,18 @@ public class ProfileController {
     @FXML private DatePicker birthdatePicker;
     @FXML private Label errorLabel;
 
-    private User currentUser;
+    private User user;
 
-    public void initialize() throws NavDAOException {
-        // Obtener instancia única de Navegacion (según PDF)
-        Navigation nav = Navigation.getInstance();
-        currentUser = nav.getLoggedUser();
+    public void initialize(URL url, ResourceBundle rb) {
 
-        if (currentUser == null) {
-            errorLabel.setText("No hay usuario logueado.");
-            return;
-        }
+        user = SessionManager.getActiveUser();
 
-        // Rellenar datos
-        nicknameField.setText(currentUser.getNickName());
-        emailField.setText(currentUser.getEmail());
-        passwordField.setText(currentUser.getPassword());
-        birthdatePicker.setValue(currentUser.getBirthdate());
-
-        // Cargar avatar
-        if (currentUser.getAvatar() != null) {
-            avatarImage.setImage(new Image(currentUser.getAvatar()));
+        if (user != null) {
+            nicknameField.setText(user.getNickName());
+            emailField.setText(user.getEmail());
+            passwordField.setText(user.getPassword());
+            birthdatePicker.setValue(user.getBirthdate());
+            avatarImage.setImage(user.getAvatar());
         }
     }
 
@@ -52,8 +45,9 @@ public class ProfileController {
 
         File file = fc.showOpenDialog(null);
         if (file != null) {
-            avatarImage.setImage(new Image(file.toURI().toString()));
-            currentUser.setAvatar(file.toURI().toString());
+            Image newImg = new Image(file.toURI().toString());
+            avatarImage.setImage(newImg);
+            user.setAvatar(newImg);
         }
     }
 
@@ -65,7 +59,6 @@ public class ProfileController {
         String newPass = passwordField.getText();
         LocalDate newBirth = birthdatePicker.getValue();
 
-        // Validaciones según el PDF
         if (!User.checkEmail(newEmail)) {
             errorLabel.setText("Email inválido.");
             return;
@@ -74,22 +67,21 @@ public class ProfileController {
             errorLabel.setText("La contraseña no cumple los requisitos.");
             return;
         }
-        if (User.getBirthdate() == newBirth) { // este método existe según PDF
+        if (!user.getBirthdate().equals(newBirth)) {
             errorLabel.setText("Debes tener al menos 16 años.");
             return;
         }
 
-        // Guardar cambios
-        currentUser.setEmail(newEmail);
-        currentUser.setPassword(newPass);
-        currentUser.setBirthdate(newBirth);
+        user.setEmail(newEmail);
+        user.setPassword(newPass);
+        user.setBirthdate(newBirth);
 
         errorLabel.setText("Cambios guardados correctamente.");
     }
 
     @FXML
     private void onCancel() {
-        // volver a main.fxml
-        Navigation.UtilsViews.openMainView(); // ejemplo: depende de cómo gestiones navegación
+        Stage stage = (Stage) avatarImage.getScene().getWindow();
+        SessionManager.goToMain(stage);
     }
 }

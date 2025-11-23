@@ -40,6 +40,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import cartaNautica.Poi;
+import java.io.IOException;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 
 /**
  *
@@ -218,6 +222,19 @@ public class MainController implements Initializable {
                 map_listview.getItems().add(poi);
             }
         }
+    }
+    
+    @FXML
+    private void openProfile(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/cartaNautica/profile.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) zoom_slider.getScene().getWindow();
+
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {}
     }
 
 
