@@ -20,11 +20,10 @@ public class PoiUPVApp extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
-        stage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logo.png")));
-        Scene scene = new Scene(root);
-        stage.setTitle("Puntos de interes UPV");
-        stage.setScene(scene);
+        Parent root = FXMLLoader.load(getClass().getResource("/cartaNautica/main.fxml"));
+//        stage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logo.png")));
+        stage.setTitle("Carta Náutica - Estrecho de Gibraltar");
+        stage.setScene(new Scene(root));
         stage.show();
     }
 
