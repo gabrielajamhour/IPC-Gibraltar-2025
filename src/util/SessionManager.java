@@ -27,4 +27,14 @@ public class SessionManager {
             stage.show();
         } catch (IOException e) {}
     }
+    
+    public static void goToRegister(Stage stage) {
+        try {
+            Parent root = FXMLLoader.load(SessionManager.class.getResource("/cartaNautica/register.fxml"));
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();  // o muestra alerta
+        }
+    }
 }
