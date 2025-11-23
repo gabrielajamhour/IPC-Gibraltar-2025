@@ -76,7 +76,9 @@ public class ProfileController {
         user.setPassword(newPass);
         user.setBirthdate(newBirth);
 
-        errorLabel.setText("Cambios guardados correctamente.");
+        // Volver al main automaticamente
+        Stage stage = (Stage) avatarImage.getScene().getWindow();
+        SessionManager.goToMain(stage);
     }
 
     @FXML
