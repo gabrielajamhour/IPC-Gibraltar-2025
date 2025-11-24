@@ -11,12 +11,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import util.SessionManager;
 
 /**
  *
  * @author jose
  */
-public class PoiUPVApp extends Application {
+public class App extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
@@ -25,6 +26,8 @@ public class PoiUPVApp extends Application {
         stage.setTitle("Carta Náutica - Estrecho de Gibraltar");
         stage.setScene(new Scene(root));
         stage.show();
+        
+        SessionManager.goToLogIn(stage);
     }
 
     /**

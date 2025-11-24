@@ -78,43 +78,32 @@ public class RegisterController implements Initializable {
     
     private void manageError(Label errorLabel, TextField textField, BooleanProperty boolProp ){
         boolProp.setValue(false);
-        showErrorMessage(errorLabel, textField);
         textField.requestFocus();
+        
+        errorLabel.visibleProperty().set(true);
+        textField.styleProperty().setValue("-fx-background-color: #FCE5E0"); 
     }
     
     private void manageCorrect(Label errorLabel, TextField textField, BooleanProperty boolProp ){
-        boolProp.setValue(false);
-        hideErrorMessage(errorLabel,textField);
-    }
-    
-    private void showErrorMessage(Label errorLabel, TextField textField) {
-        errorLabel.visibleProperty().set(true);
-        textField.styleProperty().setValue("-fx-background-color: #FCE5E0");    
-    }
-    
-    private void hideErrorMessage(Label errorLabel, TextField textField) {
+        boolProp.setValue(true);
+        
         errorLabel.visibleProperty().set(false);
         textField.styleProperty().setValue("");
     }
     
+    
     // Para el DatePicker
     private void manageError(Label errorLabel, DatePicker textField, BooleanProperty boolProp ){
         boolProp.setValue(false);
-        showErrorMessage(errorLabel, textField);
         textField.requestFocus();
+        
+        errorLabel.visibleProperty().set(true);
+        textField.styleProperty().setValue("-fx-background-color: #FCE5E0"); 
     }
     
     private void manageCorrect(Label errorLabel, DatePicker textField, BooleanProperty boolProp ){
-        boolProp.setValue(false);
-        hideErrorMessage(errorLabel,textField);
-    }
-    
-    private void showErrorMessage(Label errorLabel, DatePicker textField) {
-        errorLabel.visibleProperty().set(true);
-        textField.styleProperty().setValue("-fx-background-color: #FCE5E0");    
-    }
-    
-    private void hideErrorMessage(Label errorLabel, DatePicker textField) {
+        boolProp.setValue(true);
+        
         errorLabel.visibleProperty().set(false);
         textField.styleProperty().setValue("");
     }
@@ -151,11 +140,11 @@ public class RegisterController implements Initializable {
         bAccept.disableProperty().bind(validFields.not());
         
         bCancel.setOnAction( (event)->{
-                    //Volver a la pantalla de LOG-IN;
+            Stage stage = (Stage) epassword.getScene().getWindow();
+            SessionManager.goToLogIn(stage);
                 });
     } 
 
-    
     
     // ===================== Validaciones =====================
     
@@ -184,9 +173,7 @@ public class RegisterController implements Initializable {
         if (pass1.isEmpty() || pass2.isEmpty()) {return;}
         
         if(pass1.compareTo(pass2) != EQUALS){
-            showErrorMessage(lPassDifferent, epassword2);
-            equalPasswords.setValue(false);
-            epassword.requestFocus();
+            manageError(lPassDifferent, epassword2, equalPasswords);
         } else
             manageCorrect(lPassDifferent, epassword2, equalPasswords);
     }
@@ -224,7 +211,7 @@ public class RegisterController implements Initializable {
         int years = Period.between(birthdate, today).getYears();
 
         if (years < 16) {
-            lageNotOldEnought.setText("Debes tener al menos 16 años para registrarte");
+            lageNotOldEnought.setText("Debes tener al menos 16 años");
             manageError(lageNotOldEnought, eAge, validAge);
         } else {
             // Correcto
