@@ -112,6 +112,7 @@ public class AuthController implements Initializable {
         }
     }
     
+    
     // ===================== Helpers de error =====================
     
     private void manageError(Label errorLabel, TextField textField, BooleanProperty boolProp ){
