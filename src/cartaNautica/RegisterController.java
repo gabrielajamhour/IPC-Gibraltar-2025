@@ -276,9 +276,7 @@ public class RegisterController implements Initializable {
             Stage stage = (Stage) epassword.getScene().getWindow();
             SessionManager.goToMain(stage);
 
-        } catch (NavDAOException ex) {
-            ex.printStackTrace();
-        }
+        } catch (NavDAOException ex) {}
     }
 
 }

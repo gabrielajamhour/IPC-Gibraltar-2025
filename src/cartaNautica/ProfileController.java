@@ -8,6 +8,7 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
 import javafx.stage.Stage;
@@ -68,8 +69,7 @@ public class ProfileController implements Initializable{
             errorLabel.setText("La contraseña no cumple los requisitos.");
             return;
         }
-        if (!user.getBirthdate().equals(newBirth)) {
-            errorLabel.setText("Debes tener al menos 16 años.");
+        if (!checkAge(newBirth)) {
             return;
         }
 
@@ -87,4 +87,31 @@ public class ProfileController implements Initializable{
         Stage stage = (Stage) avatarImage.getScene().getWindow();
         SessionManager.goToMain(stage);
     }
+    
+    private boolean checkAge(LocalDate birthdate) {
+
+        if (birthdate == null) {
+            errorLabel.setText("Debes seleccionar tu fecha de nacimiento");
+            return false;
+        }
+
+        LocalDate today = LocalDate.now();
+
+        if (birthdate.isAfter(today)) {
+            errorLabel.setText("La fecha de nacimiento no puede ser futura");
+            return false;
+        }
+
+        int years = Period.between(birthdate, today).getYears();
+
+        if (years < 16) {
+            errorLabel.setText("Debes tener al menos 16 años");
+            return false;
+        }
+
+        // Sin errores
+        errorLabel.setText("");
+        return true;
+    }
+
 }
