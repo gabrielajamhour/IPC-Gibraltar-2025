@@ -115,25 +115,19 @@ public class AuthController implements Initializable {
     
     private void manageError(Label errorLabel, TextField textField, BooleanProperty boolProp ){
         boolProp.setValue(false);
-        showErrorMessage(errorLabel, textField);
         textField.requestFocus();
+        
+        errorLabel.visibleProperty().set(true);
+        textField.styleProperty().setValue("-fx-background-color: #FCE5E0"); 
     }
     
     private void manageCorrect(Label errorLabel, TextField textField, BooleanProperty boolProp ){
-        boolProp.setValue(false);
-        hideErrorMessage(errorLabel,textField);
-    }
-    
-    private void showErrorMessage(Label errorLabel, TextField textField) {
-        errorLabel.visibleProperty().set(true);
-        textField.styleProperty().setValue("-fx-background-color: #FCE5E0");    
-    }
-    
-    private void hideErrorMessage(Label errorLabel, TextField textField) {
+        boolProp.setValue(true);
+        
         errorLabel.visibleProperty().set(false);
         textField.styleProperty().setValue("");
     }
-
+    
     
     // ===================== Listeners auxiliares =====================
     
