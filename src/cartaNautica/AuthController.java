@@ -69,6 +69,7 @@ public class AuthController implements Initializable {
                 lPasswordWrong.setText("Wrong Password");
                 manageError(lPasswordWrong, ePassword, validPassword);
             } else {
+                SessionManager.setActiveUser(u);
                 Stage stage = (Stage) ePassword.getScene().getWindow();
                 SessionManager.goToMain(stage);
             }

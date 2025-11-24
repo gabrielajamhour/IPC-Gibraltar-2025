@@ -9,11 +9,12 @@ import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
+import javafx.fxml.Initializable;
 import javafx.stage.Stage;
 import model.User;
 import util.SessionManager;
 
-public class ProfileController {
+public class ProfileController implements Initializable{
 
     @FXML private ImageView avatarImage;
     @FXML private TextField nicknameField;
