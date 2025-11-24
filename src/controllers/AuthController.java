@@ -28,6 +28,11 @@ import util.SessionManager;
  */
 public class AuthController implements Initializable {
 
+    // Set "true" para que el usuario tenga un feedback del requisito de la contrasena inmediato,
+    // de manera que puede saber si la contrasena que digita cumple los requisitos de una cotnrasena, 
+    // (no le va a decir si su contrasena es correcta, solo si cumple los requisitos)
+    private final boolean feedback_password = false;
+    
     //properties to control valid fieds values
     private BooleanProperty validPassword;
     private BooleanProperty validUsername;
@@ -46,12 +51,16 @@ public class AuthController implements Initializable {
         validUsername = new SimpleBooleanProperty(false);
         
         addValidateOnFocusLost(eUsername, this::checkUsername);
-        addValidate(ePassword, this::checkPassword);
         
-        BooleanBinding validFields = validPassword.and(validUsername);
-        
-        bIniciar.disableProperty().bind(validFields.not());
-    }    
+        if (feedback_password){
+            addValidate(ePassword, this::checkPassword);
+            
+            BooleanBinding validFields = validPassword.and(validUsername);
+            bIniciar.disableProperty().bind(validFields.not());
+        } else {
+            bIniciar.disableProperty().bind(validUsername.not());
+        }
+    }  
 
     
     // ===================== Accept =====================
