@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="500" prefWidth="450" spacing="12" styleClass="profile-root" stylesheets="@../resources/estilos.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cartaNautica.ProfileController">
+<VBox alignment="TOP_CENTER" prefHeight="500" prefWidth="450" spacing="12" styleClass="profile-root" stylesheets="@../resources/estilos.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProfileController">
 
     <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
@@ -39,8 +39,8 @@
         <RowConstraints vgrow="NEVER"/>-->
 
         <children>
-            <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="96.0" styleClass="grid-label" text="Nick:" GridPane.rowIndex="0" />
-            <TextField fx:id="nicknameField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="96.0" styleClass="grid-label" text="Nickname:" GridPane.rowIndex="0" />
+         <Label fx:id="nicknameField" GridPane.columnIndex="1" />
 
             <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="96.0" styleClass="grid-label" text="Email:" textAlignment="RIGHT" GridPane.rowIndex="1" />
             <TextField fx:id="emailField" styleClass="text-input" GridPane.columnIndex="1" GridPane.rowIndex="1" />

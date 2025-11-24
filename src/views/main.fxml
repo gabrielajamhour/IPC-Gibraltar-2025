@@ -19,7 +19,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="556.0" prefWidth="853.0" stylesheets="@../resources/estilos.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cartaNautica.MainController">
+<VBox prefHeight="556.0" prefWidth="853.0" stylesheets="@../resources/estilos.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
    <children>
       <HBox alignment="CENTER_RIGHT" fillHeight="false" spacing="5.0" VBox.vgrow="NEVER">
          <children>
@@ -33,6 +33,8 @@
               </menus>
             </MenuBar>
             <Button fx:id="profileButton" mnemonicParsing="false" onAction="#openProfile" text="Profile" />
+            <Button fx:id="problemsButton" mnemonicParsing="false" onAction="#openProblems" text="Problemas" />
+            <Button fx:id="resultsButton" mnemonicParsing="false" onAction="#openResults" text="Resultados" />
             <Region HBox.hgrow="ALWAYS" />
             <Label text="Zoom" />
             <Button mnemonicParsing="false" onAction="#zoomOut" text="-" />

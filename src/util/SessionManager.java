@@ -22,7 +22,7 @@ public class SessionManager {
     // Trocar a cena para main.fxml
     public static void goToMain(Stage stage) {
         try {
-            Parent root = FXMLLoader.load(SessionManager.class.getResource("/cartaNautica/main.fxml"));
+            Parent root = FXMLLoader.load(SessionManager.class.getResource("/views/main.fxml"));
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {}
@@ -30,7 +30,7 @@ public class SessionManager {
     
     public static void goToRegister(Stage stage) {
         try {
-            Parent root = FXMLLoader.load(SessionManager.class.getResource("/cartaNautica/register.fxml"));
+            Parent root = FXMLLoader.load(SessionManager.class.getResource("/views/register.fxml"));
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {}
@@ -38,7 +38,7 @@ public class SessionManager {
     
     public static void goToLogIn(Stage stage) {
         try {
-            Parent root = FXMLLoader.load(SessionManager.class.getResource("/cartaNautica/auth.fxml"));
+            Parent root = FXMLLoader.load(SessionManager.class.getResource("/views/auth.fxml"));
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {}

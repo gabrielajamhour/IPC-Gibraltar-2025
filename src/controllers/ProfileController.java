@@ -1,4 +1,4 @@
-package cartaNautica;
+package controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -18,7 +18,7 @@ import util.SessionManager;
 public class ProfileController implements Initializable{
 
     @FXML private ImageView avatarImage;
-    @FXML private TextField nicknameField;
+    @FXML private Label nicknameField;
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private DatePicker birthdatePicker;

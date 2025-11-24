@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cartaNautica;
+package controllers;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -39,11 +39,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import cartaNautica.Poi;
 import java.io.IOException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 
 /**
  *
@@ -75,6 +75,12 @@ public class MainController implements Initializable {
     private SplitPane splitPane;
     @FXML
     private Label mousePosition;
+    @FXML
+    private Button profileButton;
+    @FXML
+    private Button problemsButton;
+    @FXML
+    private Button resultsButton;
 
     @FXML
     void zoomIn(ActionEvent event) {
@@ -227,7 +233,7 @@ public class MainController implements Initializable {
     @FXML
     private void openProfile(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/cartaNautica/profile.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/profile.fxml"));
             Parent root = loader.load();
 
             Stage stage = (Stage) zoom_slider.getScene().getWindow();
@@ -237,5 +243,29 @@ public class MainController implements Initializable {
         } catch (IOException e) {}
     }
 
+    @FXML
+    private void openProblems(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/problemSelection.fxml"));
+            Parent root = loader.load();
 
+            Stage stage = (Stage) zoom_slider.getScene().getWindow();
+
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {}
+    }
+
+    @FXML
+    private void openResults(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/results.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) zoom_slider.getScene().getWindow();
+
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {}
+    }
 }

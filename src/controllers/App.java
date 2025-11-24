@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cartaNautica;
+package controllers;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -21,7 +21,7 @@ public class App extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/cartaNautica/main.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/views/main.fxml"));
 //        stage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logo.png")));
         stage.setTitle("Carta Náutica - Estrecho de Gibraltar");
         stage.setScene(new Scene(root));
