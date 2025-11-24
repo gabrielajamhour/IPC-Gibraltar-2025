@@ -1,34 +1,53 @@
 package controllers;
 
+import java.net.URL;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.collections.*;
 import model.*;
 import java.util.List;
+import java.util.ResourceBundle;
+import javafx.fxml.Initializable;
 import javafx.stage.Stage;
 import util.SessionManager;
 
-public class ProblemSelectionController {
+public class ProblemSelectionController implements Initializable {
 
     @FXML private TextField searchField;
     @FXML private ListView<Problem> problemsList;
 
     private List<Problem> allProblems;
+    
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        try {
+            Navigation nav = Navigation.getInstance();
+            allProblems = nav.getProblems();
+            problemsList.setItems(FXCollections.observableArrayList(allProblems));
+            
+            problemsList.setCellFactory(list -> new ProblemCell());
 
-    public void setProblems(List<Problem> problems) {
-        allProblems = problems;
-        problemsList.setItems(FXCollections.observableArrayList(allProblems));
+        } catch (NavDAOException ex) {} 
     }
 
     @FXML
     private void searchProblems() {
         String query = searchField.getText().toLowerCase();
 
-//        var filtered = allProblems.stream()
-//                .filter(p -> p.getText().get().toLowerCase().contains(query))
-//                .toList();
-//
-//        problemsList.setItems(FXCollections.observableArrayList(filtered));
+        List<Problem> filtered = allProblems.stream()
+                .filter(p -> p.getText().toLowerCase().contains(query))
+                .toList();
+
+        problemsList.setItems(FXCollections.observableArrayList(filtered));
+    }
+    
+    @FXML
+    private void clearSearch() {
+        searchField.clear();
+
+        problemsList.setItems(
+                FXCollections.observableArrayList(allProblems)
+        );
     }
 
     @FXML
@@ -56,5 +75,19 @@ public class ProblemSelectionController {
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
+    }
+    
+    public class ProblemCell extends ListCell<Problem> {
+
+        @Override
+        protected void updateItem(Problem problem, boolean empty) {
+            super.updateItem(problem, empty);
+
+            if (empty || problem == null) {
+                setText(null);
+            } else {
+                setText(problem.getText());
+            }
+        }
     }
 }
