@@ -14,18 +14,18 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="500" prefWidth="450" spacing="12" stylesheets="@../resources/estilos.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cartaNautica.ProfileController" styleClass="profile-root">
+<VBox alignment="TOP_CENTER" prefHeight="500" prefWidth="450" spacing="12" styleClass="profile-root" stylesheets="@../resources/estilos.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cartaNautica.ProfileController">
 
     <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
-    <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Perfil de Usuario" styleClass="profile-title"/>
+    <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" styleClass="profile-title" text="Perfil de Usuario" />
 
     <ImageView fx:id="avatarImage" fitHeight="120" fitWidth="120" preserveRatio="true" styleClass="profile-avatar">
       <image>
          <Image url="@../resources/default.png" />
       </image></ImageView>
 
-    <Button alignment="TOP_CENTER" onAction="#onChangeAvatar" text="Cambiar avatar" styleClass="profile-change-avatar"/>
+    <Button alignment="TOP_CENTER" onAction="#onChangeAvatar" styleClass="profile-change-avatar" text="Cambiar avatar" />
 
     <GridPane hgap="10" vgap="10">
         <columnConstraints>
@@ -39,17 +39,17 @@
         <RowConstraints vgrow="NEVER"/>-->
 
         <children>
-            <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="96.0" text="Nick:" GridPane.rowIndex="0" styleClass="grid-label"/>
+            <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="96.0" styleClass="grid-label" text="Nick:" GridPane.rowIndex="0" />
             <TextField fx:id="nicknameField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-            <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="96.0" text="Email:" textAlignment="RIGHT" GridPane.rowIndex="1" styleClass="grid-label"/>
-            <TextField fx:id="emailField" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="text-input"/>
+            <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="96.0" styleClass="grid-label" text="Email:" textAlignment="RIGHT" GridPane.rowIndex="1" />
+            <TextField fx:id="emailField" styleClass="text-input" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-            <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="96.0" text="Contraseña:" GridPane.rowIndex="2" styleClass="grid-label"/>
-            <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="password-input"/>
+            <Label alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="96.0" styleClass="grid-label" text="Contraseña:" GridPane.rowIndex="2" />
+            <PasswordField fx:id="passwordField" styleClass="password-input" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-            <Label alignment="CENTER_RIGHT" text="Fecha nacimiento:" GridPane.rowIndex="3" styleClass="grid-label"/>
-            <DatePicker fx:id="birthdatePicker" GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="date-input"/>
+            <Label alignment="CENTER_RIGHT" styleClass="grid-label" text="Fecha nacimiento:" GridPane.rowIndex="3" />
+            <DatePicker fx:id="birthdatePicker" GridPane.columnIndex="1" GridPane.rowIndex="3" />
         </children>
       <rowConstraints>
          <RowConstraints />
@@ -59,11 +59,11 @@
       </rowConstraints>
     </GridPane>
 
-    <Label fx:id="errorLabel" style="-fx-text-fill: red;" styleClass="error-label"/>
+    <Label fx:id="errorLabel" style="-fx-text-fill: red;" styleClass="error-label" />
 
     <HBox alignment="TOP_CENTER" spacing="15">
-        <Button onAction="#onSave" text="Guardar" styleClass="profile-button-save"/>
-        <Button onAction="#onCancel" text="Cancelar" styleClass="profile-button-cancel"/>
+        <Button onAction="#onSave" styleClass="profile-button-save" text="Guardar" />
+        <Button onAction="#onCancel" styleClass="profile-button-cancel" text="Cancelar" />
     </HBox>
 
 </VBox>
