@@ -45,8 +45,8 @@ public class AuthController implements Initializable {
         validPassword = new SimpleBooleanProperty(false);   
         validUsername = new SimpleBooleanProperty(false);
         
-        addValidateOnFocusLost(ePassword, this::checkPassword);
         addValidateOnFocusLost(eUsername, this::checkUsername);
+        addValidate(ePassword, this::checkPassword);
         
         BooleanBinding validFields = validPassword.and(validUsername);
         
@@ -137,6 +137,13 @@ public class AuthController implements Initializable {
             if (!newFocused) {    // cuando pierde el foco
                 validator.run();
             }
+        });
+    }
+    
+    private void addValidate(TextField field, Runnable validator) {
+        field.textProperty().addListener((obs, oldFocused, newFocused) -> {
+            // Siempre
+            validator.run();
         });
     }
     

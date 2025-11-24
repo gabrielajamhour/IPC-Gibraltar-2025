@@ -123,11 +123,7 @@ public class RegisterController implements Initializable {
         addValidateOnFocusLost(epassword, this::checkPassword);
         addValidateOnFocusLost(epassword2, this::checkEquals);
         addValidateOnFocusLost(eUsername, this::checkUsername);
-        addValidateOnFocusLost(eAge, this::checkAge);
-        
-        // Listener para password1 == password2
-        // Validación en “tiempo real” al escribir la segunda contraseña
-        //epassword2.textProperty().addListener((obs, oldText, newText) -> {checkEquals();});
+        addValidate(eAge, this::checkAge);
         
         
         // Habilitar o deshabilitar el boton ACCEPT
@@ -249,13 +245,32 @@ public class RegisterController implements Initializable {
         });
     }
     
-    // Para DatePicker
-    private void addValidateOnFocusLost(DatePicker field, Runnable validator) {
-        field.focusedProperty().addListener((obs, oldFocused, newFocused) -> {
-            if (!newFocused) {    // cuando pierde el foco
+    // Para DatePicker  
+    private void addValidate(DatePicker field, Runnable validator) {
+        // 1. Cuando se selecciona en el calendario o se confirma la fecha
+        field.valueProperty().addListener((obs, oldDate, newDate) -> {
+            // siempre
+            if (newDate != null) {
                 validator.run();
             }
         });
+        
+        // 2. Cuando se escribe en el campo de texto del DataPicker
+        field.getEditor().textProperty().addListener((obs, oldText, newText) -> {
+        if (newText == null || newText.trim().isEmpty()) {
+            // opcional: marcar como inválido aquí
+            return;
+        }
+
+        try {
+            // intentamos convertir el texto a LocalDate usando el mismo formato del DatePicker
+            LocalDate date = field.getConverter().fromString(newText);
+            field.setValue(date);  // esto actualiza valueProperty y dispara el listener de arriba
+        } catch (Exception e) {
+            // el texto aún no forma una fecha válida (por ejemplo "12/" o "1/1/2")
+            // aquí puedes marcar error si quieres
+        }
+    });
     }
     
     
