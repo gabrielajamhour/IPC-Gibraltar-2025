@@ -156,6 +156,7 @@ public class RegisterController implements Initializable {
     } 
 
     
+    
     // ===================== Validaciones =====================
     
     private void checkEditMail() {
