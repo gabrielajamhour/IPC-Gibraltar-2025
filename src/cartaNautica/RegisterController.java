@@ -175,12 +175,22 @@ public class RegisterController implements Initializable {
     }
     
     private void checkUsername() {
-        String username = eUsername.getText();
-        if (!User.checkNickName(username)){
-            // Invalid Username
-            manageError(lInvalidUsername, eUsername, validUsername);
-        } else {
-            manageCorrect(lInvalidUsername, eUsername, validUsername);
+        try {
+            
+            String username = eUsername.getText();
+            Navigation nav = Navigation.getInstance();
+            if (!User.checkNickName(username)){
+                // Invalid Username
+                manageError(lInvalidUsername, eUsername, validUsername);
+            } else if (nav.exitsNickName(username)){
+                lInvalidUsername.setText("Username already in use");
+                manageError(lInvalidUsername, eUsername, validUsername);
+            } else {
+                manageCorrect(lInvalidUsername, eUsername, validUsername);
+            }
+            
+        } catch (NavDAOException ex) {
+            System.getLogger(RegisterController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
     }
     
@@ -260,13 +270,15 @@ public class RegisterController implements Initializable {
         
         try {
             Navigation nav = Navigation.getInstance();
-            nav.registerUser(username, email, password, selectedAvatar, birthdate);
-            // nav.authenticate(username, password);
+            User u = nav.registerUser(username, email, password, selectedAvatar, birthdate);
+            SessionManager.setActiveUser(u);
 
             Stage stage = (Stage) epassword.getScene().getWindow();
             SessionManager.goToMain(stage);
 
-        } catch (NavDAOException ex) {}
+        } catch (NavDAOException ex) {
+            ex.printStackTrace();
+        }
     }
 
 }
