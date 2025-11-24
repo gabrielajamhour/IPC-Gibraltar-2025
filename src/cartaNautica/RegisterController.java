@@ -68,10 +68,6 @@ public class RegisterController implements Initializable {
     @FXML    private Button bAccept;
     @FXML    private Button bCancel;
     
-    
-    
-    
-
 
     
     // ===================== Helpers de error =====================
