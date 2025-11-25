@@ -4,76 +4,68 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<GridPane hgap="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="320.0" prefWidth="400.0" vgap="10.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AuthController">
-  <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="263.5999755859375" minWidth="90.0" />
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="432.40002441406256" minWidth="130.0" prefWidth="130.0" />
-  </columnConstraints>
-  <rowConstraints>
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-  </rowConstraints>
+<VBox alignment="CENTER" stylesheets="@auth.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AuthController">
    <children>
-      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Bienvenido" GridPane.columnSpan="2" GridPane.halignment="CENTER">
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Pizzara de navegación">
          <font>
             <Font size="36.0" />
          </font>
-         <GridPane.margin>
-            <Insets />
-         </GridPane.margin>
+         <VBox.margin>
+            <Insets bottom="30.0" left="60.0" right="60.0" top="30.0" />
+         </VBox.margin>
       </Text>
-      <HBox alignment="BOTTOM_RIGHT" minWidth="100.0" prefHeight="100.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+      <VBox alignment="CENTER" prefHeight="65.0" prefWidth="352.0">
          <children>
-            <Button mnemonicParsing="false" onAction="#pulsadoRegistrar" prefHeight="30.0" prefWidth="60.0" text="Registar" />
-            <Button fx:id="bIniciar" layoutX="36.0" layoutY="40.0" mnemonicParsing="false" onAction="#pulsadoIniciar" prefHeight="30.0" prefWidth="52.0" text="Iniciar">
-               <HBox.margin>
-                  <Insets left="20.0" />
-               </HBox.margin>
-            </Button>
-         </children>
-      </HBox>
-      <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="1">
-         <children>
-            <VBox prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <Label minWidth="200.0" prefHeight="30.0" prefWidth="235.0" text="Usuario" />
-                  <TextField fx:id="eUsername" prefHeight="26.0" prefWidth="150.0" promptText="yourUsername" />
-               </children>
-            </VBox>
-            <Label fx:id="lUserInvalid" minWidth="200.0" prefHeight="30.0" prefWidth="235.0" text="Usuario inválido" textFill="RED" visible="false">
-               <HBox.margin>
-                  <Insets left="20.0" top="29.0" />
-               </HBox.margin>
+            <Label minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="160.0" text="Usuario / Nickname">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <TextField fx:id="eUsername" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="300.0" promptText="yourUsername" />
+            <Label fx:id="lUserInvalid" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="90.0" text="Usuario inválido" textFill="RED" visible="false">
+               <VBox.margin>
+                  <Insets bottom="15.0" top="5.0" />
+               </VBox.margin>
             </Label>
          </children>
-      </HBox>
-      <HBox layoutX="35.0" layoutY="105.0" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="2">
+      </VBox>
+      <VBox alignment="CENTER" prefHeight="78.0" prefWidth="352.0">
          <children>
-            <VBox prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <Label minWidth="200.0" prefHeight="30.0" prefWidth="235.0" text="Contraseña" />
-                  <TextField fx:id="ePassword" prefHeight="26.0" prefWidth="150.0" promptText="yourPassword" />
-               </children>
-            </VBox>
-            <Label fx:id="lPasswordWrong" minWidth="200.0" prefHeight="30.0" prefWidth="235.0" text="Contraseña equivocada" textFill="RED" visible="false">
+            <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="90.0" text="Contraseña">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <TextField fx:id="ePassword" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="300.0" promptText="yourPassword">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </TextField>
+            <Label fx:id="lPasswordWrong" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="130.0" text="Contraseña equivocada" textFill="RED" visible="false">
+               <VBox.margin>
+                  <Insets bottom="20.0" top="5.0" />
+               </VBox.margin>
+            </Label>
+         </children>
+      </VBox>
+      <Button fx:id="bIniciar" mnemonicParsing="false" onAction="#pulsadoIniciar" prefHeight="30.0" prefWidth="140.0" text="INICIAR SESIÓN" />
+      <HBox alignment="CENTER">
+         <VBox.margin>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+         </VBox.margin>
+         <children>
+            <Label text="¿No tienes cuenta?">
                <HBox.margin>
-                  <Insets left="20.0" top="29.0" />
+                  <Insets right="20.0" />
                </HBox.margin>
             </Label>
+            <Button mnemonicParsing="false" onAction="#pulsadoRegistrar" prefHeight="30.0" prefWidth="70.0" text="Registarse" />
          </children>
       </HBox>
    </children>
-   <padding>
-      <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
-   </padding>
-</GridPane>
+</VBox>

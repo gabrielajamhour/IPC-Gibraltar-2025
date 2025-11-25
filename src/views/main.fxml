@@ -117,5 +117,6 @@
             <RadioButton mnemonicParsing="false" text="Alternativa D" toggleGroup="$questionGroup" />
          </children>
       </VBox>
+      <Button mnemonicParsing="false" text="Comprobar respuesta" />
    </children>
 </VBox>
