@@ -109,14 +109,12 @@ public class RegisterController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-       
         // Inicializamos las properties en false
         validEmail = new SimpleBooleanProperty(false);
         validPassword = new SimpleBooleanProperty(false);   
         equalPasswords = new SimpleBooleanProperty(false);
         validAge = new SimpleBooleanProperty(false);
         validUsername = new SimpleBooleanProperty(false);
-        
         
         // Listeners        
         addValidateOnFocusLost(eemail, this::checkEditMail);

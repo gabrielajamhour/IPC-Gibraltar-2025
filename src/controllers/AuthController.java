@@ -47,6 +47,8 @@ public class AuthController implements Initializable {
     // ===================== initialize =====================
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        ePassword.setOnAction(e -> bIniciar.fire());
+        
         validPassword = new SimpleBooleanProperty(false);   
         validUsername = new SimpleBooleanProperty(false);
         

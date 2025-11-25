@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="500" prefWidth="450" spacing="12" styleClass="profile-root" stylesheets="@../resources/estilos.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProfileController">
+<VBox alignment="TOP_CENTER" prefHeight="500" prefWidth="450" spacing="12" styleClass="profile-root" stylesheets="@../resources/profile.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProfileController">
 
     <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
