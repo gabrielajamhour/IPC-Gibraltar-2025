@@ -12,6 +12,7 @@
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
@@ -21,9 +22,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox alignment="CENTER" prefHeight="719.0" prefWidth="853.0" stylesheets="@../resources/main.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
+<VBox alignment="CENTER" prefHeight="800.0" prefWidth="1000.0" stylesheets="@../resources/main.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
    <children>
-      <HBox alignment="CENTER_RIGHT" fillHeight="false" spacing="5.0" VBox.vgrow="NEVER">
+      <HBox alignment="CENTER_RIGHT" fillHeight="false" VBox.vgrow="NEVER">
          <children>
             <Button fx:id="profileButton" graphicTextGap="10.0" mnemonicParsing="false" onAction="#openProfile">
                <graphic>
@@ -32,15 +33,18 @@
                         <Image url="@../resources/default.png" />
                      </image>
                   </ImageView>
-               </graphic></Button>
+               </graphic>
+            </Button>
             <Button fx:id="problemsButton" mnemonicParsing="false" onAction="#openProblems" text="Problemas">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding></Button>
+               </padding>
+            </Button>
             <Button fx:id="resultsButton" mnemonicParsing="false" onAction="#openResults" text="Resultados">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding></Button>
+               </padding>
+            </Button>
             <Region HBox.hgrow="ALWAYS" />
             <Label text="Zoom" />
             <Button mnemonicParsing="false" onAction="#zoomOut" text="-" />
@@ -48,75 +52,97 @@
             <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#zoomIn" text="+" />
          </children>
          <VBox.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            <Insets bottom="5.0" left="5.0" right="5.0" />
          </VBox.margin>
       </HBox>
-      <SplitPane fx:id="splitPane" dividerPositions="0.19699727024567792" VBox.vgrow="ALWAYS">
-         <items>
-            <ListView fx:id="map_listview" onMouseClicked="#listClicked" prefHeight="399.0" prefWidth="87.0" />
-            <ScrollPane fx:id="map_scrollpane" hbarPolicy="ALWAYS" onMouseMoved="#showPosition" onMousePressed="#addPoi" pannable="true" prefHeight="500.0" prefWidth="500.0" vbarPolicy="ALWAYS">
-               <content>
-                  <Pane>
+      <SplitPane dividerPositions="0.7" orientation="VERTICAL" prefHeight="749.0" prefWidth="1000.0">
+        <items>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <SplitPane fx:id="splitPane" dividerPositions="0.19699727024567792" VBox.vgrow="ALWAYS">
+                     <items>
+                        <ListView fx:id="map_listview" onMouseClicked="#listClicked" prefHeight="399.0" prefWidth="87.0" />
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                           <children>
+                              <ToolBar prefHeight="40.0" prefWidth="200.0">
+                                <items>
+                                  <Button mnemonicParsing="false" text="Marcar punto" />
+                                    <Button mnemonicParsing="false" text="Trazar línea" />
+                                </items>
+                              </ToolBar>
+                              <ScrollPane fx:id="map_scrollpane" hbarPolicy="ALWAYS" onMouseMoved="#showPosition" onMousePressed="#addPoi" pannable="true" prefHeight="500.0" prefWidth="500.0" vbarPolicy="ALWAYS">
+                                 <content>
+                                    <Pane>
+                                       <children>
+                                          <ImageView layoutY="14.0" pickOnBounds="true">
+                                             <image>
+                                                <Image url="@../resources/carta_nautica.jpg" />
+                                             </image>
+                                          </ImageView>
+                                          <MenuButton fx:id="map_pin" mnemonicParsing="false" prefHeight="60.0" prefWidth="48.0" visible="false">
+                                             <items>
+                                                <MenuItem fx:id="pin_info" mnemonicParsing="false" text="Action 1" />
+                                             </items>
+                                             <styleClass>
+                                                <String fx:value="menu-button" />
+                                                <String fx:value="map-pin" />
+                                             </styleClass>
+                                          </MenuButton>
+                                       </children>
+                                    </Pane>
+                                 </content>
+                              </ScrollPane>
+                           </children>
+                        </VBox>
+                     </items>
+                  </SplitPane>
+                  <HBox alignment="CENTER_RIGHT">
                      <children>
-                        <ImageView pickOnBounds="true">
-                           <image>
-                              <Image url="@../resources/carta_nautica.jpg" />
-                           </image>
-                        </ImageView>
-                        <MenuButton fx:id="map_pin" mnemonicParsing="false" prefHeight="60.0" prefWidth="48.0" visible="false">
-                           <items>
-                              <MenuItem fx:id="pin_info" mnemonicParsing="false" text="Action 1" />
-                           </items>
-                           <styleClass>
-                              <String fx:value="menu-button" />
-                              <String fx:value="map-pin" />
-                           </styleClass>
-                        </MenuButton>
+                        <Label fx:id="mousePosition" minHeight="-Infinity" minWidth="-Infinity" text="SceneX:     SceneY:     " wrapText="true" HBox.hgrow="ALWAYS" />
                      </children>
-                  </Pane>
-               </content>
-            </ScrollPane>
-         </items>
+                     <VBox.margin>
+                        <Insets bottom="12.0" right="12.0" top="6.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="852.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Problema actual">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </Text>
+                  <VBox prefHeight="237.0" prefWidth="854.0">
+                     <children>
+                        <Label alignment="CENTER" text="Enunciado" textAlignment="CENTER">
+                           <font>
+                              <Font size="24.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets top="20.0" />
+                           </VBox.margin>
+                        </Label>
+                        <RadioButton mnemonicParsing="false" text="Alternativa A">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="questionGroup" />
+                           </toggleGroup>
+                           <VBox.margin>
+                              <Insets top="30.0" />
+                           </VBox.margin>
+                        </RadioButton>
+                        <RadioButton mnemonicParsing="false" text="Alternativa B" toggleGroup="$questionGroup" />
+                        <RadioButton mnemonicParsing="false" text="Alternativa C" toggleGroup="$questionGroup" />
+                        <RadioButton mnemonicParsing="false" text="Alternativa D" toggleGroup="$questionGroup" />
+                     </children>
+                  </VBox>
+                  <Button mnemonicParsing="false" text="Comprobar respuesta" />
+               </children>
+            </VBox>
+        </items>
       </SplitPane>
-      <HBox alignment="CENTER_RIGHT">
-         <children>
-            <Label fx:id="mousePosition" minHeight="-Infinity" minWidth="-Infinity" text="SceneX:     SceneY:     " wrapText="true" HBox.hgrow="ALWAYS" />
-         </children>
-         <VBox.margin>
-            <Insets bottom="12.0" right="12.0" top="6.0" />
-         </VBox.margin>
-      </HBox>
-      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Problema actual">
-         <font>
-            <Font size="24.0" />
-         </font>
-         <VBox.margin>
-            <Insets top="40.0" />
-         </VBox.margin>
-      </Text>
-      <VBox prefHeight="237.0" prefWidth="854.0">
-         <children>
-            <Label alignment="CENTER" text="Enunciado" textAlignment="CENTER">
-               <font>
-                  <Font size="24.0" />
-               </font>
-               <VBox.margin>
-                  <Insets top="20.0" />
-               </VBox.margin>
-            </Label>
-            <RadioButton mnemonicParsing="false" text="Alternativa A">
-               <toggleGroup>
-                  <ToggleGroup fx:id="questionGroup" />
-               </toggleGroup>
-               <VBox.margin>
-                  <Insets top="30.0" />
-               </VBox.margin>
-            </RadioButton>
-            <RadioButton mnemonicParsing="false" text="Alternativa B" toggleGroup="$questionGroup" />
-            <RadioButton mnemonicParsing="false" text="Alternativa C" toggleGroup="$questionGroup" />
-            <RadioButton mnemonicParsing="false" text="Alternativa D" toggleGroup="$questionGroup" />
-         </children>
-      </VBox>
-      <Button mnemonicParsing="false" text="Comprobar respuesta" />
    </children>
 </VBox>
