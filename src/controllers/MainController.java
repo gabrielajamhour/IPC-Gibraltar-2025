@@ -42,6 +42,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -53,22 +54,21 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import util.EraserTool;
 import util.LineTool;
 import util.MapTool;
 import util.PointTool;
+import util.ZoomManager;
+import util.ClearAll;
 
-/**
- *
- * @author jsoler
- */
+
 public class MainController implements Initializable {
 
     // ======================================
     // la variable zoomGroup se utiliza para dar soporte al zoom
     // el escalado se realiza sobre este nodo, al escalar el Group no mueve sus nodos
     private Group zoomGroup;
-    private Label mousePosistion;
-
+    
     @FXML    private ListView<Poi> map_listview;
     @FXML    private ScrollPane map_scrollpane;
     @FXML    private Slider zoom_slider;
@@ -87,15 +87,12 @@ public class MainController implements Initializable {
     @FXML    private ColorPicker colorPicker;
     @FXML    private Button btnBorrarTodo;
     
-    
-    private Line tempLine = null;
-    private Point2D lineStart = null;
-    
     // En vez de enum Tool, tendremos objetos:
     private MapTool currentTool;
     private MapTool pointTool;
     private MapTool lineTool;
     private MapTool panTool;
+    private MapTool eraserTool;
     
     // Estados compartidos (color actual, grosor, etc)
     private final ObjectProperty<Color> currentColor = new SimpleObjectProperty<>(Color.RED);
@@ -109,66 +106,38 @@ public class MainController implements Initializable {
             FXCollections.observableArrayList();
 
     private ObservableList<Poi> data;
-
     
+    private ZoomManager zoomManager;
 
-    @FXML
-    void zoomIn(ActionEvent event) {
-        //================================================
-        // el incremento del zoom dependerá de los parametros del 
-        // slider y del resultado esperado
-        double sliderVal = zoom_slider.getValue();
-        zoom_slider.setValue(sliderVal += 0.1);
-    }
+    private boolean useMousePosition;
 
-    @FXML
-    void zoomOut(ActionEvent event) {
-        double sliderVal = zoom_slider.getValue();
-        zoom_slider.setValue(sliderVal + -0.1);
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        initData();
+        
+        zoomManager = new ZoomManager(map_scrollpane, zoom_slider);
+        zoomGroup   = zoomManager.getZoomGroup();
+        
+        // Color actual = valor del ColorPicker
+        currentColor.bind(colorPicker.valueProperty());
+
+        // Grosor actual = valor del slider
+        currentLineWidth.bind(sliderGrosor.valueProperty());
+        
+        // Crear herramientas
+        pointTool = new PointTool(zoomGroup, map_listview, currentColor);
+        lineTool  = new LineTool(zoomGroup, currentLineWidth, currentColor);
+        eraserTool = new EraserTool(zoomGroup, map_listview);
+        
+        // Herramienta por defecto
+        setCurrentTool(null); // o panTool si lo tienes
+
+        // Eventos de ratón
+        zoomGroup.addEventFilter(MouseEvent.MOUSE_PRESSED,  this::onMapPressed);
+        zoomGroup.addEventFilter(MouseEvent.MOUSE_DRAGGED,  this::onMapDragged);
+        zoomGroup.addEventFilter(MouseEvent.MOUSE_RELEASED, this::onMapReleased);
     }
     
-    // esta funcion es invocada al cambiar el value del slider zoom_slider
-    private void zoom(double scaleValue) {
-        //===================================================
-        //guardamos los valores del scroll antes del escalado
-        double scrollH = map_scrollpane.getHvalue();
-        double scrollV = map_scrollpane.getVvalue();
-        //===================================================
-        // escalamos el zoomGroup en X e Y con el valor de entrada
-        zoomGroup.setScaleX(scaleValue);
-        zoomGroup.setScaleY(scaleValue);
-        //===================================================
-        // recuperamos el valor del scroll antes del escalado
-        map_scrollpane.setHvalue(scrollH);
-        map_scrollpane.setVvalue(scrollV);
-    }
-
-    @FXML
-    void listClicked(MouseEvent event) {
-        Poi itemSelected = map_listview.getSelectionModel().getSelectedItem();
-
-        // Animación del scroll hasta la mousePosistion del item seleccionado
-        double mapWidth = zoomGroup.getBoundsInLocal().getWidth();
-        double mapHeight = zoomGroup.getBoundsInLocal().getHeight();
-        double scrollH = itemSelected.getPosition().getX() / mapWidth;
-        double scrollV = itemSelected.getPosition().getY() / mapHeight;
-        final Timeline timeline = new Timeline();
-        final KeyValue kv1 = new KeyValue(map_scrollpane.hvalueProperty(), scrollH);
-        final KeyValue kv2 = new KeyValue(map_scrollpane.vvalueProperty(), scrollV);
-        final KeyFrame kf = new KeyFrame(Duration.millis(500), kv1, kv2);
-        timeline.getKeyFrames().add(kf);
-        timeline.play();
-
-        // movemos el objto map_pin hasta la mousePosistion del POI
-//        double pinW = map_pin.getBoundsInLocal().getWidth();
-//        double pinH = map_pin.getBoundsInLocal().getHeight();
-        map_pin.setLayoutX(itemSelected.getPosition().getX());
-        map_pin.setLayoutY(itemSelected.getPosition().getY());
-        pin_info.setText(itemSelected.getDescription());
-        map_pin.setVisible(true);
-        updateMapPinStyle(itemSelected.getColor()); 
-    }
-
     private void initData() {        
         // Usamos la lista compartida
         data = sharedPoiData;
@@ -182,79 +151,21 @@ public class MainController implements Initializable {
         }
         
     }
-
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        initData();
-        //==========================================================
-        // inicializamos el slider y enlazamos con el zoom
-        zoom_slider.setMin(0.1);
-        zoom_slider.setMax(1.5);
-        zoom_slider.setValue(0.1);
-        zoom_slider.valueProperty().addListener((o, oldVal, newVal) -> zoom((Double) newVal));
-
-        //=========================================================================
-        //Envuelva el contenido de scrollpane en un grupo para que 
-        //ScrollPane vuelva a calcular las barras de desplazamiento tras el escalado
-        Group contentGroup = new Group();
-        zoomGroup = new Group();
-        contentGroup.getChildren().add(zoomGroup);
-        zoomGroup.getChildren().add(map_scrollpane.getContent());
-        map_scrollpane.setContent(contentGroup);
-        zoom(0.1);
-        
-        // Zoom con Ctrl + rueda
-        map_scrollpane.addEventFilter(ScrollEvent.SCROLL, e -> {
-            if (e.isControlDown()) {
-                double delta = e.getDeltaY(); // positivo al subir rueda, negativo al bajar
-
-                double step = 0.1; // cuanto cambia el zoom cada “tic”
-                if (delta > 0) {
-                    zoom_slider.setValue(Math.min(zoom_slider.getMax(), zoom_slider.getValue() + step));
-                } else if (delta < 0) {
-                    zoom_slider.setValue(Math.max(zoom_slider.getMin(), zoom_slider.getValue() - step));
-                }
-
-                e.consume(); // no dejes que el scrollpane se desplace
-            }
-        });
-        
-        // Color actual = valor del ColorPicker
-        currentColor.bind(colorPicker.valueProperty());
-
-        // Grosor actual = valor del slider
-        currentLineWidth.bind(sliderGrosor.valueProperty());
-        
-        // Crear herramientas
-        pointTool = new PointTool(zoomGroup, map_listview, currentColor);
-        lineTool  = new LineTool(zoomGroup, currentLineWidth, currentColor);
-
-        // Herramienta por defecto
-        setCurrentTool(null); // o panTool si lo tienes
-
-        // Eventos de ratón
-        zoomGroup.addEventFilter(MouseEvent.MOUSE_PRESSED,  this::onMapPressed);
-        zoomGroup.addEventFilter(MouseEvent.MOUSE_DRAGGED,  this::onMapDragged);
-        zoomGroup.addEventFilter(MouseEvent.MOUSE_RELEASED, this::onMapReleased);
-    }
-
-    private void setCurrentTool(MapTool newTool) {
-        if (currentTool != null) {
-            currentTool.onExit();
-        }
-        currentTool = newTool;
-        if (currentTool != null) {
-            currentTool.onEnter();
-        }
-        
-        // Actualizar visualmente los botones
-        updateToolButtons();
-    }
     
+    @FXML
+    void zoomIn(ActionEvent event) {
+        zoom_slider.setValue(zoom_slider.getValue() + 0.1);
+    }
+
+    @FXML
+    void zoomOut(ActionEvent event) {
+        zoom_slider.setValue(zoom_slider.getValue() - 0.1);
+    }
+   
     
     @FXML
     private void showPosition(MouseEvent event) {
-        mousePosistion.setText("sceneX: " + (int) event.getSceneX() + ", sceneY: " + (int) event.getSceneY() + "\n"
+        mousePosition.setText("sceneX: " + (int) event.getSceneX() + ", sceneY: " + (int) event.getSceneY() + "\n"
                 + "         X: " + (int) event.getX() + ",          Y: " + (int) event.getY());
     }
 
@@ -285,45 +196,89 @@ public class MainController implements Initializable {
 
         // Color de fondo del botón-pin
         map_pin.setStyle("-fx-background-color: " + webColor + ";");
-}
+    }
+    
     
     @FXML
+    void listClicked(MouseEvent event) {
+        Poi itemSelected = map_listview.getSelectionModel().getSelectedItem();
+        if (itemSelected == null) return;
+
+        // 1) Datos básicos
+        double scale = zoomGroup.getScaleX(); // asumimos zoom uniforme X = Y
+
+        // tamaño del contenido SIN zoom (en coordenadas locales)
+        double contentWLocal = zoomGroup.getBoundsInLocal().getWidth();
+        double contentHLocal = zoomGroup.getBoundsInLocal().getHeight();
+
+        // tamaño del contenido CON zoom (lo que ve realmente el ScrollPane)
+        double contentW = contentWLocal * scale;
+        double contentH = contentHLocal * scale;
+
+        // tamaño del viewport (parte visible del ScrollPane)
+        Bounds viewport = map_scrollpane.getViewportBounds();
+        double viewportW = viewport.getWidth();
+        double viewportH = viewport.getHeight();
+
+        // 2) Posición del POI en coordenadas de contenido (con zoom)
+        double x = itemSelected.getPosition().getX() * scale;
+        double y = itemSelected.getPosition().getY() * scale;
+
+        // 3) Queremos que el POI quede en el centro del viewport
+        double targetH = (x - viewportW / 2) / (contentW - viewportW);
+        double targetV = (y - viewportH / 2) / (contentH - viewportH);
+
+        // 4) Limitar entre 0 y 1 para que no se salga
+        targetH = Math.max(0, Math.min(1, targetH));
+        targetV = Math.max(0, Math.min(1, targetV));
+
+        // 5) Animación de scroll
+        Timeline timeline = new Timeline(
+            new KeyFrame(Duration.millis(500),
+                new KeyValue(map_scrollpane.hvalueProperty(), targetH),
+                new KeyValue(map_scrollpane.vvalueProperty(), targetV)
+            )
+        );
+        timeline.play();
+
+        // 6) Mover el pin (en coordenadas locales del zoomGroup, sin escala)
+        map_pin.setLayoutX(itemSelected.getPosition().getX());
+        map_pin.setLayoutY(itemSelected.getPosition().getY());
+
+        pin_info.setText(itemSelected.getDescription());
+        map_pin.setVisible(true);
+        updateMapPinStyle(itemSelected.getColor());
+    }
+
+    
+    // Open pages
+    @FXML
     private void openProfile(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/profile.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) zoom_slider.getScene().getWindow();
-
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException e) {}
+        openPage("/views/profile.fxml", event);
     }
 
     @FXML
     private void openProblems(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/problemSelection.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) zoom_slider.getScene().getWindow();
-
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException e) {}
+        openPage("/views/problemSelection.fxml", event);
     }
 
     @FXML
     private void openResults(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/results.fxml"));
-            Parent root = loader.load();
+        openPage("/views/results.fxml", event);
+    }
 
-            Stage stage = (Stage) zoom_slider.getScene().getWindow();
+    private void openPage(String fxmlPath, ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+            
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
             stage.setScene(new Scene(root));
             stage.show();
-        } catch (IOException e) {}
+        } catch (IOException e) {
+            e.printStackTrace(); // mejor que dejar el catch vacío
+        }
     }
 
     
@@ -347,20 +302,73 @@ public class MainController implements Initializable {
             setCurrentTool(lineTool);
         }
     }
-
+    
     @FXML
+    private void activateBorrar(ActionEvent event) {
+        if (currentTool == eraserTool) {
+            // si ya está activa, la desactivamos
+            setCurrentTool(null);
+        } else {
+            setCurrentTool(eraserTool);
+        }
+    }
+
+
     private void onNoneToolClicked() {
         setCurrentTool(null); // deja solo el pan del ScrollPane
     }
     
-    @FXML
-    private void activateBorrar(ActionEvent event) {
-    }
+    
+    private void updateToolButtons() {
+        String activeStyle   = "-fx-background-color: #4287f5; -fx-text-fill: white;";
+        String inactiveStyle = "";
 
+        // Botón de puntos
+        if (btnPoint != null) {
+            btnPoint.setStyle(currentTool == pointTool ? activeStyle : inactiveStyle);
+        }
+
+        // Botón de líneas
+        if (btnLine != null) {
+            btnLine.setStyle(currentTool == lineTool ? activeStyle : inactiveStyle);
+        }
+        
+            // Botón de borrar
+        if (btnBorrar != null) {
+            btnBorrar.setStyle(currentTool == eraserTool ? activeStyle : inactiveStyle);
+        }
+
+        // importante: solo dejamos mover el mapa cuando no hay herramienta de dibujo
+        if (map_scrollpane != null) {
+            map_scrollpane.setPannable(currentTool == null);
+        }
+        
+    }
+    
+    private void setCurrentTool(MapTool newTool) {
+        if (currentTool != null) {
+            currentTool.onExit();
+        }
+        currentTool = newTool;
+        if (currentTool != null) {
+            currentTool.onEnter();
+        }
+        
+        // Actualizar visualmente los botones
+        updateToolButtons();
+    }
+    
+    
     @FXML
     private void activateBorrarTodo(ActionEvent event) {
+        ClearAll.clearAll(zoomGroup, data, map_pin);
+        setCurrentTool(null);
     }
 
+
+
+    
+    // Mouse manager
     private void onMapPressed(MouseEvent event) {
         if (currentTool != null) {
             currentTool.onMousePressed(event);
@@ -380,26 +388,5 @@ public class MainController implements Initializable {
             currentTool.onMouseReleased(event);
             event.consume();
         }
-    }
-    
-    private void updateToolButtons() {
-        String activeStyle   = "-fx-background-color: #4287f5; -fx-text-fill: white;";
-        String inactiveStyle = "";
-
-        // Botón de puntos
-        if (btnPoint != null) {
-            btnPoint.setStyle(currentTool == pointTool ? activeStyle : inactiveStyle);
-        }
-
-        // Botón de líneas
-        if (btnLine != null) {
-            btnLine.setStyle(currentTool == lineTool ? activeStyle : inactiveStyle);
-        }
-
-        // importante: solo dejamos mover el mapa cuando no hay herramienta de dibujo
-        if (map_scrollpane != null) {
-            map_scrollpane.setPannable(currentTool == null);
-        }
-        
     }
 }
