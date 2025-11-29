@@ -109,8 +109,6 @@ public class MainController implements Initializable {
     
     private ZoomManager zoomManager;
 
-    private boolean useMousePosition;
-
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         initData();
@@ -361,11 +359,12 @@ public class MainController implements Initializable {
     
     @FXML
     private void activateBorrarTodo(ActionEvent event) {
-        ClearAll.clearAll(zoomGroup, data, map_pin);
-        setCurrentTool(null);
+        boolean borrado = ClearAll.clearAllWithConfirmation(zoomGroup, data, map_pin);
+
+        if (borrado) {
+            setCurrentTool(null);   // solo si el usuario aceptó
+        }
     }
-
-
 
     
     // Mouse manager
