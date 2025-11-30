@@ -16,12 +16,13 @@ public class EraserTool implements MapTool {
 
     private final Group zoomGroup;
     private final ListView<Poi> poiListView;
+    private final Node mapPin;
 
     private final double HIT_RADIUS = 10.0;
-
-    public EraserTool(Group zoomGroup, ListView<Poi> poiListView) {
+        public EraserTool(Group zoomGroup, ListView<Poi> poiListView, Node mapPin) {
         this.zoomGroup = zoomGroup;
         this.poiListView = poiListView;
+        this.mapPin = mapPin;
     }
 
     @Override
@@ -51,7 +52,16 @@ public class EraserTool implements MapTool {
         // 1) Intentar borrar un POI cercano
         Poi poiToRemove = findPoiNear(localPoint);
         if (poiToRemove != null) {
+            // quitarlo de la lista lógica
             poiListView.getItems().remove(poiToRemove);
+
+            // quitar también los iconos del mapa asociados a ese POI
+            removePoiMarkersFromMap(poiToRemove);
+
+            // ocultar el pin de selección (MenuButton) si lo usas
+            if (mapPin != null && mapPin.isVisible()) {
+                mapPin.setVisible(false);
+            }
             return; // si ya has borrado un POI, no hace falta seguir con líneas
         }
 
@@ -62,14 +72,27 @@ public class EraserTool implements MapTool {
         }
     }
 
-    private Poi findPoiNear(Point2D p) {
+    private Poi findPoiNear(Point2D point) {
+        // AUMENTA este valor para que sea más fácil acertar
+        final double MAX_DISTANCE = 20;
+
+        Poi closest = null;
+        double closestDist = Double.MAX_VALUE;
+
         for (Poi poi : poiListView.getItems()) {
-            if (poi.getPosition() != null &&
-                poi.getPosition().distance(p) <= HIT_RADIUS) {
-                return poi;
+            Point2D poiPos = poi.getPosition(); // mismas coords en las que lo dibujas
+
+            double dx = poiPos.getX() - point.getX();
+            double dy = poiPos.getY() - point.getY();
+            double dist = Math.hypot(dx, dy);
+
+            if (dist <= MAX_DISTANCE && dist < closestDist) {
+                closestDist = dist;
+                closest = poi;
             }
         }
-        return null;
+
+        return closest;
     }
 
     private Line findLineNear(Point2D p) {
@@ -100,4 +123,19 @@ public class EraserTool implements MapTool {
         Point2D proj = new Point2D(a.getX() + t * dx, a.getY() + t * dy);
         return p.distance(proj);
     }
+    
+    private void removePoiMarkersFromMap(Poi poi) {
+        if (zoomGroup == null || poi == null) return;
+
+        // Recorremos de atrás hacia delante para poder eliminar sin problemas
+        for (int i = zoomGroup.getChildren().size() - 1; i >= 0; i--) {
+            Node n = zoomGroup.getChildren().get(i);
+            Object ud = n.getUserData();
+            // En MainController, cada marker hace marker.setUserData(poi);
+            if (ud == poi) {
+                zoomGroup.getChildren().remove(i);
+            }
+        }
+    }
+    
 }

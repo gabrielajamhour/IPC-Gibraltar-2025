@@ -8,12 +8,13 @@ public class Poi {
     private String code;
     private String description;
     private Point2D position;
-    private Color color = Color.WHITE;  // color por defecto
+    private Color color;  // color por defecto
 
-    public Poi(String code, String description, double x, double y) {
+    public Poi(String code, String description, double x, double y, Color color) {
         this.code = code;
         this.description = description;
         this.position = new Point2D(x, y);
+        this.color = color;
     }
 
     public Point2D getPosition() {

@@ -24,71 +24,90 @@ import javafx.stage.Stage;
  */
 public class PointTool implements MapTool {
 
-    private final Group zoomGroup;
-    private final ListView<Poi> poiListView;
-    private final ObjectProperty<Color> currentColor;
+    private final Group zoomGroup;               // Contenedor donde está el mapa (y se hace el zoom)
+    private final ListView<Poi> poiListView;     // Lista de POIs
+    private final ObjectProperty<Color> currentColor;  // Color actual elegido por el usuario
 
     public PointTool(Group zoomGroup,
                      ListView<Poi> poiListView,
                      ObjectProperty<Color> currentColor) {
-        this.zoomGroup = zoomGroup;
+        this.zoomGroup   = zoomGroup;
         this.poiListView = poiListView;
         this.currentColor = currentColor;
     }
 
     @Override
     public void onMousePressed(MouseEvent event) {
-        if (event.getButton() != MouseButton.PRIMARY) return;
+        // Solo reaccionamos al botón principal del ratón
+        if (event.getButton() != MouseButton.PRIMARY) {
+            return;
+        }
 
+        // Convertimos las coordenadas de escena a coordenadas del Group (carta)
+        Point2D localPoint = zoomGroup.sceneToLocal(event.getSceneX(), event.getSceneY());
+        Color poiColor = currentColor.get();  // Capturamos el color actual en este momento
+
+        // Creamos y configuramos el diálogo
         Dialog<Poi> poiDialog = new Dialog<>();
-            poiDialog.setTitle("Nuevo POI");
-            poiDialog.setHeaderText("Introduce un nuevo POI");
-            // icono del diálogo
-            Stage dialogStage = (Stage) poiDialog.getDialogPane().getScene().getWindow();
-            dialogStage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logo.png")));
+        poiDialog.setTitle("Nuevo POI");
+        poiDialog.setHeaderText("Introduce un nuevo POI");
 
-            ButtonType okButton = new ButtonType("Aceptar", ButtonBar.ButtonData.OK_DONE);
-            poiDialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
+        // Icono del diálogo (opcional, pero queda bonito)
+        // OJO: si tienes problemas aquí, puedes envolver esto en un try/catch
+        Stage dialogStage = (Stage) poiDialog.getDialogPane().getScene().getWindow();
+        dialogStage.getIcons().add(
+                new Image(getClass().getResourceAsStream("/resources/logo.png"))
+        );
 
-            TextField nameField = new TextField();
-            nameField.setPromptText("Nombre del POI");
+        // Botones del diálogo
+        ButtonType okButton = new ButtonType("Aceptar", ButtonBar.ButtonData.OK_DONE);
+        poiDialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
 
-            TextArea descArea = new TextArea();
-            descArea.setPromptText("Descripción...");
-            descArea.setWrapText(true);
-            descArea.setPrefRowCount(5);
+        // Controles del formulario
+        TextField nameField = new TextField();
+        nameField.setPromptText("Nombre del POI");
 
-            VBox vbox = new VBox(10, new Label("Nombre:"), nameField,
-                                       new Label("Descripción:"), descArea);
-            poiDialog.getDialogPane().setContent(vbox);
+        TextArea descArea = new TextArea();
+        descArea.setPromptText("Descripción...");
+        descArea.setWrapText(true);
+        descArea.setPrefRowCount(5);
 
-            poiDialog.setResultConverter(dialogButton -> {
-                if (dialogButton == okButton) {
-                    return new Poi(nameField.getText().trim(),
-                                   descArea.getText().trim(),
-                                   0, 0);
-                }
-                return null;
-            });
+        // Layout del contenido del diálogo
+        VBox vbox = new VBox(
+                10,
+                new Label("Nombre:"),      nameField,
+                new Label("Descripción:"), descArea
+        );
+        poiDialog.getDialogPane().setContent(vbox);
 
-            Optional<Poi> result = poiDialog.showAndWait();
+        // Conversor de resultado:
+        // si el usuario pulsa Aceptar, devolvemos un Poi; si no, null.
+        poiDialog.setResultConverter(dialogButton -> {
+            if (dialogButton == okButton) {
+                String name = nameField.getText().trim();
+                String desc = descArea.getText().trim();
 
-            if (result.isPresent()) {
-                Point2D localPoint = zoomGroup.sceneToLocal(event.getSceneX(), event.getSceneY());
-                Poi poi = result.get();
-                poi.setPosition(localPoint);
-                poi.setColor(currentColor.get()); // color del POI = color actual elegido por el usuario
-                poiListView.getItems().add(poi);
+                // Podrías validar aquí que el nombre no esté vacío, etc.
+                Poi poi = new Poi(name, desc, localPoint.getX(), localPoint.getY(), currentColor.get());
+                return poi;
             }
+            return null;
+        });
+
+        // Mostramos el diálogo y esperamos la respuesta del usuario
+        Optional<Poi> result = poiDialog.showAndWait();
+
+        // Si el usuario aceptó y se creó un Poi, lo añadimos a la lista
+        result.ifPresent(poi -> poiListView.getItems().add(poi));
     }
 
     @Override
     public void onMouseDragged(MouseEvent event) {
-        // Normalmente no hace nada para POI
+        // Para POIs no hacemos nada en el drag
     }
 
     @Override
     public void onMouseReleased(MouseEvent event) {
-        // Tampoco hace nada
+        // Tampoco necesitamos nada especial en el release
     }
 }

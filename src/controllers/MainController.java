@@ -59,10 +59,12 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Toggle;
+import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import model.Answer;
 import model.NavDAOException;
@@ -71,6 +73,7 @@ import model.Problem;
 import util.PointTool;
 import util.ZoomManager;
 import util.ClearAll;
+import util.SelectTool;
 import util.SessionManager;
 
 
@@ -97,6 +100,17 @@ public class MainController implements Initializable {
     @FXML    private Slider sliderGrosor;
     @FXML    private ColorPicker colorPicker;
     @FXML    private Button btnBorrarTodo;
+    @FXML    private Button btnArco;
+    @FXML    private Button btnSeleccionar;
+    @FXML    private Button randomProblem;
+    @FXML    private Text tituloProblema;
+    @FXML    private Label enunciadoProblema;
+    @FXML    private Button btnComprobarRespuesta;
+    @FXML    private RadioButton tBAlternativaA;
+    @FXML    private RadioButton tBAlternativaB;
+    @FXML    private RadioButton tBAlternativaC;
+    @FXML    private RadioButton tBAlternativaD;
+    @FXML    private Label textErrorCompResp;
     
     // En vez de enum Tool, tendremos objetos:
     private MapTool currentTool;
@@ -104,6 +118,7 @@ public class MainController implements Initializable {
     private MapTool lineTool;
     private MapTool panTool;
     private MapTool eraserTool;
+    private MapTool selectTool;
     
     // Estados compartidos (color actual, grosor, etc)
     private final ObjectProperty<Color> currentColor = new SimpleObjectProperty<>(Color.RED);
@@ -111,40 +126,29 @@ public class MainController implements Initializable {
 
     // hashmap para guardar los puntos de interes POI
     private final HashMap<String, Poi> hm = new HashMap<>();
+    
+    // Lista compartida de líneas para TODA la app (sobrevive a cambiar de escena)
+    private static final ObservableList<Line> lineData =
+        FXCollections.observableArrayList();
 
     // Lista compartida entre instancias del controlador
     private static final ObservableList<Poi> sharedPoiData =
-            FXCollections.observableArrayList();
+        FXCollections.observableArrayList();
 
     private ObservableList<Poi> data;
     
     private ZoomManager zoomManager;
-    @FXML
-    private Button randomProblem;
-    @FXML
-    private Text tituloProblema;
-    @FXML
-    private Label enunciadoProblema;
-    @FXML
-    private Button btnComprobarRespuesta;
     
     private Problem currentProblem;
     private Answer ansAlternativaA;
     private Answer ansAlternativaB;
     private Answer ansAlternativaC;
     private Answer ansAlternativaD;
-    @FXML
-    private RadioButton tBAlternativaA;
-    @FXML
-    private RadioButton tBAlternativaB;
-    @FXML
-    private RadioButton tBAlternativaC;
-    @FXML
-    private RadioButton tBAlternativaD;
-    
     private boolean alreadyAnswered = false;
-    @FXML
-    private Label textErrorCompResp;
+
+
+
+
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -161,8 +165,16 @@ public class MainController implements Initializable {
         
         // Crear herramientas
         pointTool = new PointTool(zoomGroup, map_listview, currentColor);
-        lineTool  = new LineTool(zoomGroup, currentLineWidth, currentColor);
-        eraserTool = new EraserTool(zoomGroup, map_listview);
+        lineTool  = new LineTool(zoomGroup, lineData, currentLineWidth, currentColor);
+        eraserTool = new EraserTool(zoomGroup, map_listview, map_pin);
+        selectTool = new SelectTool(zoomGroup, currentColor, currentLineWidth);
+
+        
+        // Dibujar los POIs en el mapa
+        dibujarPOI();
+        
+        // Dibujar las lineas en el mapa
+        dibujarLineas();
         
         // Herramienta por defecto
         setCurrentTool(null); // o panTool si lo tienes
@@ -187,8 +199,7 @@ public class MainController implements Initializable {
 
         // Solo creamos el POI por defecto la primera vez
         if (data.isEmpty()) {
-            Poi p1 = new Poi("Teste", "Test del POI", 1000, 1000);
-            p1.setColor(Color.RED);
+            Poi p1 = new Poi("Teste", "Test del POI", 1000, 1000, Color.RED);
             data.add(p1);
         }
         
@@ -203,7 +214,6 @@ public class MainController implements Initializable {
     void zoomOut(ActionEvent event) {
         zoom_slider.setValue(zoom_slider.getValue() - 0.1);
     }
-   
     
     @FXML
     private void showPosition(MouseEvent event) {
@@ -237,6 +247,47 @@ public class MainController implements Initializable {
 
         // Color de fondo del botón-pin
         map_pin.setStyle("-fx-background-color: " + webColor + ";");
+    }
+    
+     // Crea un marcador visual para un POI usando la clase CSS ".map-pin"
+    private void addPoiMarkerToMap(Poi poi) {
+        if (zoomGroup == null || poi == null || poi.getPosition() == null) return;
+
+        // 1) Crear el nodo gráfico
+        Region marker = new Region();
+        marker.getStyleClass().add("map-pin"); // usa el estilo de main.css
+
+        double x = poi.getPosition().getX();
+        double y = poi.getPosition().getY();
+
+        // Tamaño del pin según el CSS: 48x60
+        double pinW = 48;
+        double pinH = 60;
+
+        // Colocamos el pin "apoyado" en la posición del POI:
+        // centrado horizontalmente y con la punta abajo
+        marker.setLayoutX(x - pinW / 2);
+        marker.setLayoutY(y - pinH);
+
+        // 2) Color del pin según el color del POI
+        Color c = poi.getColor();
+        if (c == null) {
+            c = Color.RED;
+        }
+
+        int r = (int) Math.round(c.getRed() * 255);
+        int g = (int) Math.round(c.getGreen() * 255);
+        int b = (int) Math.round(c.getBlue() * 255);
+        String webColor = String.format("#%02X%02X%02X", r, g, b);
+
+        // Aplicar el color de fondo (puedes sofisticarlo más si quieres respetar el borde negro/blanco)
+        marker.setStyle("-fx-background-color: " + webColor + ";");
+
+        // 3) Vincular el Node con el Poi, para que el EraserTool pueda encontrarlo
+        marker.setUserData(poi);
+
+        // 4) Añadirlo al mapa
+        zoomGroup.getChildren().add(marker);
     }
     
     
@@ -281,14 +332,31 @@ public class MainController implements Initializable {
             )
         );
         timeline.play();
+    }
+    
+    private void dibujarPOI(){
+        for (Poi poi : data) {
+            addPoiMarkerToMap(poi);
+        }
 
-        // 6) Mover el pin (en coordenadas locales del zoomGroup, sin escala)
-        map_pin.setLayoutX(itemSelected.getPosition().getX());
-        map_pin.setLayoutY(itemSelected.getPosition().getY());
-
-        pin_info.setText(itemSelected.getDescription());
-        map_pin.setVisible(true);
-        updateMapPinStyle(itemSelected.getColor());
+        // 2) Cada vez que se añada un nuevo POI a la lista, dibujarlo también
+        data.addListener((ListChangeListener<Poi>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (Poi p : change.getAddedSubList()) {
+                        addPoiMarkerToMap(p);
+                    }
+                }
+            }
+        });
+    }
+    
+    public void dibujarLineas(){
+        for (Line line : lineData) {
+            if (!zoomGroup.getChildren().contains(line)) {
+                zoomGroup.getChildren().add(line);
+            }
+        }
     }
 
     
@@ -353,12 +421,33 @@ public class MainController implements Initializable {
             setCurrentTool(eraserTool);
         }
     }
+    
+    @FXML
+    private void activateBorrarTodo(ActionEvent event) {
+        boolean borrado = ClearAll.clearAllWithConfirmation(zoomGroup, data, lineData, map_pin);
 
+        if (borrado) {
+            setCurrentTool(null);   // solo si el usuario aceptó
+        }
+    }
+    
+    @FXML
+    private void activateArcoTool(ActionEvent event) {
+    }
+
+    @FXML
+    private void activateSeleccionarTool(ActionEvent event) {
+        if (currentTool == selectTool) {
+            // si ya está activa, la desactivamos
+            setCurrentTool(null);
+        } else {
+            setCurrentTool(selectTool);
+        }
+    }
 
     private void onNoneToolClicked() {
         setCurrentTool(null); // deja solo el pan del ScrollPane
     }
-    
     
     private void updateToolButtons() {
         String activeStyle   = "-fx-background-color: #4287f5; -fx-text-fill: white;";
@@ -377,6 +466,11 @@ public class MainController implements Initializable {
             // Botón de borrar
         if (btnBorrar != null) {
             btnBorrar.setStyle(currentTool == eraserTool ? activeStyle : inactiveStyle);
+        }
+        
+         // Botón de selección
+        if (btnSeleccionar != null) {
+            btnSeleccionar.setStyle(currentTool == selectTool ? activeStyle : inactiveStyle);
         }
 
         // importante: solo dejamos mover el mapa cuando no hay herramienta de dibujo
@@ -399,15 +493,6 @@ public class MainController implements Initializable {
         updateToolButtons();
     }
     
-    
-    @FXML
-    private void activateBorrarTodo(ActionEvent event) {
-        boolean borrado = ClearAll.clearAllWithConfirmation(zoomGroup, data, map_pin);
-
-        if (borrado) {
-            setCurrentTool(null);   // solo si el usuario aceptó
-        }
-    }
 
     
     // Mouse manager
@@ -574,4 +659,5 @@ public class MainController implements Initializable {
         if (ans == ansAlternativaC) return tBAlternativaC;
         return tBAlternativaD;
     }
+
 }

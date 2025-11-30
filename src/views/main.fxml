@@ -134,18 +134,21 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
                 <Button fx:id="btnPoint" mnemonicParsing="false" onAction="#activatePointTool" text="Marcar punto" />
-                  <Button fx:id="btnLine" mnemonicParsing="false" onAction="#activateLineTool" text="Trazar línea" GridPane.columnIndex="1" />
-                  <Button fx:id="btnBorrar" alignment="CENTER" mnemonicParsing="false" onAction="#activateBorrar" text="Borrar" GridPane.rowIndex="1" />
-                  <Slider fx:id="sliderGrosor" min="2.0" GridPane.columnSpan="2" GridPane.rowIndex="3">
+                  <Button fx:id="btnLine" mnemonicParsing="false" onAction="#activateLineTool" text="Trazar línea" GridPane.rowIndex="1" />
+                  <Button fx:id="btnBorrar" alignment="CENTER" mnemonicParsing="false" onAction="#activateBorrar" text="Borrar" GridPane.rowIndex="2" />
+                  <Slider fx:id="sliderGrosor" min="2.0" GridPane.columnSpan="2" GridPane.rowIndex="4">
                      <GridPane.margin>
                         <Insets left="15.0" right="15.0" />
                      </GridPane.margin>
                   </Slider>
-                  <ColorPicker fx:id="colorPicker" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                  <Button fx:id="btnBorrarTodo" mnemonicParsing="false" onAction="#activateBorrarTodo" text="Borrar todo" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <ColorPicker fx:id="colorPicker" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                  <Button fx:id="btnBorrarTodo" mnemonicParsing="false" onAction="#activateBorrarTodo" text="Borrar todo" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Button fx:id="btnArco" layoutX="21.0" layoutY="55.0" mnemonicParsing="false" onAction="#activateArcoTool" text="Trazar arco" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Button fx:id="btnSeleccionar" layoutX="16.0" layoutY="16.0" mnemonicParsing="false" onAction="#activateSeleccionarTool" text="Seleccionar" GridPane.columnIndex="1" />
                </children>
             </GridPane>
             <Label text="Puntos del mapa">

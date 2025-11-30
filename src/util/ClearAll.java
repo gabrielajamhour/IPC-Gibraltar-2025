@@ -13,19 +13,22 @@ import javafx.scene.image.ImageView;
  * @author Rafael Alonso
  */
 public class ClearAll {
-    public static void clearAll(Group zoomGroup, ObservableList<?> poiList, Node map_pin) {
+    public static void clearAll(Group zoomGroup, ObservableList<?> poiList, ObservableList<?> lineList, Node map_pin) {
         if (zoomGroup != null && zoomGroup.getChildren().size() > 1) {
             zoomGroup.getChildren().remove(1, zoomGroup.getChildren().size());
         }
         if (poiList != null) {
             poiList.clear();
         }
+        if (lineList != null) {
+            lineList.clear();
+        }
         if (map_pin != null) {
             map_pin.setVisible(false);
         }
     }
     
-    public static boolean clearAllWithConfirmation(Group zoomGroup, ObservableList<?> poiList, Node map_pin) {
+    public static boolean clearAllWithConfirmation(Group zoomGroup, ObservableList<?> poiList, ObservableList<?> lineList, Node map_pin) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmar borrado");
         alert.setHeaderText("¿Borrar todas las marcas del mapa?");
@@ -34,7 +37,7 @@ public class ClearAll {
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            clearAll(zoomGroup, poiList, map_pin);
+            clearAll(zoomGroup, poiList, lineList, map_pin);
             return true;
         }
 
