@@ -35,6 +35,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Random;
 import javafx.animation.Timeline;
 import javafx.beans.property.ObjectProperty;
 import javafx.scene.Parent;
@@ -61,6 +64,8 @@ import javafx.geometry.Bounds;
 import javafx.scene.control.RadioButton;
 import javafx.scene.text.Text;
 import model.Answer;
+import model.NavDAOException;
+import model.Navigation;
 import model.Problem;
 import util.PointTool;
 import util.ZoomManager;
@@ -412,8 +417,15 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void generateRandomProblem(ActionEvent event) {
-        problemContainer.setVisible(true);
+    private void generateRandomProblem(ActionEvent event) throws NavDAOException {
+        List<Problem> allProblems = Navigation.getInstance().getProblems();
+
+        if (!allProblems.isEmpty()) {
+            Random random = new Random();
+            int index = random.nextInt(allProblems.size());
+            Problem problem = allProblems.get(index);
+            loadProblem(problem);
+        }
     }
     
     public void loadProblem(Problem selected){        
@@ -421,9 +433,18 @@ public class MainController implements Initializable {
         
         List<Answer> answers = selected.getAnswers();
         
-        alternativaA.setText(answers.get(0).getText());
-        alternativaB.setText(answers.get(1).getText());
-        alternativaC.setText(answers.get(2).getText());
-        alternativaD.setText(answers.get(3).getText());        
+        int[] numeros = {0, 1, 2, 3};
+
+        for (int i = numeros.length - 1; i > 0; i--) {
+            int j = (int) (Math.random() * (i + 1));
+            int temp = numeros[i];
+            numeros[i] = numeros[j];
+            numeros[j] = temp;
+        }
+
+        alternativaA.setText(answers.get(numeros[0]).getText());
+        alternativaB.setText(answers.get(numeros[1]).getText());
+        alternativaC.setText(answers.get(numeros[2]).getText());
+        alternativaD.setText(answers.get(numeros[3]).getText());        
     }
 }
