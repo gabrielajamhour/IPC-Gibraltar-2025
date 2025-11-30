@@ -14,7 +14,7 @@ import javafx.scene.shape.Circle;
  * @author Rafael Alonso
  */
 public class ClearAll {
-    public static void clearAll(Group zoomGroup, ObservableList<?> poiList, ObservableList<?> lineList, ObservableList<Circle> circleList, ObservableList<Arc> arcList, Node map_pin) {
+    public static void clearAll(Group zoomGroup, ObservableList<?> poiList, ObservableList<?> lineList, ObservableList<Arc> arcList, Node map_pin) {
         if (zoomGroup != null && zoomGroup.getChildren().size() > 1) {
             zoomGroup.getChildren().remove(1, zoomGroup.getChildren().size());
         }
@@ -24,9 +24,6 @@ public class ClearAll {
         if (lineList != null) {
             lineList.clear();
         }
-        if (circleList != null) {
-            circleList.clear();
-        }
         if (arcList != null) {
             arcList.clear();
         }
@@ -35,7 +32,7 @@ public class ClearAll {
         }
     }
     
-    public static boolean clearAllWithConfirmation(Group zoomGroup, ObservableList<?> poiList, ObservableList<?> lineList, ObservableList<Circle> circleList, ObservableList<Arc> arcList, Node map_pin) {
+    public static boolean clearAllWithConfirmation(Group zoomGroup, ObservableList<?> poiList, ObservableList<?> lineList, ObservableList<Arc> arcList, Node map_pin) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmar borrado");
         alert.setHeaderText("¿Borrar todas las marcas del mapa?");
@@ -44,7 +41,7 @@ public class ClearAll {
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            clearAll(zoomGroup, poiList, lineList, circleList, arcList, map_pin);
+            clearAll(zoomGroup, poiList, lineList, arcList, map_pin);
             return true;
         }
 

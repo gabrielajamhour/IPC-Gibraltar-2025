@@ -49,7 +49,6 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import util.EraserTool;
 import util.LineTool;
@@ -135,11 +134,7 @@ public class MainController implements Initializable {
     private static final ObservableList<Line> lineData =
         FXCollections.observableArrayList();
     
-    // Lista compartida de circunferencias / arcos
-    private static final ObservableList<Circle> circleData =
-        FXCollections.observableArrayList();
-    
-    // Lista compartida de arcos "abiertos"
+    // Curvas (arcos y círculos, todo Arc)
     private static final ObservableList<Arc> arcData =
         FXCollections.observableArrayList();
 
@@ -183,9 +178,9 @@ public class MainController implements Initializable {
         // Crear herramientas
         pointTool = new PointTool(zoomGroup, map_listview, currentColor);
         lineTool  = new LineTool(zoomGroup, lineData, currentLineWidth, currentColor);
-        eraserTool = new EraserTool(zoomGroup, map_listview, lineData, circleData, arcData, map_pin);
+        eraserTool = new EraserTool(zoomGroup, map_listview, lineData, arcData, map_pin);
         selectTool = new SelectTool(zoomGroup, currentColor, currentLineWidth);
-        arcTool    = new ArcTool(zoomGroup, circleData, arcData, currentLineWidth, currentColor);
+        arcTool    = new ArcTool(zoomGroup, arcData, currentLineWidth, currentColor);
         
         // Dibujar los POIs en el mapa
         dibujarPOI();
@@ -193,10 +188,7 @@ public class MainController implements Initializable {
         // Dibujar las lineas en el mapa
         dibujarLineas();
         
-        // Dibujar los círculos/arcos en el mapa
-        dibujarCirculos();
-        
-        // Dibujar los arcos abiertos en el mapa
+        // Dibujar los arcos y circulos abiertos en el mapa
         dibujarArcos();
         
         // Herramienta por defecto
@@ -379,14 +371,6 @@ public class MainController implements Initializable {
         }
     }
     
-    private void dibujarCirculos() {
-        for (Circle circle : circleData) {
-            if (!zoomGroup.getChildren().contains(circle)) {
-                zoomGroup.getChildren().add(circle);
-            }
-        }
-    }
-    
     private void dibujarArcos() {
         for (Arc arc : arcData) {
             if (!zoomGroup.getChildren().contains(arc)) {
@@ -394,8 +378,6 @@ public class MainController implements Initializable {
             }
         }
     }
-
-
 
     
     // Open pages
@@ -473,7 +455,7 @@ public class MainController implements Initializable {
     
     @FXML
     private void activateBorrarTodo(ActionEvent event) {
-        boolean borrado = ClearAll.clearAllWithConfirmation(zoomGroup, data, lineData, circleData, arcData, map_pin);
+        boolean borrado = ClearAll.clearAllWithConfirmation(zoomGroup, data, lineData, arcData, map_pin);
 
         if (borrado) {
             setCurrentTool(null);   // solo si el usuario aceptó

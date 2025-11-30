@@ -8,7 +8,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Arc;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 
 /**
@@ -27,7 +26,6 @@ public class EraserTool implements MapTool {
     private final Group zoomGroup;
     private final ListView<Poi> poiListView;
     private final ObservableList<Line> lineData;
-    private final ObservableList<Circle> circleData;
     private final ObservableList<Arc> arcData;
     private final Node mapPin;
 
@@ -37,13 +35,11 @@ public class EraserTool implements MapTool {
     public EraserTool(Group zoomGroup,
                       ListView<Poi> poiListView,
                       ObservableList<Line> lineData,
-                      ObservableList<Circle> circleData,
                       ObservableList<Arc> arcData,
                       Node mapPin) {
         this.zoomGroup = zoomGroup;
         this.poiListView = poiListView;
         this.lineData = lineData;
-        this.circleData = circleData;
         this.arcData = arcData;
         this.mapPin = mapPin;
     }
@@ -102,17 +98,7 @@ public class EraserTool implements MapTool {
             return;
         }
 
-        // 3) Intentar borrar una circunferencia cercana
-        Circle circleToRemove = findCircleNear(localPoint);
-        if (circleToRemove != null) {
-            zoomGroup.getChildren().remove(circleToRemove);
-            if (circleData != null) {
-                circleData.remove(circleToRemove);
-            }
-            return;
-        }
-
-        // 4) Intentar borrar un arco cercano
+        // 3) Intentar borrar un arco cercano (incluye círculo)
         Arc arcToRemove = findArcNear(localPoint);
         if (arcToRemove != null) {
             zoomGroup.getChildren().remove(arcToRemove);
@@ -199,32 +185,8 @@ public class EraserTool implements MapTool {
         return p.distance(projection);
     }
 
-    // ---------------- Circunferencias ----------------
-
-    private Circle findCircleNear(Point2D point) {
-        if (zoomGroup == null) return null;
-
-        Circle closest = null;
-        double closestDist = Double.MAX_VALUE;
-
-        for (Node n : zoomGroup.getChildren()) {
-            if (!(n instanceof Circle)) continue;
-            Circle c = (Circle) n;
-
-            Point2D center = new Point2D(c.getCenterX(), c.getCenterY());
-            double radius = c.getRadius();
-
-            double dist = Math.abs(center.distance(point) - radius);
-            if (dist <= MAX_DISTANCE && dist < closestDist) {
-                closestDist = dist;
-                closest = c;
-            }
-        }
-        return closest;
-    }
 
     // ---------------- Arcos ----------------
-
     private Arc findArcNear(Point2D point) {
         if (zoomGroup == null) return null;
 
@@ -239,12 +201,12 @@ public class EraserTool implements MapTool {
             double cy = arc.getCenterY();
             double rx = arc.getRadiusX();
             double ry = arc.getRadiusY();
-            double radius = (rx + ry) / 2.0; // asumimos casi circular
+            double radius = (rx + ry) / 2.0;
 
             Point2D center = new Point2D(cx, cy);
             double distCenter = center.distance(point);
             double radialDiff = Math.abs(distCenter - radius);
-
+            
             if (radialDiff > MAX_DISTANCE) continue;
 
             double anglePoint = pointToAngleDeg(cx, cy, point.getX(), point.getY());
@@ -257,7 +219,6 @@ public class EraserTool implements MapTool {
                 closest = arc;
             }
         }
-
         return closest;
     }
 
@@ -266,8 +227,7 @@ public class EraserTool implements MapTool {
     private double pointToAngleDeg(double cx, double cy, double x, double y) {
         double dx = x - cx;
         double dy = y - cy;
-
-        double angleRad = Math.atan2(-dy, dx); // igual que en ArcTool
+        double angleRad = Math.atan2(-dy, dx);
         double angleDeg = Math.toDegrees(angleRad);
         return normalizeAngle(angleDeg);
     }
@@ -279,12 +239,17 @@ public class EraserTool implements MapTool {
     }
 
     private boolean isAngleOnArc(double angle, double start, double length) {
+        // Caso especial: círculos completos (también los que guardamos como ±360º)
+        if (Math.abs(length) >= 359.9) {
+            return true; // cualquier ángulo está "sobre" el arco
+        }
+
         double a = normalizeAngle(angle);
         double s = normalizeAngle(start);
         double e = normalizeAngle(start + length);
 
         if (length >= 0) {
-            // arco antihorario desde s hasta e
+            // arco antihorario
             if (s <= e) {
                 return a >= s && a <= e;
             } else {
@@ -292,7 +257,7 @@ public class EraserTool implements MapTool {
                 return a >= s || a <= e;
             }
         } else {
-            // arco horario desde s hasta e
+            // arco horario
             if (e <= s) {
                 return a >= e && a <= s;
             } else {
