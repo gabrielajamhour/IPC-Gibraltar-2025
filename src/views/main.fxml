@@ -161,48 +161,70 @@
       </VBox>
    </left>
    <right>
-      <VBox alignment="TOP_CENTER" minWidth="-Infinity" prefWidth="300.0" BorderPane.alignment="CENTER">
-         <children>
-            <Text fx:id="tituloProblema" strokeType="OUTSIDE" strokeWidth="0.0" text="Problema actual">
-               <font>
-                  <Font size="24.0" />
-               </font>
-               <VBox.margin>
-                  <Insets bottom="10.0" top="50.0" />
-               </VBox.margin>
-            </Text>
-            <Label fx:id="enunciadoProblema" maxWidth="350.0" text="Enunciado" textAlignment="JUSTIFY" wrapText="true" />
-            <RadioButton fx:id="alternativaA" mnemonicParsing="false" text="Alternativa A">
-               <toggleGroup>
-                  <ToggleGroup fx:id="questionGroup" />
-               </toggleGroup>
-               <VBox.margin>
-                  <Insets top="10.0" />
-               </VBox.margin>
-            </RadioButton>
-            <RadioButton fx:id="alternativaB" mnemonicParsing="false" text="Alternativa B" toggleGroup="$questionGroup" />
-            <RadioButton fx:id="alternativaC" mnemonicParsing="false" text="Alternativa C" toggleGroup="$questionGroup" />
-            <RadioButton fx:id="alternativaD" mnemonicParsing="false" text="Alternativa D" toggleGroup="$questionGroup" />
-            <Button mnemonicParsing="false" text="Comprobar respuesta">
-               <VBox.margin>
-                  <Insets top="10.0" />
-               </VBox.margin>
-            </Button>
-            <Region prefHeight="100.0" prefWidth="400.0" />
-            <VBox alignment="BOTTOM_CENTER">
-               <VBox.margin>
-                  <Insets bottom="10.0" />
-               </VBox.margin>
+      <BorderPane BorderPane.alignment="CENTER">
+         <bottom>
+            <VBox alignment="CENTER" minWidth="-Infinity" prefWidth="300.0">
                <children>
-                  <Button fx:id="randomProblem" mnemonicParsing="false" onAction="#generateRandomProblem" text="Generar problema aleatorio" />
+                  <Button fx:id="randomProblem" mnemonicParsing="false" onAction="#generateRandomProblem" text="Generar problema aleatorio">
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
+                  </Button>
                   <Button fx:id="problemsButton" alignment="BOTTOM_CENTER" mnemonicParsing="false" onAction="#openProblems" text="Seleccionar problema">
                      <VBox.margin>
-                        <Insets />
+                        <Insets bottom="35.0" />
                      </VBox.margin>
                   </Button>
                </children>
             </VBox>
-         </children>
-      </VBox>
+         </bottom>
+         <top>
+            <VBox alignment="TOP_CENTER" minWidth="-Infinity" prefWidth="300.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Text fx:id="tituloProblema" strokeType="OUTSIDE" strokeWidth="0.0" text="Problema actual">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="20.0" />
+                     </VBox.margin>
+                  </Text>
+                  <Label fx:id="enunciadoProblema" maxWidth="350.0" text="Enunciado" textAlignment="JUSTIFY" wrapText="true">
+                     <VBox.margin>
+                        <Insets left="20.0" right="20.0" top="10.0" />
+                     </VBox.margin>
+                  </Label>
+                  <VBox>
+                     <VBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </VBox.margin>
+                     <children>
+                        <RadioButton fx:id="tBAlternativaA" mnemonicParsing="false" text="Alternativa A">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="questionGroup" />
+                           </toggleGroup>
+                           <VBox.margin>
+                              <Insets top="-10.0" />
+                           </VBox.margin>
+                        </RadioButton>
+                        <RadioButton fx:id="tBAlternativaB" mnemonicParsing="false" text="Alternativa B" toggleGroup="$questionGroup" />
+                        <RadioButton fx:id="tBAlternativaC" mnemonicParsing="false" text="Alternativa C" toggleGroup="$questionGroup" />
+                        <RadioButton fx:id="tBAlternativaD" mnemonicParsing="false" text="Alternativa D" toggleGroup="$questionGroup" />
+                     </children>
+                  </VBox>
+                  <Button fx:id="btnComprobarRespuesta" mnemonicParsing="false" onAction="#comprobarRespuesta" text="Comprobar respuesta">
+                     <VBox.margin>
+                        <Insets top="20.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Label fx:id="textErrorCompResp" text="Selecciona una opción." textFill="RED" visible="false">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </Label>
+               </children>
+            </VBox>
+         </top>
+      </BorderPane>
    </right>
 </BorderPane>

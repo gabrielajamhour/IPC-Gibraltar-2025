@@ -62,6 +62,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.Toggle;
 import javafx.scene.text.Text;
 import model.Answer;
 import model.NavDAOException;
@@ -121,19 +122,29 @@ public class MainController implements Initializable {
     @FXML
     private Button randomProblem;
     @FXML
-    private VBox problemContainer;
-    @FXML
     private Text tituloProblema;
     @FXML
     private Label enunciadoProblema;
     @FXML
-    private RadioButton alternativaA;
+    private Button btnComprobarRespuesta;
+    
+    private Problem currentProblem;
+    private Answer ansAlternativaA;
+    private Answer ansAlternativaB;
+    private Answer ansAlternativaC;
+    private Answer ansAlternativaD;
     @FXML
-    private RadioButton alternativaB;
+    private RadioButton tBAlternativaA;
     @FXML
-    private RadioButton alternativaC;
+    private RadioButton tBAlternativaB;
     @FXML
-    private RadioButton alternativaD;
+    private RadioButton tBAlternativaC;
+    @FXML
+    private RadioButton tBAlternativaD;
+    
+    private boolean alreadyAnswered = false;
+    @FXML
+    private Label textErrorCompResp;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -162,6 +173,11 @@ public class MainController implements Initializable {
         zoomGroup.addEventFilter(MouseEvent.MOUSE_RELEASED, this::onMapReleased);
         
         mousePosition.setText("X: " + 0 + ",   Y: " + 0);
+        try {
+            generateRandomProblem(null);
+        } catch (NavDAOException e) {
+            e.printStackTrace();
+        }
     }
     
     private void initData() {        
@@ -428,7 +444,18 @@ public class MainController implements Initializable {
         }
     }
     
-    public void loadProblem(Problem selected){        
+    public void loadProblem(Problem selected){
+        alreadyAnswered = false;
+
+        questionGroup.getToggles().forEach(t -> {
+            RadioButton rb = (RadioButton)t;
+            rb.setDisable(false);
+            rb.setStyle("");
+        });
+        
+        questionGroup.selectToggle(null);
+        
+        currentProblem = selected;
         enunciadoProblema.setText(selected.getText());
         
         List<Answer> answers = selected.getAnswers();
@@ -441,10 +468,110 @@ public class MainController implements Initializable {
             numeros[i] = numeros[j];
             numeros[j] = temp;
         }
+        
+        ansAlternativaA = answers.get(numeros[0]);
+        ansAlternativaB = answers.get(numeros[1]);
+        ansAlternativaC = answers.get(numeros[2]);
+        ansAlternativaD = answers.get(numeros[3]);
 
-        alternativaA.setText(answers.get(numeros[0]).getText());
-        alternativaB.setText(answers.get(numeros[1]).getText());
-        alternativaC.setText(answers.get(numeros[2]).getText());
-        alternativaD.setText(answers.get(numeros[3]).getText());        
+        tBAlternativaA.setText("A. " + ansAlternativaA.getText());
+        tBAlternativaB.setText("B. " + ansAlternativaB.getText());
+        tBAlternativaC.setText("C. " + ansAlternativaC.getText());
+        tBAlternativaD.setText("D. " + ansAlternativaD.getText());        
+    }
+
+    @FXML
+    private void comprobarRespuesta(ActionEvent event) {
+        
+        if (alreadyAnswered) return;
+
+        List<Answer> answers = currentProblem.getAnswers();
+
+        Toggle selectedToggle = questionGroup.getSelectedToggle();
+        
+        if (selectedToggle == null) {
+            textErrorCompResp.setVisible(true);
+            return;
+        }
+        
+        textErrorCompResp.setVisible(false);
+
+        // agora converte para RadioButton depois de garantir que não é null
+        RadioButton selected = (RadioButton) selectedToggle;
+
+        Boolean isCorrect;
+        
+        if (selected == tBAlternativaA) { isCorrect = ansAlternativaA.getValidity(); }
+        else if (selected == tBAlternativaB) { isCorrect = ansAlternativaB.getValidity(); }
+        else if (selected == tBAlternativaC) { isCorrect = ansAlternativaC.getValidity(); }
+        else { isCorrect = ansAlternativaD.getValidity(); }
+        
+        alreadyAnswered = true;
+        
+        questionGroup.getToggles().forEach(t -> {
+            RadioButton rb = (RadioButton)t;
+            rb.setDisable(true);
+            rb.setStyle("-fx-opacity: 1;");
+        });
+        
+        if (isCorrect) { correctAnswer(); }
+        else { wrongAnswer(); }
+    }
+
+    private void correctAnswer() {        
+        // Descobrir qual é a alternativa correta
+        Answer correct = currentProblem.getAnswers()
+                                       .stream()
+                                       .filter(Answer::getValidity)
+                                       .findFirst()
+                                       .orElse(null);
+
+        // Match Answer -> RadioButton
+        RadioButton correctButton = getRadioButtonFromAnswer(correct);
+
+        // Pintar o fundo de verde suave
+        marcarAlternativa(correctButton, "#b6ffb3"); // verde claro
+
+        // Adicionar símbolo ✓ no texto
+        correctButton.setText(correctButton.getText() + "  ✓");
+
+        // Registrar acerto (exemplo)
+        //session.incrementCorrect(currentProblem);
+    }
+
+    private void wrongAnswer() {        
+        // Descobrir a alternativa correta
+        Answer correct = currentProblem.getAnswers()
+                                       .stream()
+                                       .filter(Answer::getValidity)
+                                       .findFirst()
+                                       .orElse(null);
+        
+        // Descobrir alternativa escolhida
+        RadioButton selected = (RadioButton) questionGroup.getSelectedToggle();
+
+        RadioButton correctButton = getRadioButtonFromAnswer(correct);
+
+        // Pintar a errada em vermelho claro
+        marcarAlternativa(selected, "#ffb3b3"); // vermelho claro
+        selected.setText(selected.getText() + "  ✗");
+
+        // Pintar a certa em verde
+        marcarAlternativa(correctButton, "#b6ffb3");
+        correctButton.setText(correctButton.getText() + "  ✓");
+
+        // Registrar erro
+        //session.incrementWrong(currentProblem);
+    }
+    
+    private void marcarAlternativa(RadioButton rb, String color) {
+        rb.setStyle("-fx-background-color: " + color + "; -fx-padding: 5px; -fx-opacity: 1;");
+    }
+    
+    private RadioButton getRadioButtonFromAnswer(Answer ans) {
+        if (ans == ansAlternativaA) return tBAlternativaA;
+        if (ans == ansAlternativaB) return tBAlternativaB;
+        if (ans == ansAlternativaC) return tBAlternativaC;
+        return tBAlternativaD;
     }
 }
