@@ -25,9 +25,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1300.0" stylesheets="@../resources/main.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
+<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1400.0" stylesheets="@../resources/main.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
    <center>
-      <VBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="561.0" prefWidth="702.0">
+      <VBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="561.0" prefWidth="800.0">
          <children>
             <ScrollPane fx:id="map_scrollpane" hbarPolicy="ALWAYS" minHeight="-Infinity" minWidth="-Infinity" onMouseMoved="#showPosition" pannable="true" prefHeight="500.0" prefWidth="600.0" vbarPolicy="ALWAYS">
                <content>
@@ -161,7 +161,7 @@
       </VBox>
    </left>
    <right>
-      <VBox alignment="TOP_CENTER" minWidth="-Infinity" prefWidth="400.0" BorderPane.alignment="CENTER">
+      <VBox alignment="TOP_CENTER" minWidth="-Infinity" prefWidth="300.0" BorderPane.alignment="CENTER">
          <children>
             <Text fx:id="tituloProblema" strokeType="OUTSIDE" strokeWidth="0.0" text="Problema actual">
                <font>
