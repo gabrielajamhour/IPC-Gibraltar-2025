@@ -11,23 +11,102 @@
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox alignment="CENTER" prefHeight="800.0" prefWidth="1000.0" stylesheets="@../resources/main.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
-   <children>
-      <HBox alignment="CENTER_RIGHT" fillHeight="false" VBox.vgrow="NEVER">
+<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200.0" stylesheets="@../resources/main.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
+   <center>
+      <VBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="561.0" prefWidth="702.0">
          <children>
-            <Button fx:id="profileButton" graphicTextGap="10.0" mnemonicParsing="false" onAction="#openProfile">
+            <ScrollPane fx:id="map_scrollpane" hbarPolicy="ALWAYS" minHeight="-Infinity" minWidth="-Infinity" onMouseMoved="#showPosition" pannable="true" prefHeight="500.0" prefWidth="600.0" vbarPolicy="ALWAYS">
+               <content>
+                  <Pane>
+                     <children>
+                        <ImageView layoutY="14.0" pickOnBounds="true">
+                           <image>
+                              <Image url="@../resources/carta_nautica.jpg" />
+                           </image>
+                        </ImageView>
+                        <MenuButton fx:id="map_pin" mnemonicParsing="false" prefHeight="60.0" prefWidth="48.0" visible="false">
+                           <items>
+                              <MenuItem fx:id="pin_info" mnemonicParsing="false" text="Action 1" />
+                           </items>
+                           <styleClass>
+                              <String fx:value="menu-button" />
+                              <String fx:value="map-pin" />
+                           </styleClass>
+                        </MenuButton>
+                     </children>
+                  </Pane>
+               </content>
+            </ScrollPane>
+            <HBox alignment="CENTER_RIGHT">
+               <children>
+                  <Label text="Zoom">
+                     <HBox.margin>
+                        <Insets left="200.0" right="10.0" />
+                     </HBox.margin>
+                  </Label>
+                  <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#zoomOut" prefHeight="25.0" prefWidth="25.0" text="-" />
+                  <Slider fx:id="zoom_slider" HBox.hgrow="SOMETIMES">
+                     <HBox.margin>
+                        <Insets left="10.0" right="10.0" />
+                     </HBox.margin></Slider>
+                  <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#zoomIn" prefHeight="25.0" prefWidth="25.0" text="+">
+                     <HBox.margin>
+                        <Insets right="150.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Pane prefWidth="80.0" HBox.hgrow="NEVER">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                     <children>
+                        <Label fx:id="mousePosition" alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" text="X: 0,   Y: 0" wrapText="true">
+                           <padding>
+                              <Insets left="6.0" top="2.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </Pane>
+               </children>
+               <VBox.margin>
+                  <Insets top="15.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </center>
+   <top>
+      <HBox alignment="CENTER_RIGHT" fillHeight="false" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="resultsButton" mnemonicParsing="false" onAction="#openResults" text="Histórico">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </Button>
+            <Region HBox.hgrow="ALWAYS" />
+            <Label text="Usuario: " />
+            <Label text="Label">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </Label>
+            <Button fx:id="profileButton" graphicTextGap="10.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#openProfile" prefHeight="30.0" prefWidth="30.0" style="-fx-background-radius: 30;">
                <graphic>
                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -35,119 +114,96 @@
                      </image>
                   </ImageView>
                </graphic>
-            </Button>
-            <Button fx:id="problemsButton" mnemonicParsing="false" onAction="#openProblems" text="Problemas">
-               <padding>
+               <HBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
+               </HBox.margin>
             </Button>
-            <Button fx:id="resultsButton" mnemonicParsing="false" onAction="#openResults" text="Resultados">
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
-            </Button>
-            <Region HBox.hgrow="ALWAYS" />
-            <Label text="Zoom" />
-            <Button mnemonicParsing="false" onAction="#zoomOut" text="-" />
-            <Slider fx:id="zoom_slider" HBox.hgrow="SOMETIMES" />
-            <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#zoomIn" text="+" />
          </children>
-         <VBox.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" />
-         </VBox.margin>
       </HBox>
-      <SplitPane dividerPositions="0.7" orientation="VERTICAL" prefHeight="749.0" prefWidth="1000.0">
-        <items>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+   </top>
+   <left>
+      <VBox alignment="CENTER" minWidth="-Infinity" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <GridPane minHeight="-Infinity" prefHeight="200.0">
+               <columnConstraints>
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="101.33333587646484" minWidth="10.0" prefWidth="99.19999694824219" />
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="113.60001373291016" minWidth="10.0" prefWidth="100.80000305175781" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
                <children>
-                  <SplitPane fx:id="splitPane" dividerPositions="0.19699727024567792" VBox.vgrow="ALWAYS">
-                     <items>
-                        <ListView fx:id="map_listview" onMouseClicked="#listClicked" prefHeight="399.0" prefWidth="87.0" />
-                        <VBox prefHeight="200.0" prefWidth="100.0">
-                           <children>
-                              <ToolBar prefHeight="40.0" prefWidth="200.0">
-                                <items>
-                                  <Button fx:id="btnPoint" mnemonicParsing="false" onAction="#activatePointTool" text="Marcar punto" />
-                                    <Button fx:id="btnLine" mnemonicParsing="false" onAction="#activateLineTool" text="Trazar línea" />
-                                    <Button fx:id="btnBorrar" mnemonicParsing="false" onAction="#activateBorrar" text="Borrar" />
-                                    <Slider fx:id="sliderGrosor" min="2.0" />
-                                    <ColorPicker fx:id="colorPicker" />
-                                    <Button fx:id="btnBorrarTodo" mnemonicParsing="false" onAction="#activateBorrarTodo" text="Borrar todo" />
-                                </items>
-                              </ToolBar>
-                              <ScrollPane fx:id="map_scrollpane" hbarPolicy="ALWAYS" onMouseMoved="#showPosition" pannable="true" prefHeight="500.0" prefWidth="500.0" vbarPolicy="ALWAYS">
-                                 <content>
-                                    <Pane>
-                                       <children>
-                                          <ImageView layoutY="14.0" pickOnBounds="true">
-                                             <image>
-                                                <Image url="@../resources/carta_nautica.jpg" />
-                                             </image>
-                                          </ImageView>
-                                          <MenuButton fx:id="map_pin" mnemonicParsing="false" prefHeight="60.0" prefWidth="48.0" visible="false">
-                                             <items>
-                                                <MenuItem fx:id="pin_info" mnemonicParsing="false" text="Action 1" />
-                                             </items>
-                                             <styleClass>
-                                                <String fx:value="menu-button" />
-                                                <String fx:value="map-pin" />
-                                             </styleClass>
-                                          </MenuButton>
-                                       </children>
-                                    </Pane>
-                                 </content>
-                              </ScrollPane>
-                           </children>
-                        </VBox>
-                     </items>
-                  </SplitPane>
-                  <HBox alignment="CENTER_RIGHT">
-                     <children>
-                        <Label fx:id="mousePosition" minHeight="-Infinity" minWidth="-Infinity" text="SceneX:     SceneY:     " wrapText="true" HBox.hgrow="ALWAYS" />
-                     </children>
-                     <VBox.margin>
-                        <Insets bottom="12.0" right="12.0" top="6.0" />
-                     </VBox.margin>
-                  </HBox>
+                <Button fx:id="btnPoint" mnemonicParsing="false" onAction="#activatePointTool" text="Marcar punto" />
+                  <Button fx:id="btnLine" mnemonicParsing="false" onAction="#activateLineTool" text="Trazar línea" GridPane.columnIndex="1" />
+                  <Button fx:id="btnBorrar" alignment="CENTER" mnemonicParsing="false" onAction="#activateBorrar" text="Borrar" GridPane.rowIndex="1" />
+                  <Slider fx:id="sliderGrosor" min="2.0" GridPane.columnSpan="2" GridPane.rowIndex="3">
+                     <GridPane.margin>
+                        <Insets left="15.0" right="15.0" />
+                     </GridPane.margin>
+                  </Slider>
+                  <ColorPicker fx:id="colorPicker" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                  <Button fx:id="btnBorrarTodo" mnemonicParsing="false" onAction="#activateBorrarTodo" text="Borrar todo" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
-            </VBox>
-            <VBox alignment="CENTER" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="852.0">
-               <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Problema actual">
-                     <font>
-                        <Font size="24.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets top="10.0" />
-                     </VBox.margin>
-                  </Text>
-                  <VBox prefHeight="237.0" prefWidth="854.0">
-                     <children>
-                        <Label alignment="CENTER" text="Enunciado" textAlignment="CENTER">
-                           <font>
-                              <Font size="24.0" />
-                           </font>
-                           <VBox.margin>
-                              <Insets top="20.0" />
-                           </VBox.margin>
-                        </Label>
-                        <RadioButton mnemonicParsing="false" text="Alternativa A">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="questionGroup" />
-                           </toggleGroup>
-                           <VBox.margin>
-                              <Insets top="30.0" />
-                           </VBox.margin>
-                        </RadioButton>
-                        <RadioButton mnemonicParsing="false" text="Alternativa B" toggleGroup="$questionGroup" />
-                        <RadioButton mnemonicParsing="false" text="Alternativa C" toggleGroup="$questionGroup" />
-                        <RadioButton mnemonicParsing="false" text="Alternativa D" toggleGroup="$questionGroup" />
-                     </children>
-                  </VBox>
-                  <Button mnemonicParsing="false" text="Comprobar respuesta" />
-               </children>
-            </VBox>
-        </items>
-      </SplitPane>
-   </children>
-</VBox>
+            </GridPane>
+            <Label text="Puntos del mapa">
+               <font>
+                  <Font size="18.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="5.0" top="10.0" />
+               </VBox.margin>
+            </Label>
+            <ListView fx:id="map_listview" minHeight="-Infinity" onMouseClicked="#listClicked" prefHeight="195.0" prefWidth="200.0" />
+         </children>
+      </VBox>
+   </left>
+   <right>
+      <VBox fx:id="problemContainer" alignment="CENTER" prefWidth="250.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="randomProblem" mnemonicParsing="false" onAction="#generateRandomProblem" text="Generar problema aleatorio">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="problemsButton" mnemonicParsing="false" onAction="#openProblems" text="Seleccionar problema">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </Button>
+            <Region prefHeight="80.0" prefWidth="200.0" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Problema actual">
+               <font>
+                  <Font size="24.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Text>
+            <Label alignment="CENTER" text="Enunciado" textAlignment="CENTER">
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+            </Label>
+            <RadioButton mnemonicParsing="false" text="Alternativa A">
+               <toggleGroup>
+                  <ToggleGroup fx:id="questionGroup" />
+               </toggleGroup>
+               <VBox.margin>
+                  <Insets top="30.0" />
+               </VBox.margin>
+            </RadioButton>
+            <RadioButton mnemonicParsing="false" text="Alternativa B" toggleGroup="$questionGroup" />
+            <RadioButton mnemonicParsing="false" text="Alternativa C" toggleGroup="$questionGroup" />
+            <RadioButton mnemonicParsing="false" text="Alternativa D" toggleGroup="$questionGroup" />
+            <Button mnemonicParsing="false" text="Comprobar respuesta">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+      </VBox>
+   </right>
+</BorderPane>

@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -36,13 +35,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.IOException;
-import javafx.beans.property.DoubleProperty;
+import javafx.animation.Timeline;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Bounds;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -57,6 +51,13 @@ import javafx.scene.shape.Line;
 import util.EraserTool;
 import util.LineTool;
 import util.MapTool;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import util.PointTool;
 import util.ZoomManager;
 import util.ClearAll;
@@ -74,7 +75,6 @@ public class MainController implements Initializable {
     @FXML    private Slider zoom_slider;
     @FXML    private MenuButton map_pin;
     @FXML    private MenuItem pin_info;
-    @FXML    private SplitPane splitPane;
     @FXML    private Label mousePosition;
     @FXML    private Button profileButton;
     @FXML    private Button problemsButton;
@@ -108,6 +108,10 @@ public class MainController implements Initializable {
     private ObservableList<Poi> data;
     
     private ZoomManager zoomManager;
+    @FXML
+    private Button randomProblem;
+    @FXML
+    private VBox problemContainer;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -134,6 +138,8 @@ public class MainController implements Initializable {
         zoomGroup.addEventFilter(MouseEvent.MOUSE_PRESSED,  this::onMapPressed);
         zoomGroup.addEventFilter(MouseEvent.MOUSE_DRAGGED,  this::onMapDragged);
         zoomGroup.addEventFilter(MouseEvent.MOUSE_RELEASED, this::onMapReleased);
+        
+        mousePosition.setText("X: " + 0 + ",   Y: " + 0);
     }
     
     private void initData() {        
@@ -163,8 +169,7 @@ public class MainController implements Initializable {
     
     @FXML
     private void showPosition(MouseEvent event) {
-        mousePosition.setText("sceneX: " + (int) event.getSceneX() + ", sceneY: " + (int) event.getSceneY() + "\n"
-                + "         X: " + (int) event.getX() + ",          Y: " + (int) event.getY());
+        mousePosition.setText("X: " + (int) event.getX() + ",   Y: " + (int) event.getY());
     }
 
     private void closeApp(ActionEvent event) {
@@ -387,5 +392,10 @@ public class MainController implements Initializable {
             currentTool.onMouseReleased(event);
             event.consume();
         }
+    }
+
+    @FXML
+    private void generateRandomProblem(ActionEvent event) {
+        problemContainer.setVisible(true);
     }
 }

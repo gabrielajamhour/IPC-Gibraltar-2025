@@ -22,9 +22,13 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/views/main.fxml"));
-//        stage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logo.png")));
+        
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(getClass().getResource("/resources/main.css").toExternalForm());
+        
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logo.png")));
         stage.setTitle("Carta Náutica - Estrecho de Gibraltar");
-        stage.setScene(new Scene(root));
+        stage.setScene(scene);
         stage.show();
         
         SessionManager.goToLogIn(stage);
