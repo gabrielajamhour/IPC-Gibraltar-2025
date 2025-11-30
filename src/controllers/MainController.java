@@ -1,6 +1,6 @@
 package controllers;
 
-import util.PoiTool;
+import util.Poi;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,12 +66,14 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Toggle;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
+import javafx.scene.shape.Arc;
 import javafx.scene.text.Text;
 import model.Answer;
 import model.NavDAOException;
 import model.Navigation;
 import model.Problem;
 import model.User;
+import util.ArcTool;
 import util.PointTool;
 import util.ZoomManager;
 import util.ClearAll;
@@ -86,7 +88,7 @@ public class MainController implements Initializable {
     // el escalado se realiza sobre este nodo, al escalar el Group no mueve sus nodos
     private Group zoomGroup;
     
-    @FXML    private ListView<PoiTool> map_listview;
+    @FXML    private ListView<Poi> map_listview;
     @FXML    private ScrollPane map_scrollpane;
     @FXML    private Slider zoom_slider;
     @FXML    private MenuButton map_pin;
@@ -120,23 +122,33 @@ public class MainController implements Initializable {
     private MapTool panTool;
     private MapTool eraserTool;
     private MapTool selectTool;
+    private MapTool arcTool;
     
     // Estados compartidos (color actual, grosor, etc)
     private final ObjectProperty<Color> currentColor = new SimpleObjectProperty<>(Color.RED);
     private final DoubleProperty currentLineWidth = new SimpleDoubleProperty(2.0);
 
     // hashmap para guardar los puntos de interes POI
-    private final HashMap<String, PoiTool> hm = new HashMap<>();
+    private final HashMap<String, Poi> hm = new HashMap<>();
     
     // Lista compartida de líneas para TODA la app (sobrevive a cambiar de escena)
     private static final ObservableList<Line> lineData =
         FXCollections.observableArrayList();
-
-    // Lista compartida entre instancias del controlador
-    private static final ObservableList<PoiTool> sharedPoiData =
+    
+    // Lista compartida de circunferencias / arcos
+    private static final ObservableList<Circle> circleData =
+        FXCollections.observableArrayList();
+    
+    // Lista compartida de arcos "abiertos"
+    private static final ObservableList<Arc> arcData =
         FXCollections.observableArrayList();
 
-    private ObservableList<PoiTool> data;
+
+    // Lista compartida entre instancias del controlador
+    private static final ObservableList<Poi> sharedPoiData =
+        FXCollections.observableArrayList();
+
+    private ObservableList<Poi> data;
     
     private ZoomManager zoomManager;
     
@@ -171,15 +183,21 @@ public class MainController implements Initializable {
         // Crear herramientas
         pointTool = new PointTool(zoomGroup, map_listview, currentColor);
         lineTool  = new LineTool(zoomGroup, lineData, currentLineWidth, currentColor);
-        eraserTool = new EraserTool(zoomGroup, map_listview, map_pin);
+        eraserTool = new EraserTool(zoomGroup, map_listview, lineData, circleData, arcData, map_pin);
         selectTool = new SelectTool(zoomGroup, currentColor, currentLineWidth);
-
+        arcTool    = new ArcTool(zoomGroup, circleData, arcData, currentLineWidth, currentColor);
         
         // Dibujar los POIs en el mapa
         dibujarPOI();
         
         // Dibujar las lineas en el mapa
         dibujarLineas();
+        
+        // Dibujar los círculos/arcos en el mapa
+        dibujarCirculos();
+        
+        // Dibujar los arcos abiertos en el mapa
+        dibujarArcos();
         
         // Herramienta por defecto
         setCurrentTool(null); // o panTool si lo tienes
@@ -211,7 +229,7 @@ public class MainController implements Initializable {
 
         // Solo creamos el POI por defecto la primera vez
         if (data.isEmpty()) {
-            PoiTool p1 = new PoiTool("Teste", "Test del POI", 1000, 1000, Color.RED);
+            Poi p1 = new Poi("Teste", "Test del POI", 1000, 1000, Color.RED);
             data.add(p1);
         }
         
@@ -252,7 +270,7 @@ public class MainController implements Initializable {
     }
     
      // Crea un marcador visual para un POI usando la clase CSS ".map-pin"
-    private void addPoiMarkerToMap(PoiTool poi) {
+    private void addPoiMarkerToMap(Poi poi) {
         if (zoomGroup == null || poi == null || poi.getPosition() == null) return;
 
         // 1) Crear el nodo gráfico
@@ -295,7 +313,7 @@ public class MainController implements Initializable {
     
     @FXML
     void listClicked(MouseEvent event) {
-        PoiTool itemSelected = map_listview.getSelectionModel().getSelectedItem();
+        Poi itemSelected = map_listview.getSelectionModel().getSelectedItem();
         if (itemSelected == null) return;
 
         // 1) Datos básicos
@@ -337,15 +355,15 @@ public class MainController implements Initializable {
     }
     
     private void dibujarPOI(){
-        for (PoiTool poi : data) {
+        for (Poi poi : data) {
             addPoiMarkerToMap(poi);
         }
 
         // 2) Cada vez que se añada un nuevo POI a la lista, dibujarlo también
-        data.addListener((ListChangeListener<PoiTool>) change -> {
+        data.addListener((ListChangeListener<Poi>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    for (PoiTool p : change.getAddedSubList()) {
+                    for (Poi p : change.getAddedSubList()) {
                         addPoiMarkerToMap(p);
                     }
                 }
@@ -360,6 +378,24 @@ public class MainController implements Initializable {
             }
         }
     }
+    
+    private void dibujarCirculos() {
+        for (Circle circle : circleData) {
+            if (!zoomGroup.getChildren().contains(circle)) {
+                zoomGroup.getChildren().add(circle);
+            }
+        }
+    }
+    
+    private void dibujarArcos() {
+        for (Arc arc : arcData) {
+            if (!zoomGroup.getChildren().contains(arc)) {
+                zoomGroup.getChildren().add(arc);
+            }
+        }
+    }
+
+
 
     
     // Open pages
@@ -437,7 +473,7 @@ public class MainController implements Initializable {
     
     @FXML
     private void activateBorrarTodo(ActionEvent event) {
-        boolean borrado = ClearAll.clearAllWithConfirmation(zoomGroup, data, lineData, map_pin);
+        boolean borrado = ClearAll.clearAllWithConfirmation(zoomGroup, data, lineData, circleData, arcData, map_pin);
 
         if (borrado) {
             setCurrentTool(null);   // solo si el usuario aceptó
@@ -446,7 +482,14 @@ public class MainController implements Initializable {
     
     @FXML
     private void activateArcoTool(ActionEvent event) {
+        if (currentTool == arcTool) {
+            // si ya está activa, la desactivamos
+            setCurrentTool(null);
+        } else {
+            setCurrentTool(arcTool);
+        }
     }
+
 
     @FXML
     private void activateSeleccionarTool(ActionEvent event) {
@@ -484,6 +527,11 @@ public class MainController implements Initializable {
          // Botón de selección
         if (btnSeleccionar != null) {
             btnSeleccionar.setStyle(currentTool == selectTool ? activeStyle : inactiveStyle);
+        }
+        
+        // Botón de arco / círculo
+        if (btnArco != null) {
+            btnArco.setStyle(currentTool == arcTool ? activeStyle : inactiveStyle);
         }
 
         // importante: solo dejamos mover el mapa cuando no hay herramienta de dibujo

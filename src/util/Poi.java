@@ -3,14 +3,14 @@ import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
 
-public class PoiTool {
+public class Poi {
     
     private String code;
     private String description;
     private Point2D position;
     private Color color;
 
-    public PoiTool(String code, String description, double x, double y, Color color) {
+    public Poi(String code, String description, double x, double y, Color color) {
         this.code = code;
         this.description = description;
         this.position = new Point2D(x, y);

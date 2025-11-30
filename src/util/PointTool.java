@@ -25,11 +25,11 @@ import javafx.stage.Stage;
 public class PointTool implements MapTool {
 
     private final Group zoomGroup;               // Contenedor donde está el mapa (y se hace el zoom)
-    private final ListView<PoiTool> poiListView;     // Lista de POIs
+    private final ListView<Poi> poiListView;     // Lista de POIs
     private final ObjectProperty<Color> currentColor;  // Color actual elegido por el usuario
 
     public PointTool(Group zoomGroup,
-                     ListView<PoiTool> poiListView,
+                     ListView<Poi> poiListView,
                      ObjectProperty<Color> currentColor) {
         this.zoomGroup   = zoomGroup;
         this.poiListView = poiListView;
@@ -48,7 +48,7 @@ public class PointTool implements MapTool {
         Color poiColor = currentColor.get();  // Capturamos el color actual en este momento
 
         // Creamos y configuramos el diálogo
-        Dialog<PoiTool> poiDialog = new Dialog<>();
+        Dialog<Poi> poiDialog = new Dialog<>();
         poiDialog.setTitle("Nuevo POI");
         poiDialog.setHeaderText("Introduce un nuevo POI");
 
@@ -88,14 +88,14 @@ public class PointTool implements MapTool {
                 String desc = descArea.getText().trim();
 
                 // Podrías validar aquí que el nombre no esté vacío, etc.
-                PoiTool poi = new PoiTool(name, desc, localPoint.getX(), localPoint.getY(), currentColor.get());
+                Poi poi = new Poi(name, desc, localPoint.getX(), localPoint.getY(), currentColor.get());
                 return poi;
             }
             return null;
         });
 
         // Mostramos el diálogo y esperamos la respuesta del usuario
-        Optional<PoiTool> result = poiDialog.showAndWait();
+        Optional<Poi> result = poiDialog.showAndWait();
 
         // Si el usuario aceptó y se creó un Poi, lo añadimos a la lista
         result.ifPresent(poi -> poiListView.getItems().add(poi));

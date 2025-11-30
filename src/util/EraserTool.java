@@ -1,114 +1,187 @@
 package util;
 
+import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Arc;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 
 /**
- *
  * @author Rafael Alonso
+ * 
+ * Herramienta de borrado:
+ * 1) Intenta borrar un POI cercano.
+ * 2) Si no, una línea cercana.
+ * 3) Si no, una circunferencia cercana.
+ * 4) Si no, un arco cercano.
+ *
+ * Funciona tanto con clic como con click-and-drag.
  */
 public class EraserTool implements MapTool {
 
     private final Group zoomGroup;
-    private final ListView<PoiTool> poiListView;
+    private final ListView<Poi> poiListView;
+    private final ObservableList<Line> lineData;
+    private final ObservableList<Circle> circleData;
+    private final ObservableList<Arc> arcData;
     private final Node mapPin;
 
-    private final double HIT_RADIUS = 10.0;
-        public EraserTool(Group zoomGroup, ListView<PoiTool> poiListView, Node mapPin) {
+    // Radio máximo de borrado en píxeles
+    private static final double MAX_DISTANCE = 5.0;
+
+    public EraserTool(Group zoomGroup,
+                      ListView<Poi> poiListView,
+                      ObservableList<Line> lineData,
+                      ObservableList<Circle> circleData,
+                      ObservableList<Arc> arcData,
+                      Node mapPin) {
         this.zoomGroup = zoomGroup;
         this.poiListView = poiListView;
+        this.lineData = lineData;
+        this.circleData = circleData;
+        this.arcData = arcData;
         this.mapPin = mapPin;
     }
 
     @Override
+    public void onEnter() {
+        // nada especial
+    }
+
+    @Override
+    public void onExit() {
+        // nada especial
+    }
+
+    @Override
     public void onMousePressed(MouseEvent event) {
-        if (event.getButton() != MouseButton.PRIMARY) return;
+        if (event.getButton() != MouseButton.PRIMARY || zoomGroup == null) return;
         eraseAt(event);
     }
 
     @Override
     public void onMouseDragged(MouseEvent event) {
-        if (event.getButton() != MouseButton.PRIMARY) return;
-        // mientras arrastras, sigue borrando todo lo que pasa por el camino
+        if (zoomGroup == null) return;
         eraseAt(event);
     }
 
     @Override
     public void onMouseReleased(MouseEvent event) {
-        // nada especial
+        // no-op
     }
 
-    // ----------------- LÓGICA DE BORRADO -----------------
+    // ===================== LÓGICA DE BORRADO =====================
 
     private void eraseAt(MouseEvent event) {
-        // Convertir coordenadas de escena a coordenadas del zoomGroup
         Point2D localPoint = zoomGroup.sceneToLocal(event.getSceneX(), event.getSceneY());
 
         // 1) Intentar borrar un POI cercano
-        PoiTool poiToRemove = findPoiNear(localPoint);
+        Poi poiToRemove = findPoiNear(localPoint);
         if (poiToRemove != null) {
-            // quitarlo de la lista lógica
             poiListView.getItems().remove(poiToRemove);
-
-            // quitar también los iconos del mapa asociados a ese POI
             removePoiMarkersFromMap(poiToRemove);
 
-            // ocultar el pin de selección (MenuButton) si lo usas
             if (mapPin != null && mapPin.isVisible()) {
                 mapPin.setVisible(false);
             }
-            return; // si ya has borrado un POI, no hace falta seguir con líneas
+            return;
         }
 
         // 2) Intentar borrar una línea cercana
         Line lineToRemove = findLineNear(localPoint);
         if (lineToRemove != null) {
             zoomGroup.getChildren().remove(lineToRemove);
+            if (lineData != null) {
+                lineData.remove(lineToRemove);
+            }
+            return;
+        }
+
+        // 3) Intentar borrar una circunferencia cercana
+        Circle circleToRemove = findCircleNear(localPoint);
+        if (circleToRemove != null) {
+            zoomGroup.getChildren().remove(circleToRemove);
+            if (circleData != null) {
+                circleData.remove(circleToRemove);
+            }
+            return;
+        }
+
+        // 4) Intentar borrar un arco cercano
+        Arc arcToRemove = findArcNear(localPoint);
+        if (arcToRemove != null) {
+            zoomGroup.getChildren().remove(arcToRemove);
+            if (arcData != null) {
+                arcData.remove(arcToRemove);
+            }
         }
     }
 
-    private PoiTool findPoiNear(Point2D point) {
-        // AUMENTA este valor para que sea más fácil acertar
-        final double MAX_DISTANCE = 20;
+    // ---------------- POIs ----------------
 
-        PoiTool closest = null;
+    private Poi findPoiNear(Point2D point) {
+        // AUMENTA este valor para que sea más fácil acertar
+        final double MAX_DISTANCE_POI = 40;
+
+        Poi closest = null;
         double closestDist = Double.MAX_VALUE;
 
-        for (PoiTool poi : poiListView.getItems()) {
+        for (Poi poi : poiListView.getItems()) {
             Point2D poiPos = poi.getPosition(); // mismas coords en las que lo dibujas
 
             double dx = poiPos.getX() - point.getX();
             double dy = poiPos.getY() - point.getY();
             double dist = Math.hypot(dx, dy);
 
-            if (dist <= MAX_DISTANCE && dist < closestDist) {
+            if (dist <= MAX_DISTANCE_POI && dist < closestDist) {
                 closestDist = dist;
                 closest = poi;
             }
         }
-
         return closest;
     }
 
-    private Line findLineNear(Point2D p) {
-        for (Node n : zoomGroup.getChildren()) {
-            if (n instanceof Line line) {
-                if (distancePointToSegment(p, line) <= HIT_RADIUS) {
-                    return line;
-                }
+    private void removePoiMarkersFromMap(Poi poi) {
+        if (zoomGroup == null || poi == null) return;
+
+        for (int i = zoomGroup.getChildren().size() - 1; i >= 0; i--) {
+            Node n = zoomGroup.getChildren().get(i);
+            Object ud = n.getUserData();
+            if (ud == poi) {
+                zoomGroup.getChildren().remove(i);
             }
         }
-        return null;
+    }
+
+    // ---------------- Líneas ----------------
+
+    private Line findLineNear(Point2D point) {
+        if (zoomGroup == null) return null;
+
+        Line closest = null;
+        double closestDist = Double.MAX_VALUE;
+
+        for (Node n : zoomGroup.getChildren()) {
+            if (!(n instanceof Line)) continue;
+            Line line = (Line) n;
+
+            double dist = distancePointToSegment(point, line);
+            if (dist <= MAX_DISTANCE && dist < closestDist) {
+                closestDist = dist;
+                closest = line;
+            }
+        }
+        return closest;
     }
 
     private double distancePointToSegment(Point2D p, Line line) {
         Point2D a = new Point2D(line.getStartX(), line.getStartY());
-        Point2D b = new Point2D(line.getEndX(), line.getEndY());
+        Point2D b = new Point2D(line.getEndX(),   line.getEndY());
 
         double dx = b.getX() - a.getX();
         double dy = b.getY() - a.getY();
@@ -117,25 +190,115 @@ public class EraserTool implements MapTool {
             return p.distance(a);
         }
 
-        double t = ((p.getX() - a.getX()) * dx + (p.getY() - a.getY()) * dy) / (dx * dx + dy * dy);
+        double t = ((p.getX() - a.getX()) * dx + (p.getY() - a.getY()) * dy) /
+                   (dx * dx + dy * dy);
+
         t = Math.max(0, Math.min(1, t));
 
-        Point2D proj = new Point2D(a.getX() + t * dx, a.getY() + t * dy);
-        return p.distance(proj);
+        Point2D projection = new Point2D(a.getX() + t * dx, a.getY() + t * dy);
+        return p.distance(projection);
     }
-    
-    private void removePoiMarkersFromMap(PoiTool poi) {
-        if (zoomGroup == null || poi == null) return;
 
-        // Recorremos de atrás hacia delante para poder eliminar sin problemas
-        for (int i = zoomGroup.getChildren().size() - 1; i >= 0; i--) {
-            Node n = zoomGroup.getChildren().get(i);
-            Object ud = n.getUserData();
-            // En MainController, cada marker hace marker.setUserData(poi);
-            if (ud == poi) {
-                zoomGroup.getChildren().remove(i);
+    // ---------------- Circunferencias ----------------
+
+    private Circle findCircleNear(Point2D point) {
+        if (zoomGroup == null) return null;
+
+        Circle closest = null;
+        double closestDist = Double.MAX_VALUE;
+
+        for (Node n : zoomGroup.getChildren()) {
+            if (!(n instanceof Circle)) continue;
+            Circle c = (Circle) n;
+
+            Point2D center = new Point2D(c.getCenterX(), c.getCenterY());
+            double radius = c.getRadius();
+
+            double dist = Math.abs(center.distance(point) - radius);
+            if (dist <= MAX_DISTANCE && dist < closestDist) {
+                closestDist = dist;
+                closest = c;
+            }
+        }
+        return closest;
+    }
+
+    // ---------------- Arcos ----------------
+
+    private Arc findArcNear(Point2D point) {
+        if (zoomGroup == null) return null;
+
+        Arc closest = null;
+        double closestDist = Double.MAX_VALUE;
+
+        for (Node n : zoomGroup.getChildren()) {
+            if (!(n instanceof Arc)) continue;
+            Arc arc = (Arc) n;
+
+            double cx = arc.getCenterX();
+            double cy = arc.getCenterY();
+            double rx = arc.getRadiusX();
+            double ry = arc.getRadiusY();
+            double radius = (rx + ry) / 2.0; // asumimos casi circular
+
+            Point2D center = new Point2D(cx, cy);
+            double distCenter = center.distance(point);
+            double radialDiff = Math.abs(distCenter - radius);
+
+            if (radialDiff > MAX_DISTANCE) continue;
+
+            double anglePoint = pointToAngleDeg(cx, cy, point.getX(), point.getY());
+            if (!isAngleOnArc(anglePoint, arc.getStartAngle(), arc.getLength())) {
+                continue;
+            }
+
+            if (radialDiff < closestDist) {
+                closestDist = radialDiff;
+                closest = arc;
+            }
+        }
+
+        return closest;
+    }
+
+    // ---------------- Utilidades de ángulos ----------------
+
+    private double pointToAngleDeg(double cx, double cy, double x, double y) {
+        double dx = x - cx;
+        double dy = y - cy;
+
+        double angleRad = Math.atan2(-dy, dx); // igual que en ArcTool
+        double angleDeg = Math.toDegrees(angleRad);
+        return normalizeAngle(angleDeg);
+    }
+
+    private double normalizeAngle(double angleDeg) {
+        double a = angleDeg % 360.0;
+        if (a < 0) a += 360.0;
+        return a;
+    }
+
+    private boolean isAngleOnArc(double angle, double start, double length) {
+        double a = normalizeAngle(angle);
+        double s = normalizeAngle(start);
+        double e = normalizeAngle(start + length);
+
+        if (length >= 0) {
+            // arco antihorario desde s hasta e
+            if (s <= e) {
+                return a >= s && a <= e;
+            } else {
+                // envuelve 360
+                return a >= s || a <= e;
+            }
+        } else {
+            // arco horario desde s hasta e
+            if (e <= s) {
+                return a >= e && a <= s;
+            } else {
+                // envuelve 360
+                return a >= e || a <= s;
             }
         }
     }
-    
 }
