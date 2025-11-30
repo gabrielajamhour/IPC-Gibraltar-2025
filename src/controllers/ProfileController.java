@@ -6,6 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.Period;
@@ -54,7 +55,7 @@ public class ProfileController implements Initializable{
     }
 
     @FXML
-    private void onSave() {
+    private void onSave() throws IOException {
         errorLabel.setText("");
 
         String newEmail = emailField.getText();
@@ -83,7 +84,7 @@ public class ProfileController implements Initializable{
     }
 
     @FXML
-    private void onCancel() {
+    private void onCancel() throws IOException {
         Stage stage = (Stage) avatarImage.getScene().getWindow();
         SessionManager.goToMain(stage);
     }

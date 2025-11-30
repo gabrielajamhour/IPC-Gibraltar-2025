@@ -67,7 +67,7 @@ public class AuthController implements Initializable {
     
     // ===================== Accept =====================
     @FXML
-    private void pulsadoIniciar(ActionEvent event) {
+    private void pulsadoIniciar(ActionEvent event) throws IOException {
         String username = eUsername.getText();
         String password = ePassword.getText();
         
@@ -80,7 +80,7 @@ public class AuthController implements Initializable {
                 lPasswordWrong.setText("Wrong Password");
                 manageError(lPasswordWrong, ePassword, validPassword);
             } else {
-                SessionManager.setActiveUser(u);
+                SessionManager.startNewSession(u);
                 Stage stage = (Stage) ePassword.getScene().getWindow();
                 SessionManager.goToMain(stage);
             }

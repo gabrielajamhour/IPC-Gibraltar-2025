@@ -30,3 +30,30 @@ S17.642,20.762,13.558,20.762z";
 .map-pin .arrow-button .arrow {
     -fx-padding: 0;
 }
+
+/* Estilo del Panel Flotante */
+.user-menu-panel {
+    -fx-background-radius: 6px;
+    -fx-padding: 10px 0;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    /* Aplica Sombra (Efecto de elevación) */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);
+    -fx-min-width: 250px;
+    -fx-max-width: 250px; 
+}
+
+/* Estilo de los elementos del menú */
+.menu-item-button {
+    -fx-background-color: transparent;
+    -fx-alignment: center-left; /* Justificar el texto a la izquierda */
+    -fx-padding: 8px 15px;
+    -fx-graphic-text-gap: 15px; /* Espacio para el icono */
+    -fx-min-width: 100%;
+}
+
+/* Efecto Hover limpio (crucial para el diseño) */
+.menu-item-button:hover {
+    -fx-background-color: #f0f0f0; /* Color de fondo muy suave al pasar el ratón */
+}

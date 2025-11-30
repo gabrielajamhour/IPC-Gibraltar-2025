@@ -1,5 +1,6 @@
 package controllers;
 
+import java.io.IOException;
 import java.net.URL;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -11,7 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.stage.Stage;
 import util.SessionManager;
 
-public class ProblemSelectionController implements Initializable {
+public class ProblemsController implements Initializable {
 
     @FXML private TextField searchField;
     @FXML private ListView<Problem> problemsList;
@@ -65,7 +66,7 @@ public class ProblemSelectionController implements Initializable {
     }
 
     @FXML
-    private void goBack() {
+    private void goBack() throws IOException {
         Stage stage = (Stage) searchField.getScene().getWindow();
         SessionManager.goToMain(stage);
     }

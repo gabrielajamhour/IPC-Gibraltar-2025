@@ -1,10 +1,12 @@
 package controllers;
 
+import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.collections.*;
 import model.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javafx.stage.Stage;
 import util.SessionManager;
 
@@ -17,11 +19,13 @@ public class ResultsController {
     @FXML private TableColumn<Session, Number> colFaults;
 
     private User currentUser;
+    
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
     public void initialize() {
         colDate.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(
-                        data.getValue().getTimeStamp().toString()
+                        data.getValue().getTimeStamp().format(DATE_FORMATTER)
                 )
         );
         colHits.setCellValueFactory(data -> 
@@ -36,8 +40,12 @@ public class ResultsController {
     }
 
     private void loadSessions() {
-        ObservableList<Session> list =
-                FXCollections.observableArrayList(currentUser.getSessions());
+        java.util.List<Session> sessions = currentUser.getSessions();
+        if (sessions == null) {
+            sessions = new java.util.ArrayList<>();
+        }
+        
+        ObservableList<Session> list = FXCollections.observableArrayList(sessions);
         sessionsTable.setItems(list);
     }
 
@@ -49,6 +57,11 @@ public class ResultsController {
             return;
         }
 
+        if (currentUser == null || currentUser.getSessions() == null) {
+             sessionsTable.setItems(FXCollections.observableArrayList());
+             return;
+        }
+        
         ObservableList<Session> filtered = FXCollections.observableArrayList(
                 currentUser.getSessions().stream()
                         .filter(s -> s.getTimeStamp().toLocalDate().isAfter(minDate.minusDays(1)))
@@ -59,7 +72,7 @@ public class ResultsController {
     }
 
     @FXML
-    private void goBack() {
+    private void goBack() throws IOException {
         Stage stage = (Stage) dateFilter.getScene().getWindow();
         SessionManager.goToMain(stage);
     }

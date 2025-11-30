@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.Period;
@@ -275,7 +276,7 @@ public class RegisterController implements Initializable {
     // ===================== Accept =====================
     
     @FXML
-    private void handleBAcceptOnAction(ActionEvent event) {
+    private void handleBAcceptOnAction(ActionEvent event) throws IOException {
         String email = eemail.getText();
         String password = epassword.getText();
         String username = eUsername.getText();
@@ -284,7 +285,7 @@ public class RegisterController implements Initializable {
         try {
             Navigation nav = Navigation.getInstance();
             User u = nav.registerUser(username, email, password, selectedAvatar, birthdate);
-            SessionManager.setActiveUser(u);
+            SessionManager.startNewSession(u);
 
             Stage stage = (Stage) epassword.getScene().getWindow();
             SessionManager.goToMain(stage);

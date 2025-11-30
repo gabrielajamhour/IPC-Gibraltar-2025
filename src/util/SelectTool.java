@@ -76,7 +76,7 @@ public class SelectTool implements MapTool {
                 }
             }
             // 2) Pins de POI
-            else if (child instanceof Region region && region.getUserData() instanceof Poi) {
+            else if (child instanceof Region region && region.getUserData() instanceof PoiTool) {
                 Bounds b = region.getBoundsInParent();
                 double cx = (b.getMinX() + b.getMaxX()) / 2.0;
                 double cy = (b.getMinY() + b.getMaxY()) / 2.0;
@@ -138,7 +138,7 @@ public class SelectTool implements MapTool {
             }
         } else if (n instanceof Region marker) {
             Object ud = marker.getUserData();
-            if (ud instanceof Poi poi) {
+            if (ud instanceof PoiTool poi) {
                 poi.setColor(c);
             }
 

@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="500" prefWidth="700" spacing="20" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProblemSelectionController">
+<VBox alignment="TOP_CENTER" prefHeight="500" prefWidth="700" spacing="20" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProblemsController">
 
     <Label style="-fx-font-size: 24px;" text="Lista de Problemas">
       <VBox.margin>

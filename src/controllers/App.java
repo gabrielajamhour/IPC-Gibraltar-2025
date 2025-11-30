@@ -24,7 +24,7 @@ public class App extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/views/main.fxml"));
         
         Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("/resources/main.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/styles/main.css").toExternalForm());
         
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logo.png")));
         stage.setTitle("Carta Náutica - Estrecho de Gibraltar");

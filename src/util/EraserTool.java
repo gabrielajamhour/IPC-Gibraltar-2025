@@ -15,11 +15,11 @@ import javafx.scene.shape.Line;
 public class EraserTool implements MapTool {
 
     private final Group zoomGroup;
-    private final ListView<Poi> poiListView;
+    private final ListView<PoiTool> poiListView;
     private final Node mapPin;
 
     private final double HIT_RADIUS = 10.0;
-        public EraserTool(Group zoomGroup, ListView<Poi> poiListView, Node mapPin) {
+        public EraserTool(Group zoomGroup, ListView<PoiTool> poiListView, Node mapPin) {
         this.zoomGroup = zoomGroup;
         this.poiListView = poiListView;
         this.mapPin = mapPin;
@@ -50,7 +50,7 @@ public class EraserTool implements MapTool {
         Point2D localPoint = zoomGroup.sceneToLocal(event.getSceneX(), event.getSceneY());
 
         // 1) Intentar borrar un POI cercano
-        Poi poiToRemove = findPoiNear(localPoint);
+        PoiTool poiToRemove = findPoiNear(localPoint);
         if (poiToRemove != null) {
             // quitarlo de la lista lógica
             poiListView.getItems().remove(poiToRemove);
@@ -72,14 +72,14 @@ public class EraserTool implements MapTool {
         }
     }
 
-    private Poi findPoiNear(Point2D point) {
+    private PoiTool findPoiNear(Point2D point) {
         // AUMENTA este valor para que sea más fácil acertar
         final double MAX_DISTANCE = 20;
 
-        Poi closest = null;
+        PoiTool closest = null;
         double closestDist = Double.MAX_VALUE;
 
-        for (Poi poi : poiListView.getItems()) {
+        for (PoiTool poi : poiListView.getItems()) {
             Point2D poiPos = poi.getPosition(); // mismas coords en las que lo dibujas
 
             double dx = poiPos.getX() - point.getX();
@@ -124,7 +124,7 @@ public class EraserTool implements MapTool {
         return p.distance(proj);
     }
     
-    private void removePoiMarkersFromMap(Poi poi) {
+    private void removePoiMarkersFromMap(PoiTool poi) {
         if (zoomGroup == null || poi == null) return;
 
         // Recorremos de atrás hacia delante para poder eliminar sin problemas

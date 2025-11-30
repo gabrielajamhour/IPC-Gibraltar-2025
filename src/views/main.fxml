@@ -10,6 +10,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
@@ -23,9 +24,8 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1400.0" stylesheets="@../resources/main.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
+<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1400.0" stylesheets="@../styles/main.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
    <center>
       <VBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="561.0" prefWidth="800.0">
          <children>
@@ -91,22 +91,14 @@
    <top>
       <HBox alignment="CENTER_RIGHT" fillHeight="false" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="resultsButton" mnemonicParsing="false" onAction="#openResults" text="Histórico">
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </HBox.margin>
-            </Button>
             <Region HBox.hgrow="ALWAYS" />
-            <Label text="Usuario: " />
-            <Label text="Label">
-               <HBox.margin>
-                  <Insets right="5.0" />
-               </HBox.margin>
-            </Label>
-            <Button fx:id="profileButton" graphicTextGap="10.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#openProfile" prefHeight="30.0" prefWidth="30.0" style="-fx-background-radius: 30;">
+            <MenuButton fx:id="profileMain" mnemonicParsing="false" text="  Usuario: ">
+              <items>
+                <MenuItem fx:id="profileButton" mnemonicParsing="false" onAction="#openProfile" text="Profile" />
+                <MenuItem fx:id="resultsButton" mnemonicParsing="false" onAction="#openResults" text="Histórico" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#logout" text="Cerrar sesión" />
+              </items>
                <graphic>
                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -115,16 +107,16 @@
                   </ImageView>
                </graphic>
                <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </HBox.margin>
-            </Button>
+            </MenuButton>
          </children>
       </HBox>
    </top>
    <left>
-      <VBox alignment="CENTER" minWidth="-Infinity" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <VBox alignment="TOP_CENTER" minWidth="-Infinity" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <GridPane minHeight="-Infinity" prefHeight="200.0">
+            <GridPane alignment="CENTER" minHeight="-Infinity" vgap="10.0">
                <columnConstraints>
                   <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="101.33333587646484" minWidth="10.0" prefWidth="99.19999694824219" />
                   <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="113.60001373291016" minWidth="10.0" prefWidth="100.80000305175781" />
@@ -150,7 +142,11 @@
                   <Button fx:id="btnArco" layoutX="21.0" layoutY="55.0" mnemonicParsing="false" onAction="#activateArcoTool" text="Trazar arco" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Button fx:id="btnSeleccionar" layoutX="16.0" layoutY="16.0" mnemonicParsing="false" onAction="#activateSeleccionarTool" text="Seleccionar" GridPane.columnIndex="1" />
                </children>
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
             </GridPane>
+            <Region prefHeight="63.0" prefWidth="200.0" />
             <Label text="Puntos del mapa">
                <font>
                   <Font size="18.0" />
@@ -161,12 +157,15 @@
             </Label>
             <ListView fx:id="map_listview" minHeight="-Infinity" onMouseClicked="#listClicked" prefHeight="195.0" prefWidth="200.0" />
          </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
       </VBox>
    </left>
    <right>
       <BorderPane BorderPane.alignment="CENTER">
          <bottom>
-            <VBox alignment="CENTER" minWidth="-Infinity" prefWidth="300.0">
+            <VBox alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="300.0">
                <children>
                   <Button fx:id="randomProblem" mnemonicParsing="false" onAction="#generateRandomProblem" text="Generar problema aleatorio">
                      <VBox.margin>
@@ -175,26 +174,31 @@
                   </Button>
                   <Button fx:id="problemsButton" alignment="BOTTOM_CENTER" mnemonicParsing="false" onAction="#openProblems" text="Seleccionar problema">
                      <VBox.margin>
-                        <Insets bottom="35.0" />
+                        <Insets bottom="10.0" />
                      </VBox.margin>
                   </Button>
+                  <Label fx:id="contadorProblemas" text="Contador problemas">
+                     <VBox.margin>
+                        <Insets bottom="25.0" />
+                     </VBox.margin>
+                  </Label>
                </children>
             </VBox>
          </bottom>
          <top>
             <VBox alignment="TOP_CENTER" minWidth="-Infinity" prefWidth="300.0" BorderPane.alignment="CENTER">
                <children>
-                  <Text fx:id="tituloProblema" strokeType="OUTSIDE" strokeWidth="0.0" text="Problema actual">
+                  <Label fx:id="tituloProbActual" text="Problema ##">
                      <font>
-                        <Font size="24.0" />
+                        <Font name="System Bold" size="24.0" />
                      </font>
                      <VBox.margin>
-                        <Insets bottom="10.0" top="20.0" />
+                        <Insets bottom="10.0" />
                      </VBox.margin>
-                  </Text>
+                  </Label>
                   <Label fx:id="enunciadoProblema" maxWidth="350.0" text="Enunciado" textAlignment="JUSTIFY" wrapText="true">
                      <VBox.margin>
-                        <Insets left="20.0" right="20.0" top="10.0" />
+                        <Insets left="20.0" right="20.0" />
                      </VBox.margin>
                   </Label>
                   <VBox>
@@ -217,7 +221,7 @@
                   </VBox>
                   <Button fx:id="btnComprobarRespuesta" mnemonicParsing="false" onAction="#comprobarRespuesta" text="Comprobar respuesta">
                      <VBox.margin>
-                        <Insets top="20.0" />
+                        <Insets bottom="-5.0" top="10.0" />
                      </VBox.margin>
                   </Button>
                   <Label fx:id="textErrorCompResp" text="Selecciona una opción." textFill="RED" visible="false">

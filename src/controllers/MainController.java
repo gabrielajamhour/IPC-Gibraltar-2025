@@ -1,6 +1,6 @@
 package controllers;
 
-import util.Poi;
+import util.PoiTool;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,12 +64,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Toggle;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import model.Answer;
 import model.NavDAOException;
 import model.Navigation;
 import model.Problem;
+import model.User;
 import util.PointTool;
 import util.ZoomManager;
 import util.ClearAll;
@@ -84,15 +86,15 @@ public class MainController implements Initializable {
     // el escalado se realiza sobre este nodo, al escalar el Group no mueve sus nodos
     private Group zoomGroup;
     
-    @FXML    private ListView<Poi> map_listview;
+    @FXML    private ListView<PoiTool> map_listview;
     @FXML    private ScrollPane map_scrollpane;
     @FXML    private Slider zoom_slider;
     @FXML    private MenuButton map_pin;
     @FXML    private MenuItem pin_info;
     @FXML    private Label mousePosition;
-    @FXML    private Button profileButton;
+    @FXML    private MenuItem profileButton;
     @FXML    private Button problemsButton;
-    @FXML    private Button resultsButton;
+    @FXML    private MenuItem resultsButton;
     @FXML    private Button btnPoint;
     @FXML    private Button btnLine;
     @FXML    private ToggleGroup questionGroup;
@@ -103,7 +105,6 @@ public class MainController implements Initializable {
     @FXML    private Button btnArco;
     @FXML    private Button btnSeleccionar;
     @FXML    private Button randomProblem;
-    @FXML    private Text tituloProblema;
     @FXML    private Label enunciadoProblema;
     @FXML    private Button btnComprobarRespuesta;
     @FXML    private RadioButton tBAlternativaA;
@@ -125,17 +126,17 @@ public class MainController implements Initializable {
     private final DoubleProperty currentLineWidth = new SimpleDoubleProperty(2.0);
 
     // hashmap para guardar los puntos de interes POI
-    private final HashMap<String, Poi> hm = new HashMap<>();
+    private final HashMap<String, PoiTool> hm = new HashMap<>();
     
     // Lista compartida de líneas para TODA la app (sobrevive a cambiar de escena)
     private static final ObservableList<Line> lineData =
         FXCollections.observableArrayList();
 
     // Lista compartida entre instancias del controlador
-    private static final ObservableList<Poi> sharedPoiData =
+    private static final ObservableList<PoiTool> sharedPoiData =
         FXCollections.observableArrayList();
 
-    private ObservableList<Poi> data;
+    private ObservableList<PoiTool> data;
     
     private ZoomManager zoomManager;
     
@@ -145,10 +146,14 @@ public class MainController implements Initializable {
     private Answer ansAlternativaC;
     private Answer ansAlternativaD;
     private boolean alreadyAnswered = false;
-
-
-
-
+    
+    @FXML
+    private MenuButton profileMain;
+    @FXML
+    private Label contadorProblemas;
+    private Label problemaActual;
+    @FXML
+    private Label tituloProbActual;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -190,6 +195,13 @@ public class MainController implements Initializable {
         } catch (NavDAOException e) {
             e.printStackTrace();
         }
+        
+        updateSessionCounters();
+        updateProblemTitle();
+    }
+    
+    public void setUser(User u) {
+        profileMain.setText("Usuario: " + u.getNickName());
     }
     
     private void initData() {        
@@ -199,7 +211,7 @@ public class MainController implements Initializable {
 
         // Solo creamos el POI por defecto la primera vez
         if (data.isEmpty()) {
-            Poi p1 = new Poi("Teste", "Test del POI", 1000, 1000, Color.RED);
+            PoiTool p1 = new PoiTool("Teste", "Test del POI", 1000, 1000, Color.RED);
             data.add(p1);
         }
         
@@ -223,16 +235,6 @@ public class MainController implements Initializable {
     private void closeApp(ActionEvent event) {
         ((Stage) zoom_slider.getScene().getWindow()).close();
     }
-
-    private void about(ActionEvent event) {
-        Alert mensaje = new Alert(Alert.AlertType.INFORMATION);
-        // Acceder al Stage del Dialog y cambiar el icono
-        Stage dialogStage = (Stage) mensaje.getDialogPane().getScene().getWindow();
-        dialogStage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logo.png")));
-        mensaje.setTitle("Acerca de");
-        mensaje.setHeaderText("IPC - 2025");
-        mensaje.showAndWait();
-    }
     
     private void updateMapPinStyle(Color c) {
         if (c == null) {
@@ -250,7 +252,7 @@ public class MainController implements Initializable {
     }
     
      // Crea un marcador visual para un POI usando la clase CSS ".map-pin"
-    private void addPoiMarkerToMap(Poi poi) {
+    private void addPoiMarkerToMap(PoiTool poi) {
         if (zoomGroup == null || poi == null || poi.getPosition() == null) return;
 
         // 1) Crear el nodo gráfico
@@ -293,7 +295,7 @@ public class MainController implements Initializable {
     
     @FXML
     void listClicked(MouseEvent event) {
-        Poi itemSelected = map_listview.getSelectionModel().getSelectedItem();
+        PoiTool itemSelected = map_listview.getSelectionModel().getSelectedItem();
         if (itemSelected == null) return;
 
         // 1) Datos básicos
@@ -335,15 +337,15 @@ public class MainController implements Initializable {
     }
     
     private void dibujarPOI(){
-        for (Poi poi : data) {
+        for (PoiTool poi : data) {
             addPoiMarkerToMap(poi);
         }
 
         // 2) Cada vez que se añada un nuevo POI a la lista, dibujarlo también
-        data.addListener((ListChangeListener<Poi>) change -> {
+        data.addListener((ListChangeListener<PoiTool>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    for (Poi p : change.getAddedSubList()) {
+                    for (PoiTool p : change.getAddedSubList()) {
                         addPoiMarkerToMap(p);
                     }
                 }
@@ -363,30 +365,41 @@ public class MainController implements Initializable {
     // Open pages
     @FXML
     private void openProfile(ActionEvent event) {
-        openPage("/views/profile.fxml", event);
+        User currentUser = SessionManager.getActiveUser();
+        openPage("/views/profile.fxml", event, currentUser);
     }
 
     @FXML
     private void openProblems(ActionEvent event) {
-        openPage("/views/problemSelection.fxml", event);
+        User currentUser = SessionManager.getActiveUser();
+        openPage("/views/problems.fxml", event, currentUser);
     }
 
     @FXML
     private void openResults(ActionEvent event) {
-        openPage("/views/results.fxml", event);
+        User currentUser = SessionManager.getActiveUser();
+        openPage("/views/results.fxml", event, currentUser);
     }
 
-    private void openPage(String fxmlPath, ActionEvent event) {
+    private void openPage(String fxmlPath, ActionEvent event, User userToInject) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
             
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Object controller = loader.getController();
+        
+            if (controller instanceof ResultsController) {
+                ((ResultsController) controller).setUser(userToInject);
+            }
+            
+            Stage stage = (Stage) zoom_slider.getScene().getWindow();
 
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace(); // mejor que dejar el catch vacío
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
     }
 
@@ -527,6 +540,8 @@ public class MainController implements Initializable {
             Problem problem = allProblems.get(index);
             loadProblem(problem);
         }
+        
+        updateProblemTitle();
     }
     
     public void loadProblem(Problem selected){
@@ -599,8 +614,16 @@ public class MainController implements Initializable {
             rb.setStyle("-fx-opacity: 1;");
         });
         
-        if (isCorrect) { correctAnswer(); }
-        else { wrongAnswer(); }
+        if (isCorrect) { 
+            SessionManager.registerCorrectAttempt();
+            correctAnswer();
+        }        
+        else { 
+            SessionManager.registerIncorrectAttempt();
+            wrongAnswer();
+        }
+        
+        updateSessionCounters();
     }
 
     private void correctAnswer() {        
@@ -659,5 +682,25 @@ public class MainController implements Initializable {
         if (ans == ansAlternativaC) return tBAlternativaC;
         return tBAlternativaD;
     }
+    
+    public void updateSessionCounters() {
+        int total = SessionManager.getProblemsSolved();
+        int correct = SessionManager.getProblemsCorrect();
+        int incorrect = SessionManager.getProblemsIncorrect();
+
+        contadorProblemas.setText("Aciertos: " + correct + "  |  Fallos: " + incorrect + "  |  Total: " + total);
+    }
+
+    @FXML
+    private void logout(ActionEvent event) {
+        SessionManager.finalizeAndSaveSession();
+        Stage stage = (Stage) zoom_slider.getScene().getWindow();
+        SessionManager.goToLogIn(stage);
+    }
+    
+    public void updateProblemTitle() {
+        int nextProblemNumber = SessionManager.getProblemsSolved()+ 1;
+        tituloProbActual.setText("Problema #" + nextProblemNumber);
+}
 
 }
