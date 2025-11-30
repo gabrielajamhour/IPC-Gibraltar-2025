@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="500" prefWidth="700" spacing="20" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProblemSelectionController">
+<VBox alignment="TOP_CENTER" prefHeight="500" prefWidth="700" spacing="20" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProblemSelectionController">
 
     <Label style="-fx-font-size: 24px;" text="Lista de Problemas">
       <VBox.margin>
@@ -28,17 +28,17 @@
     </HBox>
 
     <!-- Lista de problemas -->
-    <ListView fx:id="problemsList" prefHeight="350" prefWidth="600" />
+    <ListView fx:id="problemsList" />
 
     <HBox spacing="15">
-        <Button onAction="#openProblem" prefWidth="150" text="Abrir problema">
+        <Button fx:id="btnOpenProblem" onAction="#openProblem" prefWidth="150" text="Abrir problema">
          <HBox.margin>
             <Insets bottom="15.0" left="15.0" top="-5.0" />
          </HBox.margin></Button>
-      <Region prefHeight="36.0" prefWidth="365.0" />
+      <Region prefHeight="36.0" prefWidth="370.0" HBox.hgrow="ALWAYS" />
         <Button contentDisplay="CENTER" onAction="#goBack" prefWidth="120" text="Volver">
          <HBox.margin>
-            <Insets top="-5.0" />
+            <Insets right="15.0" top="-5.0" />
          </HBox.margin></Button>
     </HBox>
 

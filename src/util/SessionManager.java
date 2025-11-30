@@ -1,10 +1,12 @@
 package util;
 
+import controllers.MainController;
 import java.io.IOException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import model.Problem;
 import model.User;
 
 public class SessionManager {
@@ -42,5 +44,25 @@ public class SessionManager {
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {}
+    }
+    
+    public static void goToMainAndLoadProblem(Stage stage, Problem problemToLoad) {
+        try {
+            FXMLLoader loader = new FXMLLoader(SessionManager.class.getResource("/views/main.fxml"));
+            Parent root = loader.load();
+            
+            MainController mainController = loader.getController();
+
+            if (problemToLoad != null) {
+                mainController.loadProblem(problemToLoad); 
+            }
+
+            stage.setScene(new Scene(root));
+            stage.show();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Manejar error
+        }
     }
 }

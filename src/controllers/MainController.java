@@ -58,9 +58,14 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.scene.control.RadioButton;
+import javafx.scene.text.Text;
+import model.Answer;
+import model.Problem;
 import util.PointTool;
 import util.ZoomManager;
 import util.ClearAll;
+import util.SessionManager;
 
 
 public class MainController implements Initializable {
@@ -112,6 +117,18 @@ public class MainController implements Initializable {
     private Button randomProblem;
     @FXML
     private VBox problemContainer;
+    @FXML
+    private Text tituloProblema;
+    @FXML
+    private Label enunciadoProblema;
+    @FXML
+    private RadioButton alternativaA;
+    @FXML
+    private RadioButton alternativaB;
+    @FXML
+    private RadioButton alternativaC;
+    @FXML
+    private RadioButton alternativaD;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -397,5 +414,16 @@ public class MainController implements Initializable {
     @FXML
     private void generateRandomProblem(ActionEvent event) {
         problemContainer.setVisible(true);
+    }
+    
+    public void loadProblem(Problem selected){        
+        enunciadoProblema.setText(selected.getText());
+        
+        List<Answer> answers = selected.getAnswers();
+        
+        alternativaA.setText(answers.get(0).getText());
+        alternativaB.setText(answers.get(1).getText());
+        alternativaC.setText(answers.get(2).getText());
+        alternativaD.setText(answers.get(3).getText());        
     }
 }

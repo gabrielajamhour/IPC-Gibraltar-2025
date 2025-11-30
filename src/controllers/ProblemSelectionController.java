@@ -17,6 +17,8 @@ public class ProblemSelectionController implements Initializable {
     @FXML private ListView<Problem> problemsList;
 
     private List<Problem> allProblems;
+    @FXML
+    private Button btnOpenProblem;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -29,7 +31,6 @@ public class ProblemSelectionController implements Initializable {
 
         } catch (NavDAOException ex) {} 
     }
-
     @FXML
     private void searchProblems() {
         String query = searchField.getText().toLowerCase();
@@ -58,9 +59,9 @@ public class ProblemSelectionController implements Initializable {
             showAlert("Debes seleccionar un problema");
             return;
         }
-
-        // Aquí deberías navegar al Main y cargar este problema seleccionado
-        // mainController.loadProblem(selected);
+        
+        Stage stage = (Stage) searchField.getScene().getWindow();
+        SessionManager.goToMainAndLoadProblem(stage, selected);
     }
 
     @FXML

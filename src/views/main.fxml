@@ -25,7 +25,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200.0" stylesheets="@../resources/main.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
+<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1300.0" stylesheets="@../resources/main.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
    <center>
       <VBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="561.0" prefWidth="702.0">
          <children>
@@ -161,48 +161,47 @@
       </VBox>
    </left>
    <right>
-      <VBox fx:id="problemContainer" alignment="CENTER" prefWidth="250.0" BorderPane.alignment="CENTER">
+      <VBox alignment="TOP_CENTER" minWidth="-Infinity" prefWidth="400.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="randomProblem" mnemonicParsing="false" onAction="#generateRandomProblem" text="Generar problema aleatorio">
-               <VBox.margin>
-                  <Insets bottom="10.0" />
-               </VBox.margin>
-            </Button>
-            <Button fx:id="problemsButton" mnemonicParsing="false" onAction="#openProblems" text="Seleccionar problema">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </Button>
-            <Region prefHeight="80.0" prefWidth="200.0" />
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Problema actual">
+            <Text fx:id="tituloProblema" strokeType="OUTSIDE" strokeWidth="0.0" text="Problema actual">
                <font>
                   <Font size="24.0" />
                </font>
                <VBox.margin>
-                  <Insets top="10.0" />
+                  <Insets bottom="10.0" top="50.0" />
                </VBox.margin>
             </Text>
-            <Label alignment="CENTER" text="Enunciado" textAlignment="CENTER">
-               <VBox.margin>
-                  <Insets top="20.0" />
-               </VBox.margin>
-            </Label>
-            <RadioButton mnemonicParsing="false" text="Alternativa A">
+            <Label fx:id="enunciadoProblema" maxWidth="350.0" text="Enunciado" textAlignment="JUSTIFY" wrapText="true" />
+            <RadioButton fx:id="alternativaA" mnemonicParsing="false" text="Alternativa A">
                <toggleGroup>
                   <ToggleGroup fx:id="questionGroup" />
                </toggleGroup>
                <VBox.margin>
-                  <Insets top="30.0" />
+                  <Insets top="10.0" />
                </VBox.margin>
             </RadioButton>
-            <RadioButton mnemonicParsing="false" text="Alternativa B" toggleGroup="$questionGroup" />
-            <RadioButton mnemonicParsing="false" text="Alternativa C" toggleGroup="$questionGroup" />
-            <RadioButton mnemonicParsing="false" text="Alternativa D" toggleGroup="$questionGroup" />
+            <RadioButton fx:id="alternativaB" mnemonicParsing="false" text="Alternativa B" toggleGroup="$questionGroup" />
+            <RadioButton fx:id="alternativaC" mnemonicParsing="false" text="Alternativa C" toggleGroup="$questionGroup" />
+            <RadioButton fx:id="alternativaD" mnemonicParsing="false" text="Alternativa D" toggleGroup="$questionGroup" />
             <Button mnemonicParsing="false" text="Comprobar respuesta">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
             </Button>
+            <Region prefHeight="100.0" prefWidth="400.0" />
+            <VBox alignment="BOTTOM_CENTER">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+               <children>
+                  <Button fx:id="randomProblem" mnemonicParsing="false" onAction="#generateRandomProblem" text="Generar problema aleatorio" />
+                  <Button fx:id="problemsButton" alignment="BOTTOM_CENTER" mnemonicParsing="false" onAction="#openProblems" text="Seleccionar problema">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Button>
+               </children>
+            </VBox>
          </children>
       </VBox>
    </right>
