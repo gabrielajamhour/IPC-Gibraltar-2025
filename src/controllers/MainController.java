@@ -122,6 +122,7 @@ public class MainController implements Initializable {
     @FXML    private MenuButton profileMain;
     @FXML    private Button btnTransportador;
     @FXML    private Button btnRegla;
+    @FXML    private Label labelIntrucciones;
     
     // En vez de enum Tool, tendremos objetos:
     private MapTool currentTool;
@@ -262,7 +263,15 @@ public class MainController implements Initializable {
     
     @FXML
     private void showPosition(MouseEvent event) {
-        mousePosition.setText("X: " + (int) event.getX() + ",   Y: " + (int) event.getY());
+        if (zoomGroup == null) return;
+
+        // Convertimos la posición del ratón (en coordenadas de escena)
+        // al sistema de coordenadas del zoomGroup (el mapa)
+        Point2D mapPoint = zoomGroup.sceneToLocal(event.getSceneX(), event.getSceneY());
+
+        mousePosition.setText(
+            "X: " + (int) mapPoint.getX() + ",   Y: " + (int) mapPoint.getY()
+        );
     }
 
     private void closeApp(ActionEvent event) {

@@ -1,5 +1,6 @@
 package util;
 
+import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -133,26 +134,83 @@ public class ProtractorTool {
      * Coloca el transportador en el centro de la parte visible del mapa,
      * teniendo en cuenta zoom y transformaciones.
      */
+    // MAGIA NEGRA - NO DOT TOUCH
     public void centerOnViewport() {
-        if (scrollPane == null) return;
+        if (scrollPane == null || zoomGroup == null) return;
 
-        // Tamaño del viewport del ScrollPane
         Bounds viewportBounds = scrollPane.getViewportBounds();
-        double viewportCenterX = viewportBounds.getWidth() / 2.0;
-        double viewportCenterY = viewportBounds.getHeight() / 2.0;
+        Bounds contentBounds  = zoomGroup.getBoundsInLocal();
 
-        // Centro del viewport en coordenadas de escena
-        Point2D centerInScene = scrollPane.localToScene(viewportCenterX, viewportCenterY);
+        double viewportW = viewportBounds.getWidth();
+        double viewportH = viewportBounds.getHeight();
 
-        // Centro del viewport convertido a coordenadas del zoomGroup (contenido del mapa)
-        Point2D centerInZoom = zoomGroup.sceneToLocal(centerInScene);
+        // Si todavía no hay tamaño de viewport, centramos en el contenido completo
+        if (viewportW <= 0 || viewportH <= 0) {
+            double centerX = (contentBounds.getMinX() + contentBounds.getMaxX()) / 2.0;
+            double centerY = (contentBounds.getMinY() + contentBounds.getMaxY()) / 2.0;
 
-        double nodeW = protractorNode.getPrefWidth();
-        double nodeH = protractorNode.getPrefHeight();
+            Bounds nodeBounds = protractorNode.getBoundsInLocal();
+            double nodeW = nodeBounds.getWidth();
+            double nodeH = nodeBounds.getHeight();
 
-        // Colocamos el transportador con su centro en ese punto
-        protractorNode.setTranslateX(centerInZoom.getX() - nodeW / 2.0);
-        protractorNode.setTranslateY(centerInZoom.getY() - nodeH / 2.0);
+            protractorNode.setTranslateX(centerX - nodeW / 2.0);
+            protractorNode.setTranslateY(centerY - nodeH / 2.0);
+            return;
+        }
+
+        // Escala actual del mapa (la que pone el ZoomManager)
+        double scale = zoomGroup.getScaleX();
+        if (scale <= 0) scale = 1.0;
+
+        // Tamaño del contenido ya escalado
+        double contentWScaled = contentBounds.getWidth()  * scale;
+        double contentHScaled = contentBounds.getHeight() * scale;
+
+        double maxX = Math.max(contentWScaled - viewportW, 0);
+        double maxY = Math.max(contentHScaled - viewportH, 0);
+
+        // Esquina superior izquierda visible, en coordenadas ESCALADAS
+        double visibleXScaled = scrollPane.getHvalue() * maxX;
+        double visibleYScaled = scrollPane.getVvalue() * maxY;
+
+        // Centro del viewport en coordenadas LOCALES (no escaladas)
+        double centerXLocal = (visibleXScaled + viewportW / 2.0) / scale;
+        double centerYLocal = (visibleYScaled + viewportH / 2.0) / scale;
+
+        Bounds nodeBounds = protractorNode.getBoundsInLocal();
+        double nodeW = nodeBounds.getWidth();
+        double nodeH = nodeBounds.getHeight();
+
+        // Colocamos la regla centrada en ese punto local
+        protractorNode.setTranslateX(centerXLocal - nodeW / 2.0);
+        protractorNode.setTranslateY(centerYLocal - nodeH / 2.0);
+    }
+
+
+    
+    /**
+     * Ajusta la escala de la regla en función del zoom actual del mapa,
+     * para que el tamaño en pantalla sea razonable al activarla.
+     */
+        private void adjustScaleForCurrentZoom() {
+        double mapScale = zoomGroup.getScaleX(); // o zoomManager.getCurrentScale()
+        if (mapScale <= 0) {
+            mapScale = 1.0;
+        }
+
+        Bounds localBounds = protractorNode.getBoundsInLocal();
+        double width = localBounds.getWidth();
+        if (width <= 0) {
+            return;
+        }
+
+        double targetWidthOnScreen = 350; // igual que la regla, por consistencia
+
+        double escalaInterna = targetWidthOnScreen / (width * mapScale);
+        zoomScale = escalaInterna;
+
+        protractorNode.setScaleX(baseScaleX * zoomScale);
+        protractorNode.setScaleY(baseScaleY * zoomScale);
     }
 
 
@@ -163,14 +221,21 @@ public class ProtractorTool {
         return visible;
     }
 
+    // MAGIA NEGRA - NO DOT TOUCH
     public void setVisible(boolean visible) {
         this.visible = visible;
         protractorNode.setVisible(visible);
         if (visible) {
-            centerOnViewport();
-            protractorNode.toFront();
+            adjustScaleForCurrentZoom(); // primero tamaño acorde al zoom actual
+
+            // Esperamos al siguiente pulso de JavaFX para que el ScrollPane tenga bien el viewport
+            Platform.runLater(() -> {
+                centerOnViewport();   // ahora sí, centramos
+                protractorNode.toFront();
+            });
         }
     }
+
 
     public boolean isVisible() {
         return visible;

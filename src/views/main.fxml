@@ -53,6 +53,7 @@
             </ScrollPane>
             <HBox alignment="CENTER_RIGHT">
                <children>
+                  <Label fx:id="labelIntrucciones" text="Instrucciones herramientas" />
                   <Label text="Zoom">
                      <HBox.margin>
                         <Insets left="200.0" right="10.0" />
