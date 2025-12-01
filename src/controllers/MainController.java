@@ -211,7 +211,7 @@ public class MainController implements Initializable {
     }
     
     public void setUser(User u) {
-        profileMain.setText("Usuario: " + u.getNickName());
+        profileMain.setText(" " + u.getNickName());
     }
     
     private void initData() {        
