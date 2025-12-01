@@ -113,21 +113,24 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
                 <Button fx:id="btnPoint" mnemonicParsing="false" onAction="#activatePointTool" text="Marcar punto" />
                   <Button fx:id="btnLine" mnemonicParsing="false" onAction="#activateLineTool" text="Trazar línea" GridPane.rowIndex="1" />
-                  <Button fx:id="btnBorrar" alignment="CENTER" mnemonicParsing="false" onAction="#activateBorrar" text="Borrar" GridPane.rowIndex="3" />
-                  <Slider fx:id="sliderGrosor" min="2.0" GridPane.columnSpan="2" GridPane.rowIndex="5">
+                  <Button fx:id="btnBorrar" alignment="CENTER" mnemonicParsing="false" onAction="#activateBorrar" text="Borrar" GridPane.rowIndex="4" />
+                  <Slider fx:id="sliderGrosor" min="2.0" GridPane.columnSpan="2" GridPane.rowIndex="6">
                      <GridPane.margin>
                         <Insets left="15.0" right="15.0" />
                      </GridPane.margin>
                   </Slider>
-                  <ColorPicker fx:id="colorPicker" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                  <Button fx:id="btnBorrarTodo" mnemonicParsing="false" onAction="#activateBorrarTodo" text="Borrar todo" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <ColorPicker fx:id="colorPicker" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+                  <Button fx:id="btnBorrarTodo" mnemonicParsing="false" onAction="#activateBorrarTodo" text="Borrar todo" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                   <Button fx:id="btnArco" layoutX="21.0" layoutY="55.0" mnemonicParsing="false" onAction="#activateArcoTool" text="Trazar arco" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Button fx:id="btnSeleccionar" layoutX="16.0" layoutY="16.0" mnemonicParsing="false" onAction="#activateSeleccionarTool" text="Seleccionar" GridPane.columnIndex="1" />
                   <Button fx:id="btnTexto" layoutX="20.0" layoutY="48.0" mnemonicParsing="false" onAction="#activateTextTool" text="Añadir texto" GridPane.rowIndex="2" />
+                  <Button fx:id="btnTransportador" layoutX="18.0" layoutY="89.0" mnemonicParsing="false" onAction="#activateTransportadorTool" text="Transp. ángulos" GridPane.rowIndex="3" />
+                  <Button fx:id="btnRegla" layoutX="9.0" layoutY="130.0" mnemonicParsing="false" onAction="#activateReglaTool" text="Regla" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                </children>
                <VBox.margin>
                   <Insets top="10.0" />

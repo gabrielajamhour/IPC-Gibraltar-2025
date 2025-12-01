@@ -66,6 +66,7 @@ import javafx.scene.control.Toggle;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Arc;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import model.Answer;
 import model.NavDAOException;
@@ -77,6 +78,8 @@ import util.PointTool;
 import util.ZoomManager;
 import util.ClearAll;
 import util.ProblemUtil;
+import util.ProtractorTool;
+import util.ReglaTool;
 import util.SelectTool;
 import util.SessionManager;
 import util.TextTool;
@@ -117,6 +120,8 @@ public class MainController implements Initializable {
     @FXML    private Label textErrorCompResp;
     @FXML    private Button btnTexto;
     @FXML    private MenuButton profileMain;
+    @FXML    private Button btnTransportador;
+    @FXML    private Button btnRegla;
     
     // En vez de enum Tool, tendremos objetos:
     private MapTool currentTool;
@@ -127,6 +132,10 @@ public class MainController implements Initializable {
     private MapTool selectTool;
     private MapTool arcTool;
     private MapTool textTool;
+    
+    // Transportador de águlos y regla
+    private ProtractorTool protractorTool;
+    private ReglaTool reglaTool;
     
     // Estados compartidos (color actual, grosor, etc)
     private final ObjectProperty<Color> currentColor = new SimpleObjectProperty<>(Color.RED);
@@ -165,6 +174,13 @@ public class MainController implements Initializable {
     @FXML    private Label tituloProbActual;
     private Label problemaActual;
     private ProblemUtil problemUtil;
+    
+    // Nodo visual que usará el estilo del CSS (transportador)
+    private Rectangle protractorNode;
+    private boolean protractorVisible = false;
+    private double protractorScale = 1.0;
+    private double lastProtractorMouseX;
+    private double lastProtractorMouseY;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -186,7 +202,11 @@ public class MainController implements Initializable {
         selectTool = new SelectTool(zoomGroup, currentColor, currentLineWidth);
         arcTool    = new ArcTool(zoomGroup, arcData, currentLineWidth, currentColor);
         textTool   = new TextTool(zoomGroup, currentColor, currentLineWidth, sharedTextData);
-
+        
+        // Transportador (overlay auxiliar)
+        protractorTool = new ProtractorTool(zoomGroup, map_scrollpane);
+        reglaTool = new ReglaTool(zoomGroup, map_scrollpane);
+        
         // Dibujar todos los elementos
         dibujar();
         
@@ -388,7 +408,6 @@ public class MainController implements Initializable {
         }
     }
     
-
     
     // Open pages
     @FXML
@@ -501,9 +520,45 @@ public class MainController implements Initializable {
             setCurrentTool(textTool);
         }
     }
+    
+    @FXML
+    private void activateTransportadorTool(ActionEvent event) {
+        if (protractorTool == null) return;
+
+        boolean visible = protractorTool.toggleVisible();
+
+        // Estilo del botón (igual que los demás)
+        String activeStyle   = "-fx-background-color: #4287f5; -fx-text-fill: white;";
+        String inactiveStyle = "";
+
+        if (btnTransportador != null) {
+            btnTransportador.setStyle(visible ? activeStyle : inactiveStyle);
+        }
+
+        // IMPORTANTE: NO tocamos currentTool
+        // El usuario puede tener LineTool, PointTool, etc. activos y seguir dibujando.
+    }
+    
+    @FXML
+    private void activateReglaTool(ActionEvent event) {
+        if (reglaTool == null) return;
+
+        boolean visible = reglaTool.toggleVisible();
+
+        // Estilo del botón (igual que los demás)
+        String activeStyle   = "-fx-background-color: #4287f5; -fx-text-fill: white;";
+        String inactiveStyle = "";
+
+        if (btnRegla != null) {
+            btnRegla.setStyle(visible ? activeStyle : inactiveStyle);
+        }
+
+        // IMPORTANTE: NO tocamos currentTool
+        // El usuario puede tener LineTool, PointTool, etc. activos y seguir dibujando.
+    }
 
     private void onNoneToolClicked() {
-        setCurrentTool(null); // deja solo el pan del ScrollPane
+            setCurrentTool(null); // deja solo el pan del ScrollPane
     }
     
     private void updateToolButtons() {
@@ -538,6 +593,20 @@ public class MainController implements Initializable {
         // Botón de Texto
         if (btnTexto != null) {
             btnTexto.setStyle(currentTool == textTool ? activeStyle : inactiveStyle);
+        }
+        
+        // Botón de Transportador: depende de si está visible el overlay
+        if (btnTransportador != null && protractorTool != null) {
+            btnTransportador.setStyle(
+                protractorTool.isVisible() ? activeStyle : inactiveStyle
+            );
+        }
+        
+        // Botón de Regla: depende de si está visible el overlay
+        if (btnRegla != null && reglaTool != null) {
+            btnRegla.setStyle(
+                reglaTool.isVisible() ? activeStyle : inactiveStyle
+            );
         }
 
         // importante: solo dejamos mover el mapa cuando no hay herramienta de dibujo
