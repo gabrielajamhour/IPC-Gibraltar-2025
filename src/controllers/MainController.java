@@ -211,6 +211,9 @@ public class MainController implements Initializable {
         // Dibujar todos los elementos
         dibujar();
         
+        // Iniciar las intrucciones dinamicas
+        iniInstrLabel();
+        
         // Herramienta por defecto
         setCurrentTool(null);
 
@@ -414,6 +417,21 @@ public class MainController implements Initializable {
             if (!zoomGroup.getChildren().contains(t)) {
                 zoomGroup.getChildren().add(t);
             }
+        }
+    }
+    
+    // Label de instrucciones vacío al inicio
+    private void iniInstrLabel(){  
+        if (labelIntrucciones != null) {
+            labelIntrucciones.setText("");
+        }
+        ((ArcTool) arcTool).setInstructionUpdater(this::updateInstructionLabel);
+    }
+    
+    // Método genérico para actualizar el texto de instrucciones
+    private void updateInstructionLabel(String text) {
+        if (labelIntrucciones != null) {
+            labelIntrucciones.setText(text == null ? "" : text);
         }
     }
     
@@ -630,6 +648,10 @@ public class MainController implements Initializable {
             currentTool.onExit();
         }
         currentTool = newTool;
+        
+        // Limpiar instrucciones al cambiar de herramienta
+        updateInstructionLabel("");
+        
         if (currentTool != null) {
             currentTool.onEnter();
         }

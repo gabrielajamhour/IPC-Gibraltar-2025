@@ -1,5 +1,6 @@
 package util;
 
+import java.util.function.Consumer;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
@@ -23,7 +24,7 @@ import javafx.scene.shape.StrokeLineCap;
  *  Mover ratón: se ve el arco "en vivo" (sentido horario)
  *  Clic 3: punto final del arco
  *
- *  Si la diferencia angular es casi 360º, se guarda un Arc de 360º (equivale a círculo).
+ *  Si la diferencia angular es de -5º o +5º (de 355º a 05º), se guarda un Arc de 360º (equivale a círculo).
  */
 public class ArcTool implements MapTool {
 
@@ -34,6 +35,9 @@ public class ArcTool implements MapTool {
     private final ObservableList<Arc> arcData;
     private final DoubleProperty currentLineWidth;
     private final ObjectProperty<Color> currentColor;
+    
+    // Callback para actualizar instrucciones
+    private Consumer<String> instructionUpdater;
 
     private enum Step {
         WAIT_CENTER,
@@ -64,9 +68,15 @@ public class ArcTool implements MapTool {
 
     @Override
     public void onEnter() {
+        // Al entrar en la herramienta empezamos siempre por el centro
+        step = Step.WAIT_CENTER;
+
         if (zoomGroup != null) {
             zoomGroup.addEventFilter(MouseEvent.MOUSE_MOVED, mouseMovedHandler);
         }
+
+        // Instrucción inicial
+        updateInstruction("Haz clic para seleccionar\nel centro del arco");
     }
 
     @Override
@@ -79,6 +89,9 @@ public class ArcTool implements MapTool {
         }
         currentArc = null;
         step = Step.WAIT_CENTER;
+        
+        // Al salir de la herramienta, vaciamos las instrucciones
+        updateInstruction("");
     }
 
     @Override
@@ -95,6 +108,9 @@ public class ArcTool implements MapTool {
                 centerX = p.getX();
                 centerY = p.getY();
                 step = Step.WAIT_START;
+                
+                // Siguiente instrucción (Instrucción dinámica)
+                updateInstruction("Haz clic para seleccionar\nel inicio del arco");
                 break;
 
             case WAIT_START:
@@ -123,6 +139,9 @@ public class ArcTool implements MapTool {
                 zoomGroup.getChildren().add(currentArc);
 
                 step = Step.WAIT_END;
+                
+                // Instrucción para el tercer clic (Instrucción dinámica)
+                updateInstruction("Mueve el ratón y haz clic\npara seleccionar el final del arco");
                 break;
 
             case WAIT_END:
@@ -215,6 +234,23 @@ public class ArcTool implements MapTool {
 
         currentArc = null;
         step = Step.WAIT_CENTER;
+        
+        // Indicar que se ha terminado y qué hacer ahora
+        updateInstruction("Haz un clic para seleccionar\nel centro de otro arco.");
+    }
+    
+    // ============ INSTRUCCIONES DINAMICAS ============
+    
+    // Setter para registrar el callback
+    public void setInstructionUpdater(Consumer<String> instructionUpdater) {
+        this.instructionUpdater = instructionUpdater;
+    }
+
+    // Método auxiliar para lanzar el texto
+    private void updateInstruction(String text) {
+        if (instructionUpdater != null) {
+            instructionUpdater.accept(text);
+        }
     }
 
 
