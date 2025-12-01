@@ -1,6 +1,7 @@
 package util;
 
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -9,6 +10,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 
 /**
  * @author Rafael Alonso
@@ -27,6 +29,7 @@ public class EraserTool implements MapTool {
     private final ListView<Poi> poiListView;
     private final ObservableList<Line> lineData;
     private final ObservableList<Arc> arcData;
+    private final ObservableList<Text> textList;
     private final Node mapPin;
 
     // Radio máximo de borrado en píxeles
@@ -36,11 +39,13 @@ public class EraserTool implements MapTool {
                       ListView<Poi> poiListView,
                       ObservableList<Line> lineData,
                       ObservableList<Arc> arcData,
+                      ObservableList<Text> textList,
                       Node mapPin) {
         this.zoomGroup = zoomGroup;
         this.poiListView = poiListView;
         this.lineData = lineData;
         this.arcData = arcData;
+        this.textList = textList;
         this.mapPin = mapPin;
     }
 
@@ -105,6 +110,17 @@ public class EraserTool implements MapTool {
             if (arcData != null) {
                 arcData.remove(arcToRemove);
             }
+            return;
+        }
+        
+        // 4) Intenta borrar un texto cercano
+        Text text = findTextNear(localPoint);
+        if (text != null) {
+            zoomGroup.getChildren().remove(text);   // lo quitas del mapa
+            if (textList != null) {
+                textList.remove(text);              // y de la lista compartida
+            }
+            return;
         }
     }
 
@@ -220,6 +236,30 @@ public class EraserTool implements MapTool {
             }
         }
         return closest;
+    }
+    
+    private Text findTextNear(Point2D point) {
+        Text nearest = null;
+        double bestDist = Double.MAX_VALUE;
+        
+        double px = point.getX();
+        double py = point.getY();
+
+        for (Node child : zoomGroup.getChildren()) {
+            if (child instanceof Text text) {
+                Bounds b = text.getBoundsInParent();
+                double cx = (b.getMinX() + b.getMaxX()) / 2.0;
+                double cy = (b.getMinY() + b.getMaxY()) / 2.0;
+
+                double d = Math.hypot(px - cx, py - cy);
+                if (d < bestDist && d <= MAX_DISTANCE) {
+                    bestDist = d;
+                    nearest = text;
+                }
+            }
+        }
+
+        return nearest;
     }
 
     // ---------------- Utilidades de ángulos ----------------

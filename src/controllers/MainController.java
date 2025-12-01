@@ -79,6 +79,7 @@ import util.ClearAll;
 import util.ProblemUtil;
 import util.SelectTool;
 import util.SessionManager;
+import util.TextTool;
 
 
 public class MainController implements Initializable {
@@ -114,6 +115,8 @@ public class MainController implements Initializable {
     @FXML    private RadioButton tBAlternativaC;
     @FXML    private RadioButton tBAlternativaD;
     @FXML    private Label textErrorCompResp;
+    @FXML    private Button btnTexto;
+    @FXML    private MenuButton profileMain;
     
     // En vez de enum Tool, tendremos objetos:
     private MapTool currentTool;
@@ -123,13 +126,12 @@ public class MainController implements Initializable {
     private MapTool eraserTool;
     private MapTool selectTool;
     private MapTool arcTool;
+    private MapTool textTool;
     
     // Estados compartidos (color actual, grosor, etc)
     private final ObjectProperty<Color> currentColor = new SimpleObjectProperty<>(Color.RED);
     private final DoubleProperty currentLineWidth = new SimpleDoubleProperty(2.0);
 
-    // hashmap para guardar los puntos de interes POI
-    private final HashMap<String, Poi> hm = new HashMap<>();
     
     // Lista compartida de líneas para TODA la app (sobrevive a cambiar de escena)
     private static final ObservableList<Line> lineData =
@@ -138,7 +140,10 @@ public class MainController implements Initializable {
     // Curvas (arcos y círculos, todo Arc)
     private static final ObservableList<Arc> arcData =
         FXCollections.observableArrayList();
-
+    
+    // Textos compartidos entre instancias del controlador
+    private static final ObservableList<Text> sharedTextData =
+        FXCollections.observableArrayList();
 
     // Lista compartida entre instancias del controlador
     private static final ObservableList<Poi> sharedPoiData =
@@ -155,7 +160,7 @@ public class MainController implements Initializable {
     private Answer ansAlternativaD;
     private boolean alreadyAnswered = false;
     
-    @FXML    private MenuButton profileMain;
+    
     @FXML    private Label contadorProblemas;
     @FXML    private Label tituloProbActual;
     private Label problemaActual;
@@ -177,21 +182,16 @@ public class MainController implements Initializable {
         // Crear herramientas
         pointTool = new PointTool(zoomGroup, map_listview, currentColor);
         lineTool  = new LineTool(zoomGroup, lineData, currentLineWidth, currentColor);
-        eraserTool = new EraserTool(zoomGroup, map_listview, lineData, arcData, map_pin);
+        eraserTool = new EraserTool(zoomGroup, map_listview, lineData, arcData, sharedTextData, map_pin);
         selectTool = new SelectTool(zoomGroup, currentColor, currentLineWidth);
         arcTool    = new ArcTool(zoomGroup, arcData, currentLineWidth, currentColor);
-        
-        // Dibujar los POIs en el mapa
-        dibujarPOI();
-        
-        // Dibujar las lineas en el mapa
-        dibujarLineas();
-        
-        // Dibujar los arcos y circulos abiertos en el mapa
-        dibujarArcos();
+        textTool   = new TextTool(zoomGroup, currentColor, currentLineWidth, sharedTextData);
+
+        // Dibujar todos los elementos
+        dibujar();
         
         // Herramienta por defecto
-        setCurrentTool(null); // o panTool si lo tienes
+        setCurrentTool(null);
 
         // Eventos de ratón
         zoomGroup.addEventFilter(MouseEvent.MOUSE_PRESSED,  this::onMapPressed);
@@ -349,7 +349,8 @@ public class MainController implements Initializable {
         timeline.play();
     }
     
-    private void dibujarPOI(){
+    private void dibujar(){
+        // Dibujar los POIs
         for (Poi poi : data) {
             addPoiMarkerToMap(poi);
         }
@@ -364,23 +365,29 @@ public class MainController implements Initializable {
                 }
             }
         });
-    }
-    
-    public void dibujarLineas(){
+        
+        // Dibujar las Lineas
         for (Line line : lineData) {
             if (!zoomGroup.getChildren().contains(line)) {
                 zoomGroup.getChildren().add(line);
             }
         }
-    }
-    
-    private void dibujarArcos() {
+        
+        // Dibujar los arcos
         for (Arc arc : arcData) {
             if (!zoomGroup.getChildren().contains(arc)) {
                 zoomGroup.getChildren().add(arc);
             }
         }
+        
+        // Dibujar los textos
+        for (Text t : sharedTextData) {
+            if (!zoomGroup.getChildren().contains(t)) {
+                zoomGroup.getChildren().add(t);
+            }
+        }
     }
+    
 
     
     // Open pages
@@ -458,7 +465,7 @@ public class MainController implements Initializable {
     
     @FXML
     private void activateBorrarTodo(ActionEvent event) {
-        boolean borrado = ClearAll.clearAllWithConfirmation(zoomGroup, data, lineData, arcData, map_pin);
+        boolean borrado = ClearAll.clearAllWithConfirmation(zoomGroup, data, lineData, arcData, sharedTextData, map_pin);
 
         if (borrado) {
             setCurrentTool(null);   // solo si el usuario aceptó
@@ -475,7 +482,6 @@ public class MainController implements Initializable {
         }
     }
 
-
     @FXML
     private void activateSeleccionarTool(ActionEvent event) {
         if (currentTool == selectTool) {
@@ -483,6 +489,16 @@ public class MainController implements Initializable {
             setCurrentTool(null);
         } else {
             setCurrentTool(selectTool);
+        }
+    }
+    
+    @FXML
+    private void activateTextTool(ActionEvent event) {
+        if (currentTool == textTool) {
+            // Si ya estaba activa, la desactivamos
+            setCurrentTool(null);
+        } else {
+            setCurrentTool(textTool);
         }
     }
 
@@ -517,6 +533,11 @@ public class MainController implements Initializable {
         // Botón de arco / círculo
         if (btnArco != null) {
             btnArco.setStyle(currentTool == arcTool ? activeStyle : inactiveStyle);
+        }
+        
+        // Botón de Texto
+        if (btnTexto != null) {
+            btnTexto.setStyle(currentTool == textTool ? activeStyle : inactiveStyle);
         }
 
         // importante: solo dejamos mover el mapa cuando no hay herramienta de dibujo
@@ -588,5 +609,4 @@ public class MainController implements Initializable {
         Stage stage = (Stage) zoom_slider.getScene().getWindow();
         SessionManager.goToLogIn(stage);
     }
-
 }

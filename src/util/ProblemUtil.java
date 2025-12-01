@@ -1,5 +1,6 @@
 package util;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import javafx.scene.control.Label;
@@ -31,6 +32,9 @@ public class ProblemUtil {
     private Answer ansAlternativaC;
     private Answer ansAlternativaD;
     private boolean alreadyAnswered = false;
+    
+    // Lista de problemas ya respondidos en esta sesión
+    private final List<Problem> answeredProblems = new ArrayList<>();
 
     public ProblemUtil (
             Label enunciadoProblema,
@@ -61,24 +65,39 @@ public class ProblemUtil {
         updateProblemTitle();
     }
 
-    // ==============================
-    //   MÉTODOS QUE YA TIENES
-    //   (misma lógica que en MainController)
-    // ==============================
-
-    /** Equivale a tu @FXML generateRandomProblem */
     public void generateRandomProblem() throws NavDAOException {
         List<Problem> allProblems = Navigation.getInstance().getProblems();
 
-        if (!allProblems.isEmpty()) {
-            Random random = new Random();
-            int index = random.nextInt(allProblems.size());
-            Problem problem = allProblems.get(index);
-            loadProblem(problem);
+        if (allProblems.isEmpty()) {
+            return;
         }
+
+        // Filtramos solo los que aún no se han respondido
+        List<Problem> remaining = new ArrayList<>();
+        for (Problem p : allProblems) {
+            if (!answeredProblems.contains(p)) {
+                remaining.add(p);
+            }
+        }
+
+        // Si no quedan problemas sin responder, mostramos mensaje y salimos
+        if (remaining.isEmpty()) {
+            enunciadoProblema.setText("Ya has respondido todos los problemas disponibles.");
+            // opcional: desactivar el botón de comprobar o el de random si quieres
+            // btnComprobarRespuesta.setDisable(true);
+            // randomProblem.setDisable(true);
+            return;
+        }
+
+        // Elegimos aleatoriamente SOLO entre los no respondidos
+        Random random = new Random();
+        int index = random.nextInt(remaining.size());
+        Problem problem = remaining.get(index);
+        loadProblem(problem);
 
         updateProblemTitle();
     }
+
 
     /** Equivale a tu loadProblem(Problem selected) */
     public void loadProblem(Problem selected) {
@@ -167,6 +186,12 @@ public class ProblemUtil {
         }
 
         updateSessionCounters();
+        
+        // Registrar que este problema ya ha sido respondido
+        if (currentProblem != null && !answeredProblems.contains(currentProblem)) {
+            answeredProblems.add(currentProblem);
+}
+
     }
 
     /** Igual que tu correctAnswer() */

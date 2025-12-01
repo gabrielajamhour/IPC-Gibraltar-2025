@@ -13,6 +13,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Arc;   // <- NUEVO
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 /**
  *
@@ -83,7 +85,16 @@ public class SelectTool implements MapTool {
                     nearest = arc;
                 }
             }
-            // 3) Pins de POI
+            // 3) Texto (nodos javafx.scene.text.Text)
+            else if (child instanceof Text textNode) {
+                double d = distancePointToText(px, py, textNode);
+                if (d < bestDist && d <= HIT_TOLERANCE) {
+                    bestDist = d;
+                    nearest = textNode;
+                }
+            }
+            
+            // 4) Pins de POI
             else if (child instanceof Region region && region.getUserData() instanceof Poi) {
                 Bounds b = region.getBoundsInParent();
                 double cx = (b.getMinX() + b.getMaxX()) / 2.0;
@@ -134,8 +145,6 @@ public class SelectTool implements MapTool {
         return Math.hypot(px - projX, py - projY);
     }
 
-    // ==== NUEVO: distancia de un punto a un Arc ====
-
     private double distancePointToArc(double px, double py, Arc arc) {
         double cx = arc.getCenterX();
         double cy = arc.getCenterY();
@@ -182,6 +191,15 @@ public class SelectTool implements MapTool {
             double diffCW = positiveAngleDiff(anglePoint, start);
             return diffCW <= sweep + ANGLE_TOL;
         }
+    }
+    
+
+    // Distancia del punto (px, py) al centro del bounding box del texto.
+    private double distancePointToText(double px, double py, Text text) {
+        Bounds b = text.getBoundsInParent();
+        double cx = (b.getMinX() + b.getMaxX()) / 2.0;
+        double cy = (b.getMinY() + b.getMaxY()) / 2.0;
+        return Math.hypot(px - cx, py - cy);
     }
 
     // ==== Utilidades de ángulos (copiadas de ArcTool) ====
@@ -242,6 +260,15 @@ public class SelectTool implements MapTool {
             if (width > 0) {
                 arc.setStrokeWidth(width);
             }
+            
+        } else if (n instanceof Text text) {
+            // Color del texto
+            text.setFill(c);
+            text.setStroke(c);
+
+            // Usamos sliderGrosor como "tamaño de fuente"
+            double fontSize = Math.max(8, currentLineWidth.get());
+            text.setFont(Font.font(fontSize));
 
         } else if (n instanceof Region marker) {
             Object ud = marker.getUserData();
