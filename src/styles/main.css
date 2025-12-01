@@ -2,19 +2,6 @@
  *      MAIN PAGE STYLING
  *******************************/
 
-/*******************************************************************************
- *                                                                             *
- * High Contrast Theme                                                         *
- *                                                                             *
- ******************************************************************************/
-
-.contrast {
-    -app-color-hi: #5bf900;
-    -app-color-lo: black;
-    -app-hover: #666666;
-    -fx-background-color: -app-color-lo;
-}
-
 /*-------------------------- map pin ------------------------- */
 
 .map-pin {
@@ -56,4 +43,224 @@ S17.642,20.762,13.558,20.762z";
 /* Efecto Hover limpio (crucial para el diseño) */
 .menu-item-button:hover {
     -fx-background-color: #f0f0f0; /* Color de fondo muy suave al pasar el ratón */
+}
+
+/* ================================
+   PALETA DE COLORES EXTRAÍDA
+   ================================ */
+.root {
+    -fx-bg-main: #b7deeb;
+    -fx-bg-sidebar: #EEF2F6;
+    -fx-bg-card: #FFFFFF;
+
+    -fx-blue: #2D6CDF;
+    -fx-blue-light: #E5EEFF;
+
+    -fx-gray-text: #4A4A4A;
+    -fx-gray-light: #D7DDE4;
+
+    -fx-border-radius: 12px;
+    -fx-btn-radius: 10px;
+}
+
+/* ================================
+   GENERAL
+   ================================ */
+.root {
+    -fx-font-family: "Inter", "Segoe UI", sans-serif;
+    -fx-background-color: -fx-bg-main;
+}
+
+/* ================================
+   SIDEBAR (barra lateral)
+   ================================ */
+.sidebar {
+    -fx-background-color: -fx-bg-sidebar;
+    -fx-padding: 20px;
+    -fx-spacing: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0, 0, 3);
+}
+
+/* Icon + botón vertical */
+.tool-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 14px;
+    -fx-cursor: hand;
+    -fx-border-width: 2px;
+    -fx-border-color: transparent;
+    -fx-pref-width: 118px;
+}
+
+.tool-button:hover {
+    -fx-background-color: #ffffffaa;
+}
+
+.tool-button:selected {
+    -fx-background-color: -fx-blue-light;
+    -fx-border-color: -fx-blue;
+}
+.profile-button {
+    -fx-background-color: #ffffffaa;
+    -fx-background-radius: 14px;
+    -fx-cursor: hand;
+    -fx-border-width: 2px;
+    -fx-border-color: transparent;
+}
+
+.profile-button:hover {
+    -fx-background-color: #eeeeeeaa;
+}
+
+/* ================================
+   BOTONES CUADRADOS (Select, Point…)
+   ================================ */
+.square-btn {
+    -fx-background-color: -fx-bg-card;
+    -fx-background-radius: 16px;
+/*    -fx-border-color: transparent;*/
+    -fx-border-radius: 16px;
+    -fx-border-width: 2px;
+    -fx-cursor: hand;
+}
+
+.square-btn:hover {
+    -fx-border-color: -fx-blue;
+    -fx-background-color: -fx-blue-light;
+}
+
+.square-btn:selected {
+    -fx-background-color: -fx-blue-light;
+    -fx-border-color: -fx-blue;
+}
+
+/* ================================
+   LISTA DE OBJETOS CREADOS
+   ================================ */
+.object-item {
+    -fx-background-color: transparent;
+    -fx-padding: 8 12;
+    -fx-background-radius: 8px;
+}
+
+.object-item:hover {
+    -fx-background-color: rgba(0,0,0,0.05);
+}
+
+.object-item:selected {
+    -fx-background-color: -fx-blue-light;
+    -fx-border-color: -fx-blue;
+}
+
+/* ================================
+   PANEL DE PROBLEMAS (lado derecho)
+   ================================ */
+.problem-card {
+    -fx-background-color: -fx-bg-card;
+    -fx-background-radius: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0.2, 0, 3);
+}
+
+/* ================================
+   BOTONES DE RESPUESTA
+   ================================ */
+.answer-btn {
+    -fx-background-color: -fx-bg-card;
+    -fx-border-color: -fx-gray-light;
+    -fx-border-radius: 14px;
+    -fx-background-radius: 14px;
+    -fx-padding: 10 18;
+    -fx-font-size: 15px;
+    -fx-cursor: hand;
+}
+
+.answer-btn:hover {
+    -fx-border-color: -fx-blue;
+}
+
+.answer-btn.selected {
+    -fx-background-color: -fx-blue-light;
+    -fx-border-color: -fx-blue;
+}
+
+/* ================================
+   BOTÃO AZUL "Comprobar Respuesta"
+   ================================ */
+.primary-btn {
+    -fx-background-color: -fx-blue;
+    -fx-text-fill: white;
+    -fx-background-radius: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.primary-btn:hover {
+    -fx-background-color: #1f56bf;
+}
+
+/* ================================
+   BOTONES PEQUEÑOS ABAJO
+   ================================ */
+.small-btn {
+    -fx-background-color: -fx-bg-card;
+    -fx-border-radius: 16px;
+    -fx-background-radius: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0.2, 0, 3);
+    -fx-cursor: hand;
+}
+
+.small-btn:hover {
+    -fx-background-color: -fx-gray-light;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0.2, 0, 3);
+}
+
+/* ================================
+   ZOOM BAR (abajo del mapa)
+   ================================ */
+.zoom-bar {
+    -fx-background-color: -fx-bg-card;
+    -fx-background-radius: 14px;
+    -fx-padding: 6 16 6 16;
+}
+
+.zoom-tool {
+    -fx-background-color: -fx-bg-card;
+    -fx-background-radius: 14px;
+    -fx-padding: 6 10 6 10;
+}
+
+/* Slider */
+.slider .track {
+    -fx-background-color: -fx-gray-light;
+}
+
+.slider .thumb {
+    -fx-background-color: -fx-blue;
+}
+
+.color-picker {
+    -fx-pref-width: 150px;
+}
+
+/* ================================
+   TITULOS Y TEXTOS
+   ================================ */
+.title {
+    -fx-font-size: 20px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -fx-gray-text;
+}
+
+.subtitle {
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+}
+
+/* ================================
+   TARJETAS GENERALES
+   ================================ */
+.card {
+    -fx-background-color: -fx-bg-card;
+    -fx-background-radius: 16px;
+    -fx-padding: 5 7 5 7;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0.2, 0, 3);
 }

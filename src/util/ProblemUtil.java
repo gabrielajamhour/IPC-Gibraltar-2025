@@ -229,7 +229,7 @@ public class ProblemUtil {
     }
 
     private void marcarAlternativa(RadioButton rb, String color) {
-        rb.setStyle("-fx-background-color: " + color + "; -fx-padding: 5px; -fx-opacity: 1;");
+        rb.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 14px; -fx-padding: 2 5 2 5; -fx-opacity: 1;");
     }
 
     private RadioButton getRadioButtonFromAnswer(Answer ans) {
