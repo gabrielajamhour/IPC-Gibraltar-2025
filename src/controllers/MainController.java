@@ -76,6 +76,7 @@ import util.ArcTool;
 import util.PointTool;
 import util.ZoomManager;
 import util.ClearAll;
+import util.ProblemUtil;
 import util.SelectTool;
 import util.SessionManager;
 
@@ -154,13 +155,11 @@ public class MainController implements Initializable {
     private Answer ansAlternativaD;
     private boolean alreadyAnswered = false;
     
-    @FXML
-    private MenuButton profileMain;
-    @FXML
-    private Label contadorProblemas;
+    @FXML    private MenuButton profileMain;
+    @FXML    private Label contadorProblemas;
+    @FXML    private Label tituloProbActual;
     private Label problemaActual;
-    @FXML
-    private Label tituloProbActual;
+    private ProblemUtil problemUtil;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -200,14 +199,18 @@ public class MainController implements Initializable {
         zoomGroup.addEventFilter(MouseEvent.MOUSE_RELEASED, this::onMapReleased);
         
         mousePosition.setText("X: " + 0 + ",   Y: " + 0);
-        try {
-            generateRandomProblem(null);
-        } catch (NavDAOException e) {
-            e.printStackTrace();
-        }
         
-        updateSessionCounters();
-        updateProblemTitle();
+        problemUtil = new ProblemUtil(
+            enunciadoProblema,
+            tBAlternativaA,
+            tBAlternativaB,
+            tBAlternativaC,
+            tBAlternativaD,
+            textErrorCompResp,
+            questionGroup,
+            contadorProblemas,
+            tituloProbActual
+        );
     }
     
     public void setUser(User u) {
@@ -562,164 +565,22 @@ public class MainController implements Initializable {
 
     @FXML
     private void generateRandomProblem(ActionEvent event) throws NavDAOException {
-        List<Problem> allProblems = Navigation.getInstance().getProblems();
-
-        if (!allProblems.isEmpty()) {
-            Random random = new Random();
-            int index = random.nextInt(allProblems.size());
-            Problem problem = allProblems.get(index);
-            loadProblem(problem);
-        }
-        
-        updateProblemTitle();
+        problemUtil.generateRandomProblem();
     }
     
     public void loadProblem(Problem selected){
-        alreadyAnswered = false;
-
-        questionGroup.getToggles().forEach(t -> {
-            RadioButton rb = (RadioButton)t;
-            rb.setDisable(false);
-            rb.setStyle("");
-        });
-        
-        questionGroup.selectToggle(null);
-        
-        currentProblem = selected;
-        enunciadoProblema.setText(selected.getText());
-        
-        List<Answer> answers = selected.getAnswers();
-        
-        int[] numeros = {0, 1, 2, 3};
-
-        for (int i = numeros.length - 1; i > 0; i--) {
-            int j = (int) (Math.random() * (i + 1));
-            int temp = numeros[i];
-            numeros[i] = numeros[j];
-            numeros[j] = temp;
-        }
-        
-        ansAlternativaA = answers.get(numeros[0]);
-        ansAlternativaB = answers.get(numeros[1]);
-        ansAlternativaC = answers.get(numeros[2]);
-        ansAlternativaD = answers.get(numeros[3]);
-
-        tBAlternativaA.setText("A. " + ansAlternativaA.getText());
-        tBAlternativaB.setText("B. " + ansAlternativaB.getText());
-        tBAlternativaC.setText("C. " + ansAlternativaC.getText());
-        tBAlternativaD.setText("D. " + ansAlternativaD.getText());        
+        problemUtil.loadProblem(selected);    
     }
 
     @FXML
     private void comprobarRespuesta(ActionEvent event) {
-        
-        if (alreadyAnswered) return;
-
-        List<Answer> answers = currentProblem.getAnswers();
-
-        Toggle selectedToggle = questionGroup.getSelectedToggle();
-        
-        if (selectedToggle == null) {
-            textErrorCompResp.setVisible(true);
-            return;
-        }
-        
-        textErrorCompResp.setVisible(false);
-
-        // agora converte para RadioButton depois de garantir que não é null
-        RadioButton selected = (RadioButton) selectedToggle;
-
-        Boolean isCorrect;
-        
-        if (selected == tBAlternativaA) { isCorrect = ansAlternativaA.getValidity(); }
-        else if (selected == tBAlternativaB) { isCorrect = ansAlternativaB.getValidity(); }
-        else if (selected == tBAlternativaC) { isCorrect = ansAlternativaC.getValidity(); }
-        else { isCorrect = ansAlternativaD.getValidity(); }
-        
-        alreadyAnswered = true;
-        
-        questionGroup.getToggles().forEach(t -> {
-            RadioButton rb = (RadioButton)t;
-            rb.setDisable(true);
-            rb.setStyle("-fx-opacity: 1;");
-        });
-        
-        if (isCorrect) { 
-            SessionManager.registerCorrectAttempt();
-            correctAnswer();
-        }        
-        else { 
-            SessionManager.registerIncorrectAttempt();
-            wrongAnswer();
-        }
-        
-        updateSessionCounters();
-    }
-
-    private void correctAnswer() {        
-        // Descobrir qual é a alternativa correta
-        Answer correct = currentProblem.getAnswers()
-                                       .stream()
-                                       .filter(Answer::getValidity)
-                                       .findFirst()
-                                       .orElse(null);
-
-        // Match Answer -> RadioButton
-        RadioButton correctButton = getRadioButtonFromAnswer(correct);
-
-        // Pintar o fundo de verde suave
-        marcarAlternativa(correctButton, "#b6ffb3"); // verde claro
-
-        // Adicionar símbolo ✓ no texto
-        correctButton.setText(correctButton.getText() + "  ✓");
-
-        // Registrar acerto (exemplo)
-        //session.incrementCorrect(currentProblem);
-    }
-
-    private void wrongAnswer() {        
-        // Descobrir a alternativa correta
-        Answer correct = currentProblem.getAnswers()
-                                       .stream()
-                                       .filter(Answer::getValidity)
-                                       .findFirst()
-                                       .orElse(null);
-        
-        // Descobrir alternativa escolhida
-        RadioButton selected = (RadioButton) questionGroup.getSelectedToggle();
-
-        RadioButton correctButton = getRadioButtonFromAnswer(correct);
-
-        // Pintar a errada em vermelho claro
-        marcarAlternativa(selected, "#ffb3b3"); // vermelho claro
-        selected.setText(selected.getText() + "  ✗");
-
-        // Pintar a certa em verde
-        marcarAlternativa(correctButton, "#b6ffb3");
-        correctButton.setText(correctButton.getText() + "  ✓");
-
-        // Registrar erro
-        //session.incrementWrong(currentProblem);
+        problemUtil.comprobarRespuesta();
     }
     
     private void marcarAlternativa(RadioButton rb, String color) {
         rb.setStyle("-fx-background-color: " + color + "; -fx-padding: 5px; -fx-opacity: 1;");
     }
     
-    private RadioButton getRadioButtonFromAnswer(Answer ans) {
-        if (ans == ansAlternativaA) return tBAlternativaA;
-        if (ans == ansAlternativaB) return tBAlternativaB;
-        if (ans == ansAlternativaC) return tBAlternativaC;
-        return tBAlternativaD;
-    }
-    
-    public void updateSessionCounters() {
-        int total = SessionManager.getProblemsSolved();
-        int correct = SessionManager.getProblemsCorrect();
-        int incorrect = SessionManager.getProblemsIncorrect();
-
-        contadorProblemas.setText("Aciertos: " + correct + "  |  Fallos: " + incorrect + "  |  Total: " + total);
-    }
 
     @FXML
     private void logout(ActionEvent event) {
@@ -727,10 +588,5 @@ public class MainController implements Initializable {
         Stage stage = (Stage) zoom_slider.getScene().getWindow();
         SessionManager.goToLogIn(stage);
     }
-    
-    public void updateProblemTitle() {
-        int nextProblemNumber = SessionManager.getProblemsSolved()+ 1;
-        tituloProbActual.setText("Problema #" + nextProblemNumber);
-}
 
 }
