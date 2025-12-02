@@ -24,6 +24,7 @@ import javafx.scene.text.Text;
 public class SelectTool implements MapTool {
 
     private static final double HIT_TOLERANCE = 10.0; // píxeles
+    private static final double HIT_TOLERANCE_POI = 40.0;  // similar a MAX_DISTANCE_POI en EraserTool
 
     private final Group zoomGroup;
     private final ObjectProperty<Color> currentColor;
@@ -115,14 +116,14 @@ public class SelectTool implements MapTool {
                 }
             }
             
-            // 4) Pins de POI
-            else if (child instanceof Region region && region.getUserData() instanceof Poi) {
-                Bounds b = region.getBoundsInParent();
-                double cx = (b.getMinX() + b.getMaxX()) / 2.0;
-                double cy = (b.getMinY() + b.getMaxY()) / 2.0;
+            // 4) Pins de POI (usamos la misma lógica de distancia que el EraserTool)
+            else if (child instanceof Region region && region.getUserData() instanceof Poi poi) {
 
-                double d = Math.hypot(px - cx, py - cy);
-                if (d < bestDist && d <= HIT_TOLERANCE) {
+                // La posición del POI está en las mismas coords que usamos para dibujarlo
+                Point2D poiPos = poi.getPosition();
+                double d = Math.hypot(px - poiPos.getX(), py - poiPos.getY());
+
+                if (d < bestDist && d <= HIT_TOLERANCE_POI) {
                     bestDist = d;
                     nearest = region;
                 }

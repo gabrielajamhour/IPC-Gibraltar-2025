@@ -14,6 +14,9 @@ import model.Problem;
 import util.SessionManager;
 
 public class ProblemUtil {
+    // Referencia global a la instancia actual
+    private static ProblemUtil instance;
+    
     // Nodos de la UI
     private final Label enunciadoProblema;
     private final RadioButton tBAlternativaA;
@@ -47,6 +50,9 @@ public class ProblemUtil {
             Label contadorProblemas,
             Label tituloProbActual
     ) {
+        // guardar la instancia global
+        instance = this;
+        
         this.enunciadoProblema = enunciadoProblema;
         this.tBAlternativaA = tBAlternativaA;
         this.tBAlternativaB = tBAlternativaB;
@@ -64,7 +70,13 @@ public class ProblemUtil {
         updateSessionCounters();
         updateProblemTitle();
     }
-
+    
+    
+    public static ProblemUtil getInstance() {
+        return instance;
+    }
+    
+    
     public void generateRandomProblem() throws NavDAOException {
         List<Problem> allProblems = Navigation.getInstance().getProblems();
 
@@ -190,8 +202,7 @@ public class ProblemUtil {
         // Registrar que este problema ya ha sido respondido
         if (currentProblem != null && !answeredProblems.contains(currentProblem)) {
             answeredProblems.add(currentProblem);
-}
-
+        }
     }
 
     /** Igual que tu correctAnswer() */
@@ -258,5 +269,17 @@ public class ProblemUtil {
         tituloProbActual.setText("Problema #" + nextProblemNumber);
     }
     
-
+    /**
+     * Resetea la lista de problemas ya respondidos para el generador
+     * aleatorio. Después de llamar a este método, generateRandomProblem()
+     * volverá a considerar todos los problemas como "no usados".
+     */
+    public void resetAnsweredProblems() {
+        answeredProblems.clear();
+        try {
+            generateRandomProblem();
+        } catch (NavDAOException ex) {
+            System.getLogger(ProblemUtil.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+    }   
 }

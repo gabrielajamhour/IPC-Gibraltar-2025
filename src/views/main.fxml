@@ -210,7 +210,7 @@
                                 <String fx:value="tool-button" />
                             </styleClass>
                         </Button>
-                        <Button mnemonicParsing="false" text="Distancia" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Button fx:id="btnDistancia" mnemonicParsing="false" onAction="#activateDistanceTool" text="Distancia" GridPane.columnIndex="1" GridPane.rowIndex="2">
                             <styleClass>
                                 <String fx:value="small-btn" />
                                 <String fx:value="tool-button" />
@@ -285,7 +285,7 @@
                                     <items>
                                         <MenuItem fx:id="profileButton" mnemonicParsing="false" onAction="#openProfile" text="Perfil" />
                                         <MenuItem fx:id="resultsButton" mnemonicParsing="false" onAction="#openResults" text="Histórico" />
-                              <MenuItem fx:id="resultsButton1" mnemonicParsing="false" onAction="#openResults" text="Configuraciones" />
+                              <MenuItem fx:id="resultsButton1" mnemonicParsing="false" onAction="#openConfig" text="Configuraciones" />
                                         <SeparatorMenuItem mnemonicParsing="false" />
                                         <MenuItem mnemonicParsing="false" onAction="#logout" text="Cerrar sesión" />
                                     </items>

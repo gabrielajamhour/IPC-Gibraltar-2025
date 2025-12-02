@@ -2,10 +2,6 @@ package controllers;
 
 import util.Poi;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -15,39 +11,22 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Random;
 import javafx.animation.Timeline;
-import javafx.beans.property.ObjectProperty;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import util.EraserTool;
@@ -58,25 +37,19 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.Toggle;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Region;
 import javafx.scene.shape.Arc;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import model.Answer;
 import model.NavDAOException;
-import model.Navigation;
 import model.Problem;
 import model.User;
 import util.ArcTool;
 import util.PointTool;
 import util.ZoomManager;
 import util.ClearAll;
+import util.DistanceTool;
 import util.ProblemUtil;
 import util.ProtractorTool;
 import util.ReglaTool;
@@ -123,6 +96,9 @@ public class MainController implements Initializable {
     @FXML    private Button btnTransportador;
     @FXML    private Button btnRegla;
     @FXML    private Label labelIntrucciones;
+    @FXML    private Button btnDistancia;
+    @FXML    private Label tituloPuntosMapa;
+    @FXML    private MenuItem resultsButton1;
     
     // En vez de enum Tool, tendremos objetos:
     private MapTool currentTool;
@@ -133,6 +109,7 @@ public class MainController implements Initializable {
     private MapTool selectTool;
     private MapTool arcTool;
     private MapTool textTool;
+    private MapTool distanceTool;
     
     // Transportador de águlos y regla
     private ProtractorTool protractorTool;
@@ -163,25 +140,10 @@ public class MainController implements Initializable {
     
     private ZoomManager zoomManager;
     
-    private Problem currentProblem;
-    private Answer ansAlternativaA;
-    private Answer ansAlternativaB;
-    private Answer ansAlternativaC;
-    private Answer ansAlternativaD;
-    private boolean alreadyAnswered = false;
-    
-    
     @FXML    private Label contadorProblemas;
     @FXML    private Label tituloProbActual;
-    private Label problemaActual;
     private ProblemUtil problemUtil;
     
-    // Nodo visual que usará el estilo del CSS (transportador)
-    private Rectangle protractorNode;
-    private boolean protractorVisible = false;
-    private double protractorScale = 1.0;
-    private double lastProtractorMouseX;
-    private double lastProtractorMouseY;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -189,6 +151,13 @@ public class MainController implements Initializable {
         
         zoomManager = new ZoomManager(map_scrollpane, zoom_slider);
         zoomGroup   = zoomManager.getZoomGroup();
+        
+        // Cada vez que cambie el slider de zoom, avisamos a PointTool
+        zoom_slider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (pointTool instanceof util.PointTool pt) {
+                pt.onZoomChanged(newVal.doubleValue()); // o zoomManager.getCurrentScale()
+            }
+        });
         
         // Color actual = valor del ColorPicker
         currentColor.bind(colorPicker.valueProperty());
@@ -203,6 +172,7 @@ public class MainController implements Initializable {
         selectTool = new SelectTool(zoomGroup, currentColor, currentLineWidth);
         arcTool    = new ArcTool(zoomGroup, arcData, currentLineWidth, currentColor); 
         textTool   = new TextTool(zoomGroup, currentColor, currentLineWidth, sharedTextData);
+        distanceTool = new DistanceTool(zoomGroup, currentLineWidth, currentColor);
         
         // Transportador (overlay auxiliar)
         protractorTool = new ProtractorTool(zoomGroup, map_scrollpane);
@@ -295,48 +265,7 @@ public class MainController implements Initializable {
         // Color de fondo del botón-pin
         map_pin.setStyle("-fx-background-color: " + webColor + ";");
     }
-    
-     // Crea un marcador visual para un POI usando la clase CSS ".map-pin"
-    private void addPoiMarkerToMap(Poi poi) {
-        if (zoomGroup == null || poi == null || poi.getPosition() == null) return;
 
-        // 1) Crear el nodo gráfico
-        Region marker = new Region();
-        marker.getStyleClass().add("map-pin"); // usa el estilo de main.css
-
-        double x = poi.getPosition().getX();
-        double y = poi.getPosition().getY();
-
-        // Tamaño del pin según el CSS: 48x60
-        double pinW = 48;
-        double pinH = 60;
-
-        // Colocamos el pin "apoyado" en la posición del POI:
-        // centrado horizontalmente y con la punta abajo
-        marker.setLayoutX(x - pinW / 2);
-        marker.setLayoutY(y - pinH);
-
-        // 2) Color del pin según el color del POI
-        Color c = poi.getColor();
-        if (c == null) {
-            c = Color.RED;
-        }
-
-        int r = (int) Math.round(c.getRed() * 255);
-        int g = (int) Math.round(c.getGreen() * 255);
-        int b = (int) Math.round(c.getBlue() * 255);
-        String webColor = String.format("#%02X%02X%02X", r, g, b);
-
-        // Aplicar el color de fondo (puedes sofisticarlo más si quieres respetar el borde negro/blanco)
-        marker.setStyle("-fx-background-color: " + webColor + ";");
-
-        // 3) Vincular el Node con el Poi, para que el EraserTool pueda encontrarlo
-        marker.setUserData(poi);
-
-        // 4) Añadirlo al mapa
-        zoomGroup.getChildren().add(marker);
-    }
-    
     
     @FXML
     void listClicked(MouseEvent event) {
@@ -382,21 +311,10 @@ public class MainController implements Initializable {
     }
     
     private void dibujar(){
-        // Dibujar los POIs
-        for (Poi poi : data) {
-            addPoiMarkerToMap(poi);
+        // Inicializar el dibujado de POIs (esta llamada sustituye a tu antiguo dibujar())
+        if (pointTool instanceof PointTool pt) {
+            pt.initPoiDrawing(data);
         }
-
-        // 2) Cada vez que se añada un nuevo POI a la lista, dibujarlo también
-        data.addListener((ListChangeListener<Poi>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    for (Poi p : change.getAddedSubList()) {
-                        addPoiMarkerToMap(p);
-                    }
-                }
-            }
-        });
         
         // Dibujar las Lineas
         for (Line line : lineData) {
@@ -465,6 +383,19 @@ public class MainController implements Initializable {
     private void openResults(ActionEvent event) {
         User currentUser = SessionManager.getActiveUser();
         openPage("/views/results.fxml", event, currentUser);
+    }
+    
+        @FXML
+    private void logout(ActionEvent event) {
+        SessionManager.finalizeAndSaveSession();
+        Stage stage = (Stage) zoom_slider.getScene().getWindow();
+        SessionManager.goToLogIn(stage);
+    }
+
+    @FXML
+    private void openConfig(ActionEvent event) {
+        User currentUser = SessionManager.getActiveUser();
+        openPage("/views/config.fxml", event, currentUser);
     }
 
     private void openPage(String fxmlPath, ActionEvent event, User userToInject) {
@@ -595,6 +526,17 @@ public class MainController implements Initializable {
         // IMPORTANTE: NO tocamos currentTool
         // El usuario puede tener LineTool, PointTool, etc. activos y seguir dibujando.
     }
+    
+    
+    @FXML
+    private void activateDistanceTool(ActionEvent event) {
+        if (currentTool == distanceTool) {
+            // Si ya estaba activa, la desactivamos
+            setCurrentTool(null);
+        } else {
+            setCurrentTool(distanceTool);
+        }
+    }
 
     private void onNoneToolClicked() {
             setCurrentTool(null); // deja solo el pan del ScrollPane
@@ -632,6 +574,11 @@ public class MainController implements Initializable {
         // Botón de Texto
         if (btnTexto != null) {
             btnTexto.setStyle(currentTool == textTool ? activeStyle : inactiveStyle);
+        }
+        
+        // Botón de Distancia
+        if (btnDistancia != null) {
+            btnDistancia.setStyle(currentTool == distanceTool ? activeStyle : inactiveStyle);
         }
         
         // Botón de Transportador: depende de si está visible el overlay
@@ -714,11 +661,4 @@ public class MainController implements Initializable {
         rb.setStyle("-fx-background-color: " + color + "; -fx-padding: 5px; -fx-opacity: 1;");
     }
     
-
-    @FXML
-    private void logout(ActionEvent event) {
-        SessionManager.finalizeAndSaveSession();
-        Stage stage = (Stage) zoom_slider.getScene().getWindow();
-        SessionManager.goToLogIn(stage);
-    }
 }

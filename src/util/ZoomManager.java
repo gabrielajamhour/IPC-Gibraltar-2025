@@ -65,6 +65,10 @@ public class ZoomManager {
     public Group getZoomGroup() {
         return zoomGroup;
     }
+    
+    public double getCurrentScale() {
+        return currentScale;
+    }
 
 
     /**

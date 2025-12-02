@@ -227,12 +227,9 @@ public class ProtractorTool {
         protractorNode.setVisible(visible);
         if (visible) {
             adjustScaleForCurrentZoom(); // primero tamaño acorde al zoom actual
-
-            // Esperamos al siguiente pulso de JavaFX para que el ScrollPane tenga bien el viewport
-            Platform.runLater(() -> {
-                centerOnViewport();   // ahora sí, centramos
-                protractorNode.toFront();
-            });
+            
+            centerOnViewport();   // ahora sí, centramos
+            protractorNode.toFront();
         }
     }
 
