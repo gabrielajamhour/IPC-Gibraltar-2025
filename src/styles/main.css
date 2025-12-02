@@ -68,8 +68,22 @@ S17.642,20.762,13.558,20.762z";
    ================================ */
 .root {
     -fx-font-family: "Inter", "Segoe UI", sans-serif;
-    -fx-background-color: -fx-bg-main;
+    -fx-background-image: url("background-image.png");
 }
+
+.text-box {
+    -fx-background-color: #ffffffaa;
+    -fx-background-radius: 14px;
+    -fx-padding: 2 5 2 5;
+    -fx-opacity: 1;
+}
+
+/*.text-box-error {
+    -fx-background-color: #e88b8b;
+    -fx-background-radius: 14px;
+    -fx-padding: 2 5 2 5;
+    -fx-opacity: 1;
+}*/
 
 /* ================================
    SIDEBAR (barra lateral)
@@ -263,4 +277,8 @@ S17.642,20.762,13.558,20.762z";
     -fx-background-radius: 16px;
     -fx-padding: 5 7 5 7;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0.2, 0, 3);
+}
+
+.effect {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0, 0, 3);
 }

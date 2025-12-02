@@ -219,10 +219,10 @@ public class ProblemUtil {
         RadioButton selected = (RadioButton) questionGroup.getSelectedToggle();
         RadioButton correctButton = getRadioButtonFromAnswer(correct);
 
-        marcarAlternativa(selected, "#ffb3b3"); // rojo claro
+        marcarAlternativa(selected, "#e88b8b"); // rojo claro
         selected.setText(selected.getText() + "  ✗");
 
-        marcarAlternativa(correctButton, "#b6ffb3"); // verde claro
+        marcarAlternativa(correctButton, "#81c97f"); // verde claro
         if (!correctButton.getText().contains("✓")) {
             correctButton.setText(correctButton.getText() + "  ✓");
         }

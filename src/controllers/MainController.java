@@ -201,7 +201,7 @@ public class MainController implements Initializable {
         lineTool  = new LineTool(zoomGroup, lineData, currentLineWidth, currentColor);
         eraserTool = new EraserTool(zoomGroup, map_listview, lineData, arcData, sharedTextData, map_pin);
         selectTool = new SelectTool(zoomGroup, currentColor, currentLineWidth);
-        arcTool    = new ArcTool(zoomGroup, arcData, currentLineWidth, currentColor);
+        arcTool    = new ArcTool(zoomGroup, arcData, currentLineWidth, currentColor); 
         textTool   = new TextTool(zoomGroup, currentColor, currentLineWidth, sharedTextData);
         
         // Transportador (overlay auxiliar)
@@ -430,8 +430,19 @@ public class MainController implements Initializable {
     
     // Método genérico para actualizar el texto de instrucciones
     private void updateInstructionLabel(String text) {
-        if (labelIntrucciones != null) {
-            labelIntrucciones.setText(text == null ? "" : text);
+        if (labelIntrucciones == null) return;
+
+        labelIntrucciones.setText(text);
+
+        // Si no hay texto → NO aplicar CSS
+        if (text == null || text.trim().isEmpty()) {
+            labelIntrucciones.getStyleClass().remove("text-box");
+        } 
+        // Si hay texto → aplicar CSS (solo una vez)
+        else {
+            if (!labelIntrucciones.getStyleClass().contains("text-box")) {
+                labelIntrucciones.getStyleClass().add("text-box");
+            }
         }
     }
     

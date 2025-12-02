@@ -56,11 +56,16 @@
                 </ScrollPane>
                 <HBox alignment="CENTER_RIGHT">
                     <children>
-                        <Label fx:id="labelIntrucciones" prefHeight="18.0" prefWidth="165.0" text="Instrucciones herramientas" />
-                        <Label prefHeight="18.0" prefWidth="34.0" text="Zoom">
+                        <Label fx:id="labelIntrucciones" prefHeight="46.0" prefWidth="142.0" text="Instrucciones herramientas" textAlignment="CENTER" wrapText="true">
                             <HBox.margin>
-                                <Insets left="100.0" right="10.0" />
+                                <Insets right="100.0" />
                             </HBox.margin>
+                            <styleClass>
+                                <String fx:value="text-box" />
+                            </styleClass>
+                            <padding>
+                                <Insets left="5.0" />
+                            </padding>
                         </Label>
                         <Button alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#zoomOut" prefHeight="30.0" prefWidth="30.0" text="-" textAlignment="CENTER"> 
                             <styleClass>
@@ -96,7 +101,7 @@
                                         <Insets left="6.0" top="2.0" />
                                     </padding>
                                     <styleClass>
-                                        <String fx:value="card" />
+                                        <String fx:value="text-box" />
                                     </styleClass>
                                 </Label>
                             </children>
@@ -155,7 +160,7 @@
                                 <String fx:value="tool-button" />
                             </styleClass>
                         </Button>
-                        <Slider fx:id="sliderGrosor" min="2.0" minWidth="-Infinity" prefWidth="150.0" GridPane.columnSpan="2" GridPane.rowIndex="6">
+                        <Slider fx:id="sliderGrosor" min="2.0" minWidth="-Infinity" prefWidth="150.0" GridPane.columnSpan="2" GridPane.rowIndex="5">
                             <styleClass>
                                 <String fx:value="zoom-tool" />
                             </styleClass>
@@ -163,7 +168,7 @@
                                 <Insets left="15.0" right="15.0" />
                             </GridPane.margin>
                         </Slider>
-                        <ColorPicker fx:id="colorPicker" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="5">
+                        <ColorPicker fx:id="colorPicker" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="6">
                             <styleClass>
                                 <String fx:value="small-btn" />
                                 <String fx:value="tool-button" />
@@ -205,15 +210,21 @@
                                 <String fx:value="tool-button" />
                             </styleClass>
                         </Button>
+                        <Button mnemonicParsing="false" text="Distancia" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                            <styleClass>
+                                <String fx:value="small-btn" />
+                                <String fx:value="tool-button" />
+                            </styleClass>
+                        </Button>
                     </children>
                     <VBox.margin>
                         <Insets top="10.0" />
                     </VBox.margin>
                 </GridPane>
-                <Region prefHeight="28.0" prefWidth="200.0" />
-                <Label fx:id="tituloPuntosMapa" text="Puntos del mapa">
+                <Region prefHeight="21.0" prefWidth="200.0" />
+                <Label fx:id="tituloPuntosMapa" text="Puntos del mapa" textFill="WHITE">
                     <font>
-                        <Font name="System Bold" size="18.0" />
+                        <Font name="System Bold" size="24.0" />
                     </font>
                     <VBox.margin>
                         <Insets bottom="5.0" top="10.0" />
@@ -221,9 +232,9 @@
                 </Label>
                 <ListView fx:id="map_listview" minHeight="-Infinity" onMouseClicked="#listClicked" prefHeight="195.0" prefWidth="200.0">
                     <styleClass>
-                  <String fx:value="object-list" />
-               </styleClass>
-            </ListView>
+                        <String fx:value="object-list" />
+                    </styleClass>
+                </ListView>
             </children>
             <BorderPane.margin>
                 <Insets left="15.0" right="15.0" top="20.0" />
@@ -255,6 +266,9 @@
                             <VBox.margin>
                                 <Insets bottom="20.0" />
                             </VBox.margin>
+                            <styleClass>
+                                <String fx:value="text-box" />
+                            </styleClass>
                         </Label>
                     </children>
                 </VBox>
@@ -269,8 +283,9 @@
                             <children>
                                 <MenuButton fx:id="profileMain" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" text=" username">
                                     <items>
-                                        <MenuItem fx:id="profileButton" mnemonicParsing="false" onAction="#openProfile" text="Profile" />
+                                        <MenuItem fx:id="profileButton" mnemonicParsing="false" onAction="#openProfile" text="Perfil" />
                                         <MenuItem fx:id="resultsButton" mnemonicParsing="false" onAction="#openResults" text="Histórico" />
+                              <MenuItem fx:id="resultsButton1" mnemonicParsing="false" onAction="#openResults" text="Configuraciones" />
                                         <SeparatorMenuItem mnemonicParsing="false" />
                                         <MenuItem mnemonicParsing="false" onAction="#logout" text="Cerrar sesión" />
                                     </items>
@@ -287,13 +302,16 @@
                                 </MenuButton>
                             </children>
                         </Pane>
-                        <Label fx:id="tituloProbActual" text="Problema ##">
+                        <Label fx:id="tituloProbActual" text="Problema ##" textFill="WHITE">
                             <font>
                                 <Font name="System Bold" size="24.0" />
                             </font>
                             <VBox.margin>
                                 <Insets bottom="10.0" />
                             </VBox.margin>
+                            <styleClass>
+                                <String fx:value="effect" />
+                            </styleClass>
                         </Label>
                         <Label fx:id="enunciadoProblema" maxWidth="350.0" text="Enunciado" textAlignment="JUSTIFY" wrapText="true">
                             <VBox.margin>
@@ -308,55 +326,68 @@
                                 <Insets left="20.0" top="20.0" />
                             </VBox.margin>
                             <children>
-                                <RadioButton fx:id="tBAlternativaA" mnemonicParsing="false" text="Alternativa A">
-                                    <toggleGroup>
-                                        <ToggleGroup fx:id="questionGroup" />
-                                    </toggleGroup>
+                                <VBox>
                                     <VBox.margin>
-                                        <Insets bottom="2.0" left="5.0" top="-10.0" />
+                                        <Insets bottom="2.0" left="5.0" right="20.0" top="-10.0" />
                                     </VBox.margin>
-                                    <padding>
-                                        <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
-                                    </padding>
-                                </RadioButton>
-                                <RadioButton fx:id="tBAlternativaB" mnemonicParsing="false" text="Alternativa B" toggleGroup="$questionGroup">
-                                    <VBox.margin>
-                                        <Insets bottom="2.0" left="5.0" />
-                                    </VBox.margin>
-                                    <padding>
-                                        <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
-                                    </padding>
-                                </RadioButton>
-                                <RadioButton fx:id="tBAlternativaC" mnemonicParsing="false" text="Alternativa C" toggleGroup="$questionGroup">
-                                    <VBox.margin>
-                                        <Insets bottom="2.0" left="5.0" />
-                                    </VBox.margin>
-                                    <padding>
-                                        <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
-                                    </padding>
-                                </RadioButton>
-                                <RadioButton fx:id="tBAlternativaD" mnemonicParsing="false" text="Alternativa D" toggleGroup="$questionGroup">
-                                    <VBox.margin>
-                                        <Insets left="5.0" />
-                                    </VBox.margin>
-                                    <padding>
-                                        <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
-                                    </padding>
-                                </RadioButton>
+                                    <styleClass>
+                                        <String fx:value="text-box" />
+                                    </styleClass>
+                                    <children>
+                                        <RadioButton fx:id="tBAlternativaA" mnemonicParsing="false" text="Alternativa A">
+                                            <toggleGroup>
+                                                <ToggleGroup fx:id="questionGroup" />
+                                            </toggleGroup>
+                                            <padding>
+                                                <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
+                                            </padding>
+                                        </RadioButton>
+                                        <RadioButton fx:id="tBAlternativaB" mnemonicParsing="false" text="Alternativa B" toggleGroup="$questionGroup">
+                                            <VBox.margin>
+                                                <Insets />
+                                            </VBox.margin>
+                                            <padding>
+                                                <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
+                                            </padding>
+                                        </RadioButton>
+                                        <RadioButton fx:id="tBAlternativaC" mnemonicParsing="false" text="Alternativa C" toggleGroup="$questionGroup">
+                                            <VBox.margin>
+                                                <Insets />
+                                            </VBox.margin>
+                                            <padding>
+                                                <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
+                                            </padding>
+                                        </RadioButton>
+                                        <RadioButton fx:id="tBAlternativaD" mnemonicParsing="false" text="Alternativa D" toggleGroup="$questionGroup">
+                                            <VBox.margin>
+                                                <Insets />
+                                            </VBox.margin>
+                                            <padding>
+                                                <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
+                                            </padding>
+                                        </RadioButton>
+                                    </children>
+                                </VBox>
                             </children>
                         </VBox>
                         <Button fx:id="btnComprobarRespuesta" mnemonicParsing="false" onAction="#comprobarRespuesta" text="Comprobar respuesta">
                             <VBox.margin>
-                                <Insets top="10.0" />
+                                <Insets top="5.0" />
                             </VBox.margin>
                             <styleClass>
                                 <String fx:value="primary-btn" />
                             </styleClass>
                         </Button>
-                        <Label fx:id="textErrorCompResp" text="Selecciona una opción." textFill="RED" visible="false">
+                        <Label fx:id="textErrorCompResp" text="Selecciona una opción" textFill="RED" visible="false">
                             <VBox.margin>
                                 <Insets bottom="8.0" top="5.0" />
                             </VBox.margin>
+                            <styleClass>
+                                <String fx:value="card" />
+                            </styleClass>
+                            <font>
+                                <Font name="System Bold" size="10.0" />
+                            </font>
                         </Label>
                     </children>
                 </VBox>
