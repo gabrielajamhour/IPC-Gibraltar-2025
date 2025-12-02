@@ -426,6 +426,7 @@ public class MainController implements Initializable {
             labelIntrucciones.setText("");
         }
         ((ArcTool) arcTool).setInstructionUpdater(this::updateInstructionLabel);
+        ((SelectTool) selectTool).setInstructionUpdater(this::updateInstructionLabel);
     }
     
     // Método genérico para actualizar el texto de instrucciones

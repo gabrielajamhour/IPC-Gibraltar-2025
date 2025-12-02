@@ -1,5 +1,6 @@
 package util;
 
+import java.util.function.Consumer;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Bounds;
@@ -12,7 +13,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Arc;   // <- NUEVO
+import javafx.scene.shape.Arc;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
@@ -27,6 +28,9 @@ public class SelectTool implements MapTool {
     private final Group zoomGroup;
     private final ObjectProperty<Color> currentColor;
     private final DoubleProperty currentLineWidth;
+    
+    // Callback para instrucciones dinámicas
+    private Consumer<String> instructionUpdater;
 
     public SelectTool(Group zoomGroup,
                       ObjectProperty<Color> currentColor,
@@ -35,18 +39,35 @@ public class SelectTool implements MapTool {
         this.currentColor = currentColor;
         this.currentLineWidth = currentLineWidth;
     }
+    
+    // Setter para registrar el callback de instrucciones
+    public void setInstructionUpdater(Consumer<String> instructionUpdater) {
+        this.instructionUpdater = instructionUpdater;
+    }
 
     @Override
     public void onEnter() {
         if (zoomGroup != null) {
             zoomGroup.setCursor(Cursor.HAND);
         }
+        // Instrucción inicial al activar la herramienta de selección
+        updateInstruction("Primero selecciona las nuevas configuraciones del elemento a seleccionar");
     }
 
     @Override
     public void onExit() {
         if (zoomGroup != null) {
             zoomGroup.setCursor(Cursor.DEFAULT);
+        }
+        // Al salir, limpiamos el texto de instrucciones
+        updateInstruction("");
+    }
+    
+    // ============ INSTRUCCIONES DINÁMICAS ============
+
+    private void updateInstruction(String text) {
+        if (instructionUpdater != null) {
+            instructionUpdater.accept(text);
         }
     }
 
