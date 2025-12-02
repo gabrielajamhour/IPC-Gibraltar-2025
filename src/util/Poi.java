@@ -45,7 +45,10 @@ public class Poi {
 
     @Override
     public String toString() {
-        return code + ", " + description;
+        if (description == null || description.trim().isEmpty()) {
+            return code;                 // Solo el “título”
+        }
+        return code + ", " + description; // Título + descripción
     }
 }
 

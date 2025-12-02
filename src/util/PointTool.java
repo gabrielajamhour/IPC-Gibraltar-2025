@@ -28,6 +28,8 @@ public class PointTool implements MapTool {
     private final ListView<Poi> poiListView;     // Lista de POIs
     private final ObjectProperty<Color> currentColor;  // Color actual elegido por el usuario
 
+    private int unnamedPoiCounter = 1;
+    
     public PointTool(Group zoomGroup,
                      ListView<Poi> poiListView,
                      ObjectProperty<Color> currentColor) {
@@ -84,15 +86,33 @@ public class PointTool implements MapTool {
         // si el usuario pulsa Aceptar, devolvemos un Poi; si no, null.
         poiDialog.setResultConverter(dialogButton -> {
             if (dialogButton == okButton) {
-                String name = nameField.getText().trim();
-                String desc = descArea.getText().trim();
+                String name = nameField.getText();
+                String desc = descArea.getText();
 
-                // Podrías validar aquí que el nombre no esté vacío, etc.
-                Poi poi = new Poi(name, desc, localPoint.getX(), localPoint.getY(), currentColor.get());
-                return poi;
+                // AQUÍ metemos la lógica del nombre por defecto
+                if (name != null) {
+                    name = name.trim();
+                }
+                if (desc != null) {
+                    desc = desc.trim();
+                }
+
+                // Si no hay nombre, ponemos "Punto i"
+                if (name == null || name.isEmpty()) {
+                    name = "Punto " + unnamedPoiCounter++;
+                }
+
+                return new Poi(
+                        name,
+                        desc,
+                        localPoint.getX(),
+                        localPoint.getY(),
+                        poiColor
+                );
             }
             return null;
         });
+
 
         // Mostramos el diálogo y esperamos la respuesta del usuario
         Optional<Poi> result = poiDialog.showAndWait();
