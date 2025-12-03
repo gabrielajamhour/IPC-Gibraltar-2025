@@ -227,8 +227,12 @@ public class EraserTool implements MapTool {
             Point2D center = new Point2D(cx, cy);
             double distCenter = center.distance(point);
             double radialDiff = Math.abs(distCenter - radius);
-            
-            if (radialDiff > MAX_DISTANCE) continue;
+
+            // 👇 NUEVO: tolerancia depende del grosor del arco
+            double stroke = arc.getStrokeWidth();
+            double tolerance = MAX_DISTANCE + stroke / 2.0;
+
+            if (radialDiff > tolerance) continue;
 
             double anglePoint = pointToAngleDeg(cx, cy, point.getX(), point.getY());
             if (!isAngleOnArc(anglePoint, arc.getStartAngle(), arc.getLength())) {
@@ -242,6 +246,7 @@ public class EraserTool implements MapTool {
         }
         return closest;
     }
+
     
     // ---------------- Texto ----------------
     private Text findTextNear(Point2D point) {

@@ -107,7 +107,11 @@ public class SelectTool implements MapTool {
             // 2) Arcos / círculos (Arc)
             else if (child instanceof Arc arc) {
                 double d = distancePointToArc(px, py, arc);
-                if (d < bestDist && d <= HIT_TOLERANCE) {
+
+                double stroke = arc.getStrokeWidth();
+                double tolerance = HIT_TOLERANCE + stroke / 2.0;
+
+                if (d < bestDist && d <= tolerance) {
                     bestDist = d;
                     nearest = arc;
                 }
