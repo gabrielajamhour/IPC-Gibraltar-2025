@@ -3,7 +3,6 @@ package util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Toggle;
@@ -38,7 +37,7 @@ public class ProblemUtil {
     private boolean alreadyAnswered = false;
     
     // Lista de problemas ya respondidos en esta sesión
-    private static final List<Problem> answeredProblems = new ArrayList<>();
+    private final List<Problem> answeredProblems = new ArrayList<>();
 
     public ProblemUtil (
             Label enunciadoProblema,
@@ -95,16 +94,10 @@ public class ProblemUtil {
 
         // Si no quedan problemas sin responder, mostramos mensaje y salimos
         if (remaining.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Problemas completados");
-            alert.setHeaderText("Ya has respondido todos los problemas disponibles.");
-            alert.setContentText(
-                "Si quieres volver a empezar, ve a la pantalla de Configuración " +
-                "y usa la opción de resetear problemas."
-            );
-            alert.showAndWait();
-
-            // NO tocamos el enunciado actual, simplemente no cargamos uno nuevo.
+            enunciadoProblema.setText("Ya has respondido todos los problemas disponibles.");
+            // opcional: desactivar el botón de comprobar o el de random si quieres
+            // btnComprobarRespuesta.setDisable(true);
+            // randomProblem.setDisable(true);
             return;
         }
 
