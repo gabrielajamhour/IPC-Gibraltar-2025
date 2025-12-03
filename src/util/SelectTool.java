@@ -94,7 +94,12 @@ public class SelectTool implements MapTool {
                         line.getStartX(), line.getStartY(),
                         line.getEndX(), line.getEndY()
                 );
-                if (d < bestDist && d <= HIT_TOLERANCE) {
+
+                // Tolerancia dinámica: base + mitad del grosor de la línea
+                double stroke = line.getStrokeWidth();
+                double tolerance = HIT_TOLERANCE + stroke / 2.0;
+
+                if (d < bestDist && d <= tolerance) {
                     bestDist = d;
                     nearest = line;
                 }

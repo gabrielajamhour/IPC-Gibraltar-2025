@@ -161,7 +161,6 @@ public class EraserTool implements MapTool {
     }
 
     // ---------------- Líneas ----------------
-
     private Line findLineNear(Point2D point) {
         if (zoomGroup == null) return null;
 
@@ -169,17 +168,23 @@ public class EraserTool implements MapTool {
         double closestDist = Double.MAX_VALUE;
 
         for (Node n : zoomGroup.getChildren()) {
-            if (!(n instanceof Line)) continue;
-            Line line = (Line) n;
+            if (!(n instanceof Line line)) continue;
 
+            // Distancia al segmento (eje de la línea)
             double dist = distancePointToSegment(point, line);
-            if (dist <= MAX_DISTANCE && dist < closestDist) {
+
+            // Tolerancia: base + mitad del grosor
+            double stroke = line.getStrokeWidth();
+            double tolerance = MAX_DISTANCE + stroke / 2.0;
+
+            if (dist <= tolerance && dist < closestDist) {
                 closestDist = dist;
                 closest = line;
             }
         }
         return closest;
     }
+
 
     private double distancePointToSegment(Point2D p, Line line) {
         Point2D a = new Point2D(line.getStartX(), line.getStartY());
