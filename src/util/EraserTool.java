@@ -238,21 +238,30 @@ public class EraserTool implements MapTool {
         return closest;
     }
     
+    // ---------------- Texto ----------------
     private Text findTextNear(Point2D point) {
+        if (zoomGroup == null) return null;
+
         Text nearest = null;
         double bestDist = Double.MAX_VALUE;
-        
+
         double px = point.getX();
         double py = point.getY();
 
         for (Node child : zoomGroup.getChildren()) {
             if (child instanceof Text text) {
-                Bounds b = text.getBoundsInParent();
-                double cx = (b.getMinX() + b.getMaxX()) / 2.0;
-                double cy = (b.getMinY() + b.getMaxY()) / 2.0;
 
-                double d = Math.hypot(px - cx, py - cy);
-                if (d < bestDist && d <= MAX_DISTANCE) {
+                // Distancia basada en bounding box + margen
+                double d = distancePointToText(px, py, text);
+
+                // Tolerancia específica para texto: como mínimo MAX_DISTANCE,
+                // pero crece con la altura del texto
+                double textTolerance = Math.max(
+                        MAX_DISTANCE,
+                        text.getBoundsInParent().getHeight() / 2.0
+                );
+
+                if (d < bestDist && d <= textTolerance) {
                     bestDist = d;
                     nearest = text;
                 }
@@ -261,6 +270,39 @@ public class EraserTool implements MapTool {
 
         return nearest;
     }
+    
+    // Distancia del punto (px, py) al rectángulo del texto,
+    // teniendo en cuenta su tamaño (bounding box + margen según font-size).
+    private double distancePointToText(double px, double py, Text text) {
+        Bounds b = text.getBoundsInParent();
+
+        // Margen adicional proporcional al tamaño de la fuente
+        double fontSize = (text.getFont() != null) ? text.getFont().getSize() : 0.0;
+        double margin = Math.max(3.0, fontSize * 0.25); // ajusta este factor si quieres
+
+        double minX = b.getMinX() - margin;
+        double maxX = b.getMaxX() + margin;
+        double minY = b.getMinY() - margin;
+        double maxY = b.getMaxY() + margin;
+
+        // Si el clic está dentro del rectángulo inflado, consideramos distancia 0
+        if (px >= minX && px <= maxX && py >= minY && py <= maxY) {
+            return 0.0;
+        }
+
+        // Si está fuera, calculamos la distancia mínima al borde del rectángulo
+        double dx = 0.0;
+        if (px < minX)      dx = minX - px;
+        else if (px > maxX) dx = px - maxX;
+
+        double dy = 0.0;
+        if (py < minY)      dy = minY - py;
+        else if (py > maxY) dy = py - maxY;
+
+        return Math.hypot(dx, dy);
+    }
+
+
 
     // ---------------- Utilidades de ángulos ----------------
 

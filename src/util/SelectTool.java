@@ -214,15 +214,38 @@ public class SelectTool implements MapTool {
             return diffCW <= sweep + ANGLE_TOL;
         }
     }
-    
 
-    // Distancia del punto (px, py) al centro del bounding box del texto.
+    // Distancia del punto (px, py) al rectángulo del texto,
+    // teniendo en cuenta su tamaño (bounding box + margen según font-size).
     private double distancePointToText(double px, double py, Text text) {
         Bounds b = text.getBoundsInParent();
-        double cx = (b.getMinX() + b.getMaxX()) / 2.0;
-        double cy = (b.getMinY() + b.getMaxY()) / 2.0;
-        return Math.hypot(px - cx, py - cy);
+
+        // Margen adicional proporcional al tamaño de la fuente
+        double fontSize = (text.getFont() != null) ? text.getFont().getSize() : 0.0;
+        double margin = Math.max(3.0, fontSize * 0.25); // puedes ajustar este factor
+
+        double minX = b.getMinX() - margin;
+        double maxX = b.getMaxX() + margin;
+        double minY = b.getMinY() - margin;
+        double maxY = b.getMaxY() + margin;
+
+        // Si el clic está dentro del rectángulo inflado, consideramos distancia 0
+        if (px >= minX && px <= maxX && py >= minY && py <= maxY) {
+            return 0.0;
+        }
+
+        // Si está fuera, calculamos la distancia mínima al borde del rectángulo
+        double dx = 0.0;
+        if (px < minX)      dx = minX - px;
+        else if (px > maxX) dx = px - maxX;
+
+        double dy = 0.0;
+        if (py < minY)      dy = minY - py;
+        else if (py > maxY) dy = py - maxY;
+
+        return Math.hypot(dx, dy);
     }
+    
 
     // ==== Utilidades de ángulos (copiadas de ArcTool) ====
 
