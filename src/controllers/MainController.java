@@ -40,6 +40,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.scene.control.RadioButton;
+import javafx.scene.input.MouseButton;
 import javafx.scene.shape.Arc;
 import javafx.scene.text.Text;
 import model.NavDAOException;
@@ -621,8 +622,17 @@ public class MainController implements Initializable {
     
 
     
-    // Mouse manager
     private void onMapPressed(MouseEvent event) {
+        // Si es RMB, desactivar herramienta actual y no delegar nada
+        if (event.getButton() == MouseButton.SECONDARY) {
+            if (currentTool != null) {
+                setCurrentTool(null);   // desactiva la herramienta
+            }
+            // No hacemos consume(), así el contexto (menús de líneas, etc.) sigue funcionando
+            return;
+        }
+
+        // Solo delegamos el LMB (u otros botones que no sean RMB)
         if (currentTool != null) {
             currentTool.onMousePressed(event);
             event.consume();
@@ -630,6 +640,11 @@ public class MainController implements Initializable {
     }
 
     private void onMapDragged(MouseEvent event) {
+        // Ignoramos el arrastre con RMB
+        if (event.getButton() == MouseButton.SECONDARY) {
+            return;
+        }
+
         if (currentTool != null) {
             currentTool.onMouseDragged(event);
             event.consume();
@@ -637,11 +652,17 @@ public class MainController implements Initializable {
     }
 
     private void onMapReleased(MouseEvent event) {
+        // Ignoramos la suelta con RMB
+        if (event.getButton() == MouseButton.SECONDARY) {
+            return;
+        }
+
         if (currentTool != null) {
             currentTool.onMouseReleased(event);
             event.consume();
         }
     }
+
 
     @FXML
     private void generateRandomProblem(ActionEvent event) throws NavDAOException {
