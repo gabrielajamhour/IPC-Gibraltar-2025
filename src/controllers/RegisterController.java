@@ -6,9 +6,11 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,6 +19,10 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.NavDAOException;
@@ -40,7 +46,7 @@ public class RegisterController implements Initializable {
     
     private final int EQUALS = 0;  
     private Image selectedAvatar;
-
+    private User user;
 
     // Email
     @FXML    private TextField eemail;
@@ -62,12 +68,17 @@ public class RegisterController implements Initializable {
     @FXML    private DatePicker eAge;
     @FXML    private Label lageNotOldEnought;
     
-    // Avatar
-    @FXML    private Label lAvatarError;
     
     // Buttons
     @FXML    private Button bAccept;
     @FXML    private Button bCancel;
+    @FXML    private Button bChangeAvatar;
+    
+    private boolean ignoreValidation = false;
+    
+    @FXML    private ImageView showAvatar;
+    @FXML    private StackPane avatarPane;
+
     
 
     
@@ -78,6 +89,7 @@ public class RegisterController implements Initializable {
         textField.requestFocus();
         
         errorLabel.visibleProperty().set(true);
+        errorLabel.setManaged(true);
         textField.styleProperty().setValue("-fx-background-color: #FCE5E0"); 
     }
     
@@ -85,6 +97,7 @@ public class RegisterController implements Initializable {
         boolProp.setValue(true);
         
         errorLabel.visibleProperty().set(false);
+        errorLabel.setManaged(false);
         textField.styleProperty().setValue("");
     }
     
@@ -94,14 +107,16 @@ public class RegisterController implements Initializable {
         boolProp.setValue(false);
         textField.requestFocus();
         
-        errorLabel.visibleProperty().set(true);
+        errorLabel.setVisible(true);
+        errorLabel.setManaged(true);
         textField.styleProperty().setValue("-fx-background-color: #FCE5E0"); 
     }
     
     private void manageCorrect(Label errorLabel, DatePicker textField, BooleanProperty boolProp ){
         boolProp.setValue(true);
         
-        errorLabel.visibleProperty().set(false);
+        errorLabel.setVisible(false);
+        errorLabel.setManaged(false);
         textField.styleProperty().setValue("");
     }
     
@@ -124,25 +139,36 @@ public class RegisterController implements Initializable {
         addValidateOnFocusLost(eUsername, this::checkUsername);
         addValidate(eAge, this::checkAge);
         
-        
         // Habilitar o deshabilitar el boton ACCEPT
         BooleanBinding validFields = validEmail.and(validPassword).and(equalPasswords).and(validAge).and(validUsername);
         
         bAccept.disableProperty().bind(validFields.not());
         
-        bCancel.setOnAction( (event)->{
-            Stage stage = (Stage) epassword.getScene().getWindow();
+        bCancel.setOnMousePressed( (event)->{          
+            Stage stage = (Stage) bCancel.getScene().getWindow();
             SessionManager.goToLogIn(stage);
                 });
-    } 
-
+        
+        bChangeAvatar.setFocusTraversable(false);
+        selectedAvatar = new Image(getClass().getResource("/resources/profile.png").toExternalForm());
+        
+        initErrorLabel(lIncorrectEmail);
+        initErrorLabel(lIncorrectPassword);
+        initErrorLabel(lPassDifferent);
+        initErrorLabel(lInvalidUsername);
+        initErrorLabel(lageNotOldEnought);
+     } 
+    
+    private void initErrorLabel(Label lbl) {
+        lbl.setVisible(false);
+        lbl.setManaged(false);
+    }
     
     // ===================== Validaciones =====================
     
     private void checkEditMail() {
         String email = eemail.getText();
         if(!User.checkEmail(email))
-            // Incorrect email
             manageError(lIncorrectEmail, eemail, validEmail);
         else
             manageCorrect(lIncorrectEmail, eemail, validEmail);
@@ -151,7 +177,6 @@ public class RegisterController implements Initializable {
     private void checkPassword() {
         String password = epassword.getText();
         if(!User.checkPassword(password))
-            // Incorrect password
             manageError(lIncorrectPassword, epassword, validPassword);
         else
             manageCorrect(lIncorrectPassword, epassword, validPassword);
@@ -175,10 +200,10 @@ public class RegisterController implements Initializable {
             String username = eUsername.getText();
             Navigation nav = Navigation.getInstance();
             if (!User.checkNickName(username)){
-                // Invalid Username
+                lInvalidUsername.setText("Nombre de usuario incorrecto. Debe tener entre 6 y 15 caracteres (letras, dígitos, '-' o '_').");
                 manageError(lInvalidUsername, eUsername, validUsername);
             } else if (nav.exitsNickName(username)){
-                lInvalidUsername.setText("Username already in use");
+                lInvalidUsername.setText("Este nombre de usuário ya está en uso.");
                 manageError(lInvalidUsername, eUsername, validUsername);
             } else {
                 manageCorrect(lInvalidUsername, eUsername, validUsername);
@@ -223,22 +248,32 @@ public class RegisterController implements Initializable {
     
     
     @FXML
-    private void onChangeAvatar() {
-        FileChooser fc = new FileChooser();
-        fc.setTitle("Selecciona tu avatar");
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg"));
+    private void onChangeAvatar(MouseEvent event) {
+        Platform.runLater(() -> {
+            ignoreValidation = true; // activamos flag
+            bAccept.requestFocus(); // ponemos foco en un nodo "inocuo"
 
-        File file = fc.showOpenDialog(bAccept.getScene().getWindow());
-        if (file != null) {
-            Image selectedAvatar = new Image(file.toURI().toString());
-        }
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Selecciona tu avatar");
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg"));
+
+            File file = fc.showOpenDialog(bAccept.getScene().getWindow());
+            if (file != null) {
+                selectedAvatar = new Image(file.toURI().toString());
+                showAvatar.setImage(selectedAvatar);
+            }
+
+            ignoreValidation = false; // desactivamos flag
+        });
     }
+    
     
     // ===================== Listeners auxiliares =====================
     
     private void addValidateOnFocusLost(TextField field, Runnable validator) {
         field.focusedProperty().addListener((obs, oldFocused, newFocused) -> {
-            if (!newFocused) {    // cuando pierde el foco
+            if (ignoreValidation) return;
+            if (!newFocused) {
                 validator.run();
             }
         });
@@ -248,7 +283,6 @@ public class RegisterController implements Initializable {
     private void addValidate(DatePicker field, Runnable validator) {
         // 1. Cuando se selecciona en el calendario o se confirma la fecha
         field.valueProperty().addListener((obs, oldDate, newDate) -> {
-            // siempre
             if (newDate != null) {
                 validator.run();
             }
@@ -266,8 +300,6 @@ public class RegisterController implements Initializable {
             LocalDate date = field.getConverter().fromString(newText);
             field.setValue(date);  // esto actualiza valueProperty y dispara el listener de arriba
         } catch (Exception e) {
-            // el texto aún no forma una fecha válida (por ejemplo "12/" o "1/1/2")
-            // aquí puedes marcar error si quieres
         }
     });
     }

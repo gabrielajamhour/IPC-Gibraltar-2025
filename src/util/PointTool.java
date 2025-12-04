@@ -326,11 +326,9 @@ public class PointTool implements MapTool {
 
     @Override
     public void onMouseDragged(MouseEvent event) {
-        // Para POIs no hacemos nada en el drag
     }
 
     @Override
     public void onMouseReleased(MouseEvent event) {
-        // Tampoco necesitamos nada especial en el release
     }
 }

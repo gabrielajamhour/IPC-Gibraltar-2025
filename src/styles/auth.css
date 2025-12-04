@@ -1,0 +1,51 @@
+/*******************************
+ *      LOGIN PAGE STYLING
+ *******************************/
+
+.root {
+    -fx-bg-box: #ffffffaa;
+    -fx-blue: #2a8396;
+    -fx-blue-light: #46acbb;
+    -fx-blue-dark: #246f80;
+}
+
+.root {
+    -fx-background-image: url("background-image.png");
+}
+
+/* ====== GENERAL ====== */
+
+.box {
+    -fx-background-color: -fx-bg-box;
+    -fx-background-radius: 14px;
+    -fx-padding: 2 5 2 5;
+    -fx-opacity: 1;
+}
+
+/* ====== BOTONES ====== */
+
+.login-btn {
+    -fx-background-color: -fx-blue;
+    -fx-text-fill: white;
+    -fx-background-radius: 14px;
+    -fx-cursor: hand;
+    -fx-padding: 10 20 10 20;
+}
+
+.login-btn:hover {
+    -fx-background-color: -fx-blue-dark;
+}
+
+.register-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 14px;
+    -fx-cursor: hand;
+    -fx-border-width: 2px;
+    -fx-border-color: -fx-blue;
+    -fx-border-radius: 14px;
+    -fx-pref-width: 100px;
+}
+
+.register-btn:hover {
+    -fx-background-color: -fx-blue-light;
+}

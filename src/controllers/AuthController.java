@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import model.NavDAOException;
 import model.Navigation;
@@ -62,7 +63,15 @@ public class AuthController implements Initializable {
         } else {
             bIniciar.disableProperty().bind(validUsername.not());
         }
+        
+        initErrorLabel(lUserInvalid);
+        initErrorLabel(lPasswordWrong);
     }  
+    
+    private void initErrorLabel(Label lbl) {
+        lbl.setVisible(false);
+        lbl.setManaged(false);
+    }
 
     
     // ===================== Accept =====================
@@ -91,11 +100,10 @@ public class AuthController implements Initializable {
     }
     
     @FXML
-    private void pulsadoRegistrar(ActionEvent event) {
+    private void pulsadoRegistrar(MouseEvent event) {
         Stage stage = (Stage) ePassword.getScene().getWindow();
         SessionManager.goToRegister(stage);
-    }
-    
+    }    
     
     // ===================== Validaciones =====================
 
@@ -130,14 +138,16 @@ public class AuthController implements Initializable {
         boolProp.setValue(false);
         textField.requestFocus();
         
-        errorLabel.visibleProperty().set(true);
+        errorLabel.setVisible(true);
+        errorLabel.setManaged(true);
         textField.styleProperty().setValue("-fx-background-color: #FCE5E0"); 
     }
     
     private void manageCorrect(Label errorLabel, TextField textField, BooleanProperty boolProp ){
         boolProp.setValue(true);
         
-        errorLabel.visibleProperty().set(false);
+        errorLabel.setVisible(false);
+        errorLabel.setManaged(false);
         textField.styleProperty().setValue("");
     }
     
@@ -158,5 +168,7 @@ public class AuthController implements Initializable {
             validator.run();
         });
     }
+
+    
     
 }

@@ -79,6 +79,7 @@ public class ProblemUtil {
     
     
     public void generateRandomProblem() throws NavDAOException {
+        textErrorCompResp.setVisible(false);
         List<Problem> allProblems = Navigation.getInstance().getProblems();
 
         if (allProblems.isEmpty()) {

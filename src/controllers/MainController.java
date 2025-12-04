@@ -40,7 +40,9 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.scene.control.RadioButton;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.shape.Arc;
 import javafx.scene.text.Text;
 import model.NavDAOException;
@@ -56,6 +58,7 @@ import util.ProtractorTool;
 import util.ReglaTool;
 import util.SelectTool;
 import util.SessionManager;
+import util.SettingsUtil;
 import util.TextTool;
 
 
@@ -144,6 +147,11 @@ public class MainController implements Initializable {
     @FXML    private Label contadorProblemas;
     @FXML    private Label tituloProbActual;
     private ProblemUtil problemUtil;
+    @FXML    private ImageView avatarMain;
+    
+    private SettingsUtil settings;
+    @FXML    private BorderPane pane;
+    
     
 
     @Override
@@ -206,10 +214,14 @@ public class MainController implements Initializable {
             contadorProblemas,
             tituloProbActual
         );
+        
+        settings = SettingsUtil.getInstance();
+        updateBackground();
     }
     
     public void setUser(User u) {
         profileMain.setText(" " + u.getNickName());
+        avatarMain.setImage(u.getAvatar());
     }
     
     private void initData() {        
@@ -408,6 +420,10 @@ public class MainController implements Initializable {
         
             if (controller instanceof ResultsController) {
                 ((ResultsController) controller).setUser(userToInject);
+            }
+            
+            if (controller instanceof ConfigController) {
+                ((ConfigController) controller).setSettings(SettingsUtil.getInstance());
             }
             
             Stage stage = (Stage) zoom_slider.getScene().getWindow();
@@ -680,6 +696,25 @@ public class MainController implements Initializable {
     
     private void marcarAlternativa(RadioButton rb, String color) {
         rb.setStyle("-fx-background-color: " + color + "; -fx-padding: 5px; -fx-opacity: 1;");
+    }
+
+    public void setSettings(SettingsUtil settings) {
+         this.settings = settings;
+
+        settings.usarColorSolidoProperty()
+                .addListener((obs, oldV, newV) -> updateBackground());
+
+        updateBackground();
+    }
+
+    private void updateBackground() {
+        if (settings.usarColorSolidoProperty().get()) {
+            pane.setStyle("-fx-background-color: #dbdbdb;");
+            tituloProbActual.setStyle("-fx-text-fill: #246f80;");
+            tituloPuntosMapa.setStyle("-fx-text-fill: #246f80;");
+        } else {
+            pane.setStyle("-fx-background-image: url('/styles/background-image.png');");
+        }
     }
     
 }

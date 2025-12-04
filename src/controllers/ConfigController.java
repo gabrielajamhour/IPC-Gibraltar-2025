@@ -12,23 +12,28 @@ import javafx.stage.Stage;
 import util.PointTool;
 import util.ProblemUtil;
 import util.SessionManager;
+import util.SettingsUtil;
 
-/**
- * FXML Controller class
- *
- * @author Rafael Alonso
- */
 public class ConfigController implements Initializable {
 
     @FXML    private Button btnResetProblem;
     @FXML    private CheckBox chkDynamicPoiSize;
+    
+    private SettingsUtil settings;
+    @FXML    private CheckBox chkColorSolido;
+    @FXML    private Button btnBack;
+    private Boolean valorOriginalColorFondo;
+    private boolean valorOriginalDynamicPoiSize;
+    @FXML    private Button btnSave;
 
-    /**
-     * Initializes the controller class.
-     */
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         chkDynamicPoiSize.setSelected(PointTool.isDynamicPoiSizeEnabled());
+        if (settings != null) {
+            valorOriginalColorFondo = settings.isUsarColorSolido();
+        }
+        chkDynamicPoiSize.setSelected(valorOriginalDynamicPoiSize);
     }
     
     @FXML
@@ -40,14 +45,31 @@ public class ConfigController implements Initializable {
     }
 
     @FXML
-    private void activateVovler(ActionEvent event) throws IOException {
+    private void alternateDinamicPOISize(ActionEvent event) {}
+    
+    public void setSettings(SettingsUtil settings) {
+        this.settings = settings;
+        valorOriginalColorFondo = settings.isUsarColorSolido();
+        valorOriginalDynamicPoiSize = PointTool.isDynamicPoiSizeEnabled();
+        
+        chkColorSolido.selectedProperty().bindBidirectional(settings.usarColorSolidoProperty());
+        chkDynamicPoiSize.setSelected(valorOriginalDynamicPoiSize);
+    }
+
+    @FXML
+    private void activateVolver(ActionEvent event) throws IOException {
+        settings.setUsarColorSolido(valorOriginalColorFondo);
+        PointTool.setDynamicPoiSizeEnabled(valorOriginalDynamicPoiSize);
+        
         Stage stage = (Stage) btnResetProblem.getScene().getWindow();
         SessionManager.goToMain(stage);
     }
 
     @FXML
-    private void alternateDinamicPOISize(ActionEvent event) {
+    private void activateGuardar(ActionEvent event) throws IOException {
         PointTool.setDynamicPoiSizeEnabled(chkDynamicPoiSize.isSelected());
+        Stage stage = (Stage) btnSave.getScene().getWindow();
+        SessionManager.goToMain(stage);
     }
 
 }

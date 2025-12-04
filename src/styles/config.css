@@ -1,15 +1,13 @@
 /*******************************
- *    REGISTER PAGE STYLING
+ *      LOGIN PAGE STYLING
  *******************************/
 
 .root {
     -fx-bg-box: #ffffffaa;
-    
     -fx-blue: #2a8396;
-    -fx-blue-light: #E5EEFFaa;
+    -fx-blue-light: #46acbb;
     -fx-blue-dark: #246f80;
-    
-    -fx-white: #FFFFFF;
+    -fx-white: #ffffff;
     -fx-gray-light: #D7DDE4;
 }
 
@@ -19,44 +17,49 @@
 
 /* ====== GENERAL ====== */
 
-.box {
+.panel {
     -fx-background-color: -fx-bg-box;
     -fx-background-radius: 14px;
+    -fx-padding: 2 5 2 5;
     -fx-opacity: 1;
-}
-
-/* ====== AVATAR ====== */
-
-.avatar-btn {
-    -fx-background-color: -fx-white;
-    -fx-border-radius: 16px;
-    -fx-background-radius: 16px;
-    -fx-cursor: hand;
-}
-
-.avatar-btn:hover {
-    -fx-background-color: -fx-gray-light;
 }
 
 /* ====== BOTONES ====== */
 
-.accept-btn {
+.save-btn {
     -fx-background-color: -fx-blue;
     -fx-text-fill: white;
     -fx-background-radius: 14px;
     -fx-cursor: hand;
+    -fx-border-width: 2px;
+    -fx-border-radius: 14px;
 }
 
-.accept-btn:hover {
+.save-btn:hover {
     -fx-background-color: -fx-blue-dark;
 }
 
 .cancel-btn {
-    -fx-background-color: -fx-white;
+    -fx-background-color: transparent;
     -fx-background-radius: 14px;
     -fx-cursor: hand;
+    -fx-border-width: 2px;
+    -fx-border-color: -fx-blue;
+    -fx-border-radius: 14px;
 }
 
 .cancel-btn:hover {
     -fx-background-color: -fx-blue-light;
+}
+
+.restart-btn {
+    -fx-background-color: -fx-white;
+    -fx-border-radius: 16px;
+    -fx-border-color: -fx-blue;
+    -fx-background-radius: 16px;
+    -fx-cursor: hand;
+}
+
+.restart-btn:hover {
+    -fx-background-color: -fx-gray-light;
 }

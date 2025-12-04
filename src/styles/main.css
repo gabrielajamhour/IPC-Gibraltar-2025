@@ -2,59 +2,15 @@
  *      MAIN PAGE STYLING
  *******************************/
 
-/*-------------------------- map pin ------------------------- */
-
-.map-pin {
-    -fx-shape: "M13.558,0C6.07,0,0,6.07,0,13.558s13.558,22.346,13.558,22.346s13.558-14.858,13.558-22.346S21.045,0,13.558,0z
-M13.558,20.762c-4.084,0-7.395-3.311-7.395-7.395s3.311-7.395,7.395-7.395c4.084,0,7.396,3.311,7.396,7.395
-S17.642,20.762,13.558,20.762z";    
-    -fx-background-color: black, white;
-    -fx-background-insets: 0, 2;
-    -fx-effect: dropshadow( two-pass-box, rgba(0, 0, 0, 0.5), 10, 0.0, 0, 10 );
-    -fx-pref-width: 48;
-    -fx-pref-height: 60;
-}
-.map-pin .arrow-button .arrow {
-    -fx-padding: 0;
-}
-
-/* Estilo del Panel Flotante */
-.user-menu-panel {
-    -fx-background-radius: 6px;
-    -fx-padding: 10px 0;
-    -fx-border-color: #e0e0e0;
-    -fx-border-radius: 6px;
-    -fx-border-width: 1px;
-    /* Aplica Sombra (Efecto de elevación) */
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);
-    -fx-min-width: 250px;
-    -fx-max-width: 250px; 
-}
-
-/* Estilo de los elementos del menú */
-.menu-item-button {
-    -fx-background-color: transparent;
-    -fx-alignment: center-left; /* Justificar el texto a la izquierda */
-    -fx-padding: 8px 15px;
-    -fx-graphic-text-gap: 15px; /* Espacio para el icono */
-    -fx-min-width: 100%;
-}
-
-/* Efecto Hover limpio (crucial para el diseño) */
-.menu-item-button:hover {
-    -fx-background-color: #f0f0f0; /* Color de fondo muy suave al pasar el ratón */
-}
-
-/* ================================
-   PALETA DE COLORES EXTRAÍDA
-   ================================ */
 .root {
     -fx-bg-main: #b7deeb;
     -fx-bg-sidebar: #EEF2F6;
     -fx-bg-card: #FFFFFF;
+    -fx-bg-card-light: #FFFFFFcc;
 
-    -fx-blue: #2D6CDF;
-    -fx-blue-light: #E5EEFF;
+    -fx-blue: #2a8396;
+    -fx-blue-light: #E5EEFFaa;
+    -fx-blue-dark: #246f80;
 
     -fx-gray-text: #4A4A4A;
     -fx-gray-light: #D7DDE4;
@@ -63,40 +19,36 @@ S17.642,20.762,13.558,20.762z";
     -fx-btn-radius: 10px;
 }
 
-/* ================================
-   GENERAL
-   ================================ */
-.root {
-    -fx-font-family: "Inter", "Segoe UI", sans-serif;
-    -fx-background-image: url("background-image.png");
+/* ====== GENERAL ====== */
+
+.card {
+    -fx-background-color: -fx-bg-card;
+    -fx-background-radius: 16px;
+    -fx-padding: 5 7 5 7;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0.2, 0, 3);
+}
+
+.card-light {
+    -fx-background-color: -fx-bg-card-light;
+    -fx-background-radius: 16px;
+    -fx-padding: 5 7 5 7;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0.2, 0, 3);
 }
 
 .text-box {
-    -fx-background-color: #ffffffaa;
+    -fx-background-color: -fx-bg-card-light;
     -fx-background-radius: 14px;
     -fx-padding: 2 5 2 5;
     -fx-opacity: 1;
 }
 
-/*.text-box-error {
-    -fx-background-color: #e88b8b;
-    -fx-background-radius: 14px;
-    -fx-padding: 2 5 2 5;
-    -fx-opacity: 1;
-}*/
-
-/* ================================
-   SIDEBAR (barra lateral)
-   ================================ */
-.sidebar {
-    -fx-background-color: -fx-bg-sidebar;
-    -fx-padding: 20px;
-    -fx-spacing: 20px;
+.effect {
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0, 0, 3);
 }
 
-/* Icon + botón vertical */
-.tool-button {
+/* ====== BOTONES ====== */
+
+.tool-btn {
     -fx-background-color: transparent;
     -fx-background-radius: 14px;
     -fx-cursor: hand;
@@ -105,15 +57,15 @@ S17.642,20.762,13.558,20.762z";
     -fx-pref-width: 118px;
 }
 
-.tool-button:hover {
+.tool-btn:hover {
     -fx-background-color: #ffffffaa;
 }
 
-.tool-button:selected {
+.tool-btn:selected {
     -fx-background-color: -fx-blue-light;
     -fx-border-color: -fx-blue;
 }
-.profile-button {
+.profile-btn {
     -fx-background-color: #ffffffaa;
     -fx-background-radius: 14px;
     -fx-cursor: hand;
@@ -121,99 +73,21 @@ S17.642,20.762,13.558,20.762z";
     -fx-border-color: transparent;
 }
 
-.profile-button:hover {
+.profile-btn:hover {
     -fx-background-color: #eeeeeeaa;
 }
 
-/* ================================
-   BOTONES CUADRADOS (Select, Point…)
-   ================================ */
-.square-btn {
-    -fx-background-color: -fx-bg-card;
-    -fx-background-radius: 16px;
-/*    -fx-border-color: transparent;*/
-    -fx-border-radius: 16px;
-    -fx-border-width: 2px;
-    -fx-cursor: hand;
-}
-
-.square-btn:hover {
-    -fx-border-color: -fx-blue;
-    -fx-background-color: -fx-blue-light;
-}
-
-.square-btn:selected {
-    -fx-background-color: -fx-blue-light;
-    -fx-border-color: -fx-blue;
-}
-
-/* ================================
-   LISTA DE OBJETOS CREADOS
-   ================================ */
-.object-item {
-    -fx-background-color: transparent;
-    -fx-padding: 8 12;
-    -fx-background-radius: 8px;
-}
-
-.object-item:hover {
-    -fx-background-color: rgba(0,0,0,0.05);
-}
-
-.object-item:selected {
-    -fx-background-color: -fx-blue-light;
-    -fx-border-color: -fx-blue;
-}
-
-/* ================================
-   PANEL DE PROBLEMAS (lado derecho)
-   ================================ */
-.problem-card {
-    -fx-background-color: -fx-bg-card;
-    -fx-background-radius: 16px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0.2, 0, 3);
-}
-
-/* ================================
-   BOTONES DE RESPUESTA
-   ================================ */
-.answer-btn {
-    -fx-background-color: -fx-bg-card;
-    -fx-border-color: -fx-gray-light;
-    -fx-border-radius: 14px;
-    -fx-background-radius: 14px;
-    -fx-padding: 10 18;
-    -fx-font-size: 15px;
-    -fx-cursor: hand;
-}
-
-.answer-btn:hover {
-    -fx-border-color: -fx-blue;
-}
-
-.answer-btn.selected {
-    -fx-background-color: -fx-blue-light;
-    -fx-border-color: -fx-blue;
-}
-
-/* ================================
-   BOTÃO AZUL "Comprobar Respuesta"
-   ================================ */
-.primary-btn {
+.check-ans-btn {
     -fx-background-color: -fx-blue;
     -fx-text-fill: white;
     -fx-background-radius: 14px;
-    -fx-font-weight: bold;
     -fx-cursor: hand;
 }
 
-.primary-btn:hover {
-    -fx-background-color: #1f56bf;
+.check-ans-btn:hover {
+    -fx-background-color: -fx-blue-dark;
 }
 
-/* ================================
-   BOTONES PEQUEÑOS ABAJO
-   ================================ */
 .small-btn {
     -fx-background-color: -fx-bg-card;
     -fx-border-radius: 16px;
@@ -227,9 +101,8 @@ S17.642,20.762,13.558,20.762z";
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0.2, 0, 3);
 }
 
-/* ================================
-   ZOOM BAR (abajo del mapa)
-   ================================ */
+/* ====== ZOOM ====== */
+
 .zoom-bar {
     -fx-background-color: -fx-bg-card;
     -fx-background-radius: 14px;
@@ -242,7 +115,7 @@ S17.642,20.762,13.558,20.762z";
     -fx-padding: 6 10 6 10;
 }
 
-/* Slider */
+/* SLIDER */
 .slider .track {
     -fx-background-color: -fx-gray-light;
 }
@@ -251,34 +124,18 @@ S17.642,20.762,13.558,20.762z";
     -fx-background-color: -fx-blue;
 }
 
-.color-picker {
-    -fx-pref-width: 150px;
-}
+/* ====== MAP PIN ====== */
 
-/* ================================
-   TITULOS Y TEXTOS
-   ================================ */
-.title {
-    -fx-font-size: 20px;
-    -fx-font-weight: 700;
-    -fx-text-fill: -fx-gray-text;
+.map-pin {
+    -fx-shape: "M13.558,0C6.07,0,0,6.07,0,13.558s13.558,22.346,13.558,22.346s13.558-14.858,13.558-22.346S21.045,0,13.558,0z
+M13.558,20.762c-4.084,0-7.395-3.311-7.395-7.395s3.311-7.395,7.395-7.395c4.084,0,7.396,3.311,7.396,7.395
+S17.642,20.762,13.558,20.762z";    
+    -fx-background-color: black, white;
+    -fx-background-insets: 0, 2;
+    -fx-effect: dropshadow( two-pass-box, rgba(0, 0, 0, 0.5), 10, 0.0, 0, 10 );
+    -fx-pref-width: 48;
+    -fx-pref-height: 60;
 }
-
-.subtitle {
-    -fx-font-size: 16px;
-    -fx-font-weight: 600;
-}
-
-/* ================================
-   TARJETAS GENERALES
-   ================================ */
-.card {
-    -fx-background-color: -fx-bg-card;
-    -fx-background-radius: 16px;
-    -fx-padding: 5 7 5 7;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0.2, 0, 3);
-}
-
-.effect {
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0, 0, 3);
+.map-pin .arrow-button .arrow {
+    -fx-padding: 0;
 }

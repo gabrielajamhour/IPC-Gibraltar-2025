@@ -42,6 +42,8 @@ public class SessionManager {
 
             MainController mainController = loader.getController();
             mainController.setUser(activeUser);
+            
+            mainController.setSettings(SettingsUtil.getInstance());
 
             stage.setScene(new Scene(root));
             stage.show();
@@ -74,6 +76,8 @@ public class SessionManager {
             
             MainController mainController = loader.getController();
             mainController.setUser(activeUser);
+            
+            mainController.setSettings(SettingsUtil.getInstance());
 
             if (problemToLoad != null) {
                 mainController.loadProblem(problemToLoad); 
