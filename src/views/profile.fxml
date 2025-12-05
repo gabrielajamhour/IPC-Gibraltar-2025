@@ -92,7 +92,7 @@
             </rowConstraints>
           </GridPane>
       
-          <Label fx:id="errorLabel" style="-fx-text-fill: red;" text="error" visible="false">
+          <Label fx:id="errorLabel" style="-fx-text-fill: red;" text="error">
             <VBox.margin>
                <Insets bottom="15.0" top="15.0" />
             </VBox.margin>
