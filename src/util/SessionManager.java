@@ -4,6 +4,8 @@ import controllers.AuthController;
 import controllers.MainController;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -21,6 +23,8 @@ public class SessionManager {
     private static int problemsIncorrect = 0; 
     
     private static LocalDateTime sessionStartTime;
+    
+    private static final Map<Integer, Boolean> problemResults = new HashMap<>();
 
     public static void startNewSession(User user) {
         problemsSolved = 0;
@@ -117,5 +121,13 @@ public class SessionManager {
         activeUser = null;
         clearSessionCounters();
         sessionStartTime = null;
+    }
+    
+    public static void registerProblemResult(Problem p, boolean correct) {
+        problemResults.put(p.getText().hashCode(), correct);
+    }
+
+    public static Boolean getProblemResult(Problem p) {
+        return problemResults.get(p.getText().hashCode());
     }
 }

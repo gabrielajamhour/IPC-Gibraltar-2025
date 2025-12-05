@@ -5,41 +5,74 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox alignment="TOP_CENTER" prefHeight="500" prefWidth="700" spacing="20" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProblemsController">
-
-    <Label style="-fx-font-size: 24px;" text="Lista de Problemas">
-      <VBox.margin>
-         <Insets top="15.0" />
-      </VBox.margin></Label>
-
-    <!-- Barra de búsqueda -->
-    <HBox alignment="CENTER_LEFT" prefWidth="600" spacing="10">
-        <Label text="Buscar: ">
-         <HBox.margin>
-            <Insets left="25.0" />
-         </HBox.margin></Label>
-        <TextField fx:id="searchField" promptText="Texto del problema..." />
-        <Button onAction="#searchProblems" text="Buscar" />
-      <Button mnemonicParsing="false" onAction="#clearSearch" text="Limpar" />
-    </HBox>
-
-    <!-- Lista de problemas -->
-    <ListView fx:id="problemsList" />
-
-    <HBox spacing="15">
-        <Button fx:id="btnOpenProblem" onAction="#openProblem" prefWidth="150" text="Abrir problema">
-         <HBox.margin>
-            <Insets bottom="15.0" left="15.0" top="-5.0" />
-         </HBox.margin></Button>
-      <Region prefHeight="36.0" prefWidth="370.0" HBox.hgrow="ALWAYS" />
-        <Button contentDisplay="CENTER" onAction="#goBack" prefWidth="120" text="Volver">
-         <HBox.margin>
-            <Insets right="15.0" top="-5.0" />
-         </HBox.margin></Button>
-    </HBox>
-
-</VBox>
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="695.0" prefWidth="1024.0" stylesheets="@../styles/problems.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProblemsController">
+   <center>
+      <VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="710.4" spacing="20" styleClass="panel">
+         <HBox alignment="CENTER" minWidth="-Infinity" prefHeight="60.0" prefWidth="710.4" style="-fx-background-color: #2a8396;">
+            <VBox.margin>
+               <Insets bottom="10.0" top="15.0" />
+            </VBox.margin>
+            <children>
+            
+                <Label text="Lista de Problemas" textFill="WHITE">
+                  <font>
+                     <Font name="Arial Rounded MT Bold" size="28.0" />
+                  </font>
+               </Label>
+            </children>
+         </HBox>
+      
+          <HBox alignment="CENTER_LEFT" prefWidth="600" spacing="10">
+              <Label text="Buscar: ">
+               <HBox.margin>
+                  <Insets left="25.0" />
+               </HBox.margin>
+               <font>
+                  <Font name="Segoe UI Semibold" size="13.0" />
+               </font>
+            </Label>
+              <TextField fx:id="searchField" promptText="Texto del problema..." />
+              <Button minWidth="-Infinity" onAction="#searchProblems" prefWidth="65.0" styleClass="search-btn" text="Buscar">
+               <font>
+                  <Font name="Segoe UI Semibold" size="13.0" />
+               </font></Button>
+            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#clearSearch" prefWidth="65.0" styleClass="clear-btn" text="Limpar">
+               <font>
+                  <Font name="Segoe UI Semibold" size="13.0" />
+               </font></Button>
+          </HBox>
+      
+          <ListView fx:id="problemsList">
+            <VBox.margin>
+               <Insets bottom="5.0" left="15.0" right="15.0" />
+            </VBox.margin></ListView>
+      
+          <HBox spacing="15">
+              <Button contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" onAction="#goBack" prefHeight="35.0" prefWidth="80.0" styleClass="back-btn" text="Volver">
+               <HBox.margin>
+                  <Insets left="20.0" top="-5.0" />
+               </HBox.margin>
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
+            <Region prefHeight="36.0" prefWidth="370.0" HBox.hgrow="ALWAYS" />
+              <Button fx:id="btnOpenProblem" minHeight="-Infinity" minWidth="-Infinity" onAction="#openProblem" prefHeight="35.0" prefWidth="120.0" styleClass="open-problem-btn" text="Abrir problema">
+               <HBox.margin>
+                  <Insets bottom="15.0" right="20.0" top="-5.0" />
+               </HBox.margin>
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
+          </HBox>
+      
+      </VBox>
+   </center>
+</BorderPane>

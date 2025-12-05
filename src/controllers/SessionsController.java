@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 import javafx.stage.Stage;
 import util.SessionManager;
 
-public class ResultsController {
+public class SessionsController {
 
     @FXML private DatePicker dateFilter;
     @FXML private TableView<Session> sessionsTable;

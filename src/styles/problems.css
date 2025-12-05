@@ -1,0 +1,83 @@
+/*******************************
+ *     PROBLEMS PAGE STYLING
+ *******************************/
+
+.root {
+    -fx-bg-box: #ffffffaa;
+    -fx-blue: #2a8396;
+    -fx-blue-light: #46acbb;
+    -fx-blue-dark: #246f80;
+    -fx-white: #ffffff;
+    -fx-gray-light: #D7DDE4;
+}
+
+.root {
+    -fx-background-image: url("background-image.png");
+}
+
+/* ====== GENERAL ====== */
+
+.panel {
+    -fx-background-color: -fx-bg-box;
+    -fx-background-radius: 14px;
+    -fx-padding: 2 5 2 5;
+    -fx-opacity: 1;
+}
+
+.list-cell {
+    -fx-border-color: transparent transparent -fx-blue transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* ====== BOTONES ====== */
+
+.open-problem-btn {
+    -fx-background-color: -fx-blue;
+    -fx-text-fill: white;
+    -fx-background-radius: 14px;
+    -fx-cursor: hand;
+    -fx-border-width: 2px;
+    -fx-border-radius: 14px;
+}
+
+.open-problem-btn:hover {
+    -fx-background-color: -fx-blue-dark;
+}
+
+.back-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 14px;
+    -fx-cursor: hand;
+    -fx-border-width: 2px;
+    -fx-border-color: -fx-blue;
+    -fx-border-radius: 14px;
+}
+
+.back-btn:hover {
+    -fx-background-color: -fx-blue-light;
+}
+
+.search-btn {
+    -fx-background-color: -fx-blue;
+    -fx-text-fill: white;
+    -fx-border-radius: 16px;
+    -fx-border-color: -fx-blue;
+    -fx-background-radius: 16px;
+    -fx-cursor: hand;
+}
+
+.search-btn:hover {
+    -fx-background-color: -fx-blue-dark;
+}
+
+.clear-btn {
+    -fx-background-color: -fx-white;
+    -fx-border-radius: 16px;
+    -fx-border-color: -fx-blue;
+    -fx-background-radius: 16px;
+    -fx-cursor: hand;
+}
+
+.clear-btn:hover {
+    -fx-background-color: -fx-gray-light;
+}

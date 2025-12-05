@@ -1,0 +1,66 @@
+/*******************************
+ *    SESSIONS PAGE STYLING
+ *******************************/
+
+.root {
+    -fx-bg-box: #ffffffaa;
+    -fx-blue: #2a8396;
+    -fx-blue-light: #46acbb;
+    -fx-blue-dark: #246f80;
+    -fx-white: #ffffff;
+    -fx-gray-light: #D7DDE4;
+}
+
+.root {
+    -fx-background-image: url("background-image.png");
+}
+
+/* ====== GENERAL ====== */
+
+.panel {
+    -fx-background-color: -fx-bg-box;
+    -fx-background-radius: 14px;
+    -fx-padding: 2 5 2 5;
+    -fx-opacity: 1;
+}
+
+.tabla .column-header {
+    -fx-background-color: -fx-blue;
+    -fx-border-color: -fx-blue;
+}
+
+.tabla .column-header .label {
+    -fx-text-fill: white;
+}
+
+.tabla .table-cell {
+    -fx-text-font: "Segoe UI";
+    -fx-alignment: CENTER;
+}
+
+/* ====== BOTONES ====== */
+
+.back-btn {
+    -fx-background-color: -fx-blue;
+    -fx-text-fill: white;
+    -fx-background-radius: 14px;
+    -fx-cursor: hand;
+    -fx-border-width: 2px;
+    -fx-border-radius: 14px;
+}
+
+.back-btn:hover {
+    -fx-background-color: -fx-blue-dark;
+}
+
+.filter-btn {
+    -fx-background-color: -fx-white;
+    -fx-border-radius: 16px;
+    -fx-border-color: -fx-blue;
+    -fx-background-radius: 16px;
+    -fx-cursor: hand;
+}
+
+.filter-btn:hover {
+    -fx-background-color: -fx-gray-light;
+}

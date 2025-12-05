@@ -393,9 +393,9 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void openResults(ActionEvent event) {
+    private void openSessions(ActionEvent event) {
         User currentUser = SessionManager.getActiveUser();
-        openPage("/views/results.fxml", event, currentUser);
+        openPage("/views/session-history.fxml", event, currentUser);
     }
     
         @FXML
@@ -418,8 +418,8 @@ public class MainController implements Initializable {
             
             Object controller = loader.getController();
         
-            if (controller instanceof ResultsController) {
-                ((ResultsController) controller).setUser(userToInject);
+            if (controller instanceof SessionsController) {
+                ((SessionsController) controller).setUser(userToInject);
             }
             
             if (controller instanceof ConfigController) {

@@ -331,8 +331,8 @@
                             <children>
                                 <MenuButton fx:id="profileMain" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" text=" username">
                                     <items>
-                                        <MenuItem fx:id="profileButton" mnemonicParsing="false" onAction="#openProfile" text="Perfil" />
-                                        <MenuItem fx:id="resultsButton" mnemonicParsing="false" onAction="#openResults" text="Histórico" />
+                                        <MenuItem fx:id="profileButton" mnemonicParsing="false" onAction="#openProfile" text="Mi Perfil" />
+                                        <MenuItem fx:id="sessionsButton" mnemonicParsing="false" onAction="#openSessions" text="Historial de sesiones" />
                                         <MenuItem fx:id="resultsButton1" mnemonicParsing="false" onAction="#openConfig" text="Configuraciones" />
                                         <SeparatorMenuItem mnemonicParsing="false" />
                                         <MenuItem mnemonicParsing="false" onAction="#logout" text="Cerrar sesión" />

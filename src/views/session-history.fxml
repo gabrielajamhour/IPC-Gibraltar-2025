@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="695.0" prefWidth="1024.0" stylesheets="@../styles/session-history.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.SessionsController">
+   <center>
+      <VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="490.0" spacing="20" styleClass="panel">
+         <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="55.0" prefWidth="490.0" style="-fx-background-color: #2a8396;">
+            <children>
+            
+                <Label text="Historial de sesiones" textFill="WHITE">
+                  <font>
+                     <Font name="Arial Rounded MT Bold" size="28.0" />
+                  </font>
+               </Label>
+            </children>
+            <VBox.margin>
+               <Insets bottom="5.0" top="15.0" />
+            </VBox.margin>
+         </HBox>
+      
+          <HBox alignment="CENTER" spacing="10">
+              <Label text="Filtrar desde fecha:">
+               <font>
+                  <Font name="Segoe UI Semibold" size="12.0" />
+               </font></Label>
+              <DatePicker fx:id="dateFilter" />
+              <Button onAction="#applyFilter" styleClass="filter-btn" text="Aplicar filtro">
+               <font>
+                  <Font name="Segoe UI" size="12.0" />
+               </font></Button>
+          </HBox>
+      
+          <TableView fx:id="sessionsTable" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350" prefWidth="450.5" styleClass="tabla">
+              <columns>
+                  <TableColumn fx:id="colDate" prefWidth="150.0" resizable="false" text="Fecha/Hora" />
+                  <TableColumn fx:id="colHits" prefWidth="150" resizable="false" text="Aciertos" />
+                  <TableColumn fx:id="colFaults" prefWidth="150.0" resizable="false" text="Fallos" />
+              </columns>
+            <VBox.margin>
+               <Insets left="15.0" right="15.0" />
+            </VBox.margin>
+            <padding>
+               <Insets right="-1.0" />
+            </padding>
+          </TableView>
+      
+          <Button alignment="CENTER" onAction="#goBack" prefWidth="120" styleClass="back-btn" text="Volver">
+            <VBox.margin>
+               <Insets bottom="20.0" />
+            </VBox.margin>
+            <font>
+               <Font name="Segoe UI" size="14.0" />
+            </font>
+         </Button>
+      
+      </VBox>
+   </center>
+</BorderPane>

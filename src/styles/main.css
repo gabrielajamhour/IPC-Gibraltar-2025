@@ -24,7 +24,7 @@
 .card {
     -fx-background-color: -fx-bg-card;
     -fx-background-radius: 16px;
-    -fx-padding: 5 7 5 7;
+    -fx-padding: 7 9 7 9;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0.2, 0, 3);
 }
 

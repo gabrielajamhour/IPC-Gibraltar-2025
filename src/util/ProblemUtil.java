@@ -157,12 +157,10 @@ public class ProblemUtil {
         tBAlternativaD.setText("D. " + ansAlternativaD.getText());
     }
 
-    /** Equivale a tu comprobarRespuesta(ActionEvent event) */
     public void comprobarRespuesta() {
 
         if (alreadyAnswered) return;
 
-        // mismo patrón que ya tienes:
         List<Answer> answers = currentProblem.getAnswers();
 
         Toggle selectedToggle = questionGroup.getSelectedToggle();
@@ -190,7 +188,6 @@ public class ProblemUtil {
 
         alreadyAnswered = true;
 
-        // desactivar toggles y dejar opacidad normal
         questionGroup.getToggles().forEach(t -> {
             RadioButton rb = (RadioButton) t;
             rb.setDisable(true);
@@ -204,16 +201,15 @@ public class ProblemUtil {
             SessionManager.registerIncorrectAttempt();
             wrongAnswer();
         }
-
+        
+        SessionManager.registerProblemResult(currentProblem, isCorrect);
         updateSessionCounters();
         
-        // Registrar que este problema ya ha sido respondido
         if (currentProblem != null && !answeredProblems.contains(currentProblem)) {
             answeredProblems.add(currentProblem);
         }
     }
 
-    /** Igual que tu correctAnswer() */
     private void correctAnswer() {
         Answer correct = currentProblem.getAnswers()
                 .stream()
@@ -227,7 +223,6 @@ public class ProblemUtil {
         correctButton.setText(correctButton.getText() + "  ✓");
     }
 
-    /** Igual que tu wrongAnswer() */
     private void wrongAnswer() {
         Answer correct = currentProblem.getAnswers()
                 .stream()
@@ -258,7 +253,6 @@ public class ProblemUtil {
         return tBAlternativaD;
     }
 
-    /** Igual que tu updateSessionCounters() */
     public void updateSessionCounters() {
         int total = SessionManager.getProblemsSolved();
         int correct = SessionManager.getProblemsCorrect();
@@ -271,17 +265,11 @@ public class ProblemUtil {
         );
     }
 
-    /** Igual que tu updateProblemTitle() */
     public void updateProblemTitle() {
         int nextProblemNumber = SessionManager.getProblemsSolved() + 1;
         tituloProbActual.setText("Problema #" + nextProblemNumber);
     }
     
-    /**
-     * Resetea la lista de problemas ya respondidos para el generador
-     * aleatorio. Después de llamar a este método, generateRandomProblem()
-     * volverá a considerar todos los problemas como "no usados".
-     */
     public void resetAnsweredProblems() {
         answeredProblems.clear();
         try {

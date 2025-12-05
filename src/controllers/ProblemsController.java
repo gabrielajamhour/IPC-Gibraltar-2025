@@ -18,8 +18,7 @@ public class ProblemsController implements Initializable {
     @FXML private ListView<Problem> problemsList;
 
     private List<Problem> allProblems;
-    @FXML
-    private Button btnOpenProblem;
+    @FXML    private Button btnOpenProblem;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -80,15 +79,38 @@ public class ProblemsController implements Initializable {
     }
     
     public class ProblemCell extends ListCell<Problem> {
+        
+        private final Label label = new Label();
+        
+        public ProblemCell() {
+            label.setWrapText(true);
+            label.setMaxWidth(Double.MAX_VALUE);
+            setPrefWidth(0);
+        }
 
         @Override
         protected void updateItem(Problem problem, boolean empty) {
             super.updateItem(problem, empty);
 
             if (empty || problem == null) {
+                setGraphic(null);
                 setText(null);
+                setStyle("");
+                return;
+            }
+            
+            label.setText(problem.getText());
+            label.setMaxWidth(getListView().getWidth() - 20);
+            setGraphic(label);
+            
+            Boolean result = SessionManager.getProblemResult(problem);
+
+            if (result == null) {
+                setStyle("");
+            } else if (result) {
+                setStyle("-fx-background-color: #c6f7c2;");
             } else {
-                setText(problem.getText());
+                setStyle("-fx-background-color: #f6c1c1;");
             }
         }
     }
