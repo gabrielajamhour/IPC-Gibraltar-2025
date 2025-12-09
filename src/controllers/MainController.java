@@ -228,12 +228,13 @@ public class MainController implements Initializable {
         // Usamos la lista compartida
         data = sharedPoiData;
         map_listview.setItems(data);
-
+        
+        /*
         // Solo creamos el POI por defecto la primera vez
         if (data.isEmpty()) {
             Poi p1 = new Poi("Teste", "Test del POI", 1000, 1000, Color.RED);
             data.add(p1);
-        }
+        }*/
         
     }
     
