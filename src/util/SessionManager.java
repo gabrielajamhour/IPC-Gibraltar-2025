@@ -121,6 +121,12 @@ public class SessionManager {
         activeUser = null;
         clearSessionCounters();
         sessionStartTime = null;
+        
+        problemResults.clear();
+    }
+    
+    public static void clearProblemsResults(){
+        problemResults.clear();
     }
     
     public static void registerProblemResult(Problem p, boolean correct) {

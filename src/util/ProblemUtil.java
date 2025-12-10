@@ -272,6 +272,7 @@ public class ProblemUtil {
     
     public void resetAnsweredProblems() {
         answeredProblems.clear();
+        SessionManager.clearProblemsResults();
         try {
             generateRandomProblem();
         } catch (NavDAOException ex) {

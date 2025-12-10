@@ -235,7 +235,6 @@ public class MainController implements Initializable {
             Poi p1 = new Poi("Teste", "Test del POI", 1000, 1000, Color.RED);
             data.add(p1);
         }*/
-        
     }
     
     @FXML
