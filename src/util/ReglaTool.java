@@ -33,8 +33,12 @@ public class ReglaTool {
 
     // escala de zoom que se modifica con la rueda
     private double zoomScale = 1.0;
+    
+    // rotación acumulada (grados)
+    private double rotationDeg = DEFAULT_ROTATION;
+    private static final double DEFAULT_ROTATION = 0.0;
 
-
+    
     public ReglaTool(Group zoomGroup, ScrollPane scrollPane) {
         this.zoomGroup = zoomGroup;
         this.scrollPane = scrollPane;
@@ -48,9 +52,6 @@ public class ReglaTool {
 
         // Clase CSS -> coincide con ".transportador" en protractor.css
         reglaNode.getStyleClass().add("regla");
-        
-        //reglaNode.setRotate(180);
-
         
         // aplicar la combinación base + zoom
         reglaNode.setScaleX(baseScaleX * zoomScale);
@@ -116,17 +117,32 @@ public class ReglaTool {
             dragging = false;
         });
 
-        // Scroll sobre el transportador = cambiar tamaño
-        reglaNode.addEventHandler(ScrollEvent.SCROLL, e -> {
+        // Scroll sobre la regla:
+        //  - sin modificadores -> cambiar tamaño
+        //  - con SHIFT -> rotar
+        reglaNode.addEventFilter(ScrollEvent.SCROLL, e -> {
+            // con SHIFT, muchas veces deltaY = 0 y el scroll viene en deltaX
             double delta = e.getDeltaY();
-            double step = (delta > 0) ? 0.15 : -0.15;
+            if (delta == 0) delta = e.getDeltaX();
 
-            zoomScale = Math.max(0.1, Math.min(8.0, zoomScale + step));
+            if (e.isShiftDown()) {
+                // aunque delta sea 0, consumimos para evitar que el ScrollPane haga scroll horizontal
+                if (delta != 0) {
+                    double rotStep = (delta > 0) ? 5.0 : -5.0;
+                    rotationDeg = (rotationDeg + rotStep) % 360.0;
+                    reglaNode.setRotate(rotationDeg);
+                }
+                e.consume();
+                return;
+            }
 
-            // aplicamos orientación base * escala de zoom
-            reglaNode.setScaleX(baseScaleX * zoomScale);
-            reglaNode.setScaleY(baseScaleY * zoomScale);
-
+            // scroll normal -> escala
+            if (delta != 0) {
+                double step = (delta > 0) ? 0.15 : -0.15;
+                zoomScale = Math.max(0.1, Math.min(8.0, zoomScale + step));
+                reglaNode.setScaleX(baseScaleX * zoomScale);
+                reglaNode.setScaleY(baseScaleY * zoomScale);
+            }
             e.consume();
         });
     }
@@ -227,7 +243,11 @@ public class ReglaTool {
         reglaNode.setVisible(visible);
         if (visible) {
             adjustScaleForCurrentZoom(); // primero tamaño acorde al zoom actual
-
+            
+            // Poner a la rotación default
+            rotationDeg = DEFAULT_ROTATION;
+            reglaNode.setRotate(rotationDeg);
+            
             // Esperamos al siguiente pulso de JavaFX para que el ScrollPane tenga bien el viewport
             Platform.runLater(() -> {
                 centerOnViewport();   // ahora sí, centramos

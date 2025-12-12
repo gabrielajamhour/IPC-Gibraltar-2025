@@ -53,7 +53,6 @@ import util.PointTool;
 import util.ZoomManager;
 import util.ClearAll;
 import util.DistanceTool;
-import util.ExtremosOverlay;
 import util.ProblemUtil;
 import util.ProtractorTool;
 import util.ReglaTool;
@@ -61,6 +60,7 @@ import util.SelectTool;
 import util.SessionManager;
 import util.SettingsUtil;
 import util.TextTool;
+import util.ExtremosOverlay;
 
 
 public class MainController implements Initializable {
@@ -102,11 +102,8 @@ public class MainController implements Initializable {
     @FXML    private Label labelIntrucciones;
     @FXML    private Button btnDistancia;
     @FXML    private Label tituloPuntosMapa;
-    @FXML    private MenuItem resultsButton1;    
-    @FXML    private Button btnExtremos;
-    @FXML    private MenuItem sessionsButton;
-    @FXML    private BorderPane pane;
-
+    @FXML    private MenuItem resultsButton1;
+    
     // En vez de enum Tool, tendremos objetos:
     private MapTool currentTool;
     private MapTool pointTool;
@@ -121,9 +118,6 @@ public class MainController implements Initializable {
     // Transportador de águlos y regla
     private ProtractorTool protractorTool;
     private ReglaTool reglaTool;
-    
-    // Marcación de extremos (overlay independiente)
-    private ExtremosOverlay extremosOverlay;
     
     // Estados compartidos (color actual, grosor, etc)
     private final ObjectProperty<Color> currentColor = new SimpleObjectProperty<>(Color.RED);
@@ -156,6 +150,13 @@ public class MainController implements Initializable {
     @FXML    private ImageView avatarMain;
     
     private SettingsUtil settings;
+    @FXML    private BorderPane pane;
+    @FXML
+    private Button btnExtremos;
+    // Marcación de extremos (overlay)
+    private ExtremosOverlay extremosOverlay;
+    @FXML
+    private MenuItem sessionsButton;
     
     
 
@@ -165,6 +166,9 @@ public class MainController implements Initializable {
         
         zoomManager = new ZoomManager(map_scrollpane, zoom_slider);
         zoomGroup   = zoomManager.getZoomGroup();
+
+        // Overlay de extremos (líneas guía hacia los bordes)
+        extremosOverlay = new ExtremosOverlay(zoomGroup);
         
         // Cada vez que cambie el slider de zoom, avisamos a PointTool
         zoom_slider.valueProperty().addListener((obs, oldVal, newVal) -> {
@@ -172,9 +176,6 @@ public class MainController implements Initializable {
                 pt.onZoomChanged(newVal.doubleValue()); // o zoomManager.getCurrentScale()
             }
         });
-        
-        // Overlay de marcación de extremos (queda dentro del zoomGroup)
-        extremosOverlay = new ExtremosOverlay(zoomGroup);
         
         // Color actual = valor del ColorPicker
         currentColor.bind(colorPicker.valueProperty());
@@ -329,7 +330,7 @@ public class MainController implements Initializable {
             )
         );
         timeline.play();
-        
+
         // Si están activos los extremos, actualizarlos al POI seleccionado
         if (extremosOverlay != null && extremosOverlay.isEnabled()) {
             extremosOverlay.showFor(itemSelected);
@@ -567,21 +568,6 @@ public class MainController implements Initializable {
             setCurrentTool(distanceTool);
         }
     }
-    
-    @FXML
-    private void activateExtremos(ActionEvent event) {
-        if (extremosOverlay == null) return;
-
-        extremosOverlay.toggle();
-
-        // Si lo acabamos de activar, dibujamos para el POI seleccionado (si lo hay)
-        if (extremosOverlay.isEnabled()) {
-            Poi selected = map_listview.getSelectionModel().getSelectedItem();
-            extremosOverlay.showFor(selected);
-        }
-
-        updateToolButtons();
-    }
 
     private void onNoneToolClicked() {
             setCurrentTool(null); // deja solo el pan del ScrollPane
@@ -639,10 +625,12 @@ public class MainController implements Initializable {
                 reglaTool.isVisible() ? activeStyle : inactiveStyle
             );
         }
-        
-        // Botón de Extremos: depende de si está habilitado el overlay
+
+        // Botón de Extremos: depende de si está habilitado
         if (btnExtremos != null && extremosOverlay != null) {
-            btnExtremos.setStyle(extremosOverlay.isEnabled() ? activeStyle : inactiveStyle);
+            btnExtremos.setStyle(
+                extremosOverlay.isEnabled() ? activeStyle : inactiveStyle
+            );
         }
 
         // importante: solo dejamos mover el mapa cuando no hay herramienta de dibujo
@@ -719,7 +707,7 @@ public class MainController implements Initializable {
     }
     
     public void loadProblem(Problem selected){
-        problemUtil.loadProblem(selected);
+        problemUtil.loadProblem(selected);    
     }
 
     @FXML
@@ -732,7 +720,7 @@ public class MainController implements Initializable {
     }
 
     public void setSettings(SettingsUtil settings) {
-        this.settings = settings;
+         this.settings = settings;
 
         settings.usarColorSolidoProperty()
                 .addListener((obs, oldV, newV) -> updateBackground());
@@ -749,4 +737,20 @@ public class MainController implements Initializable {
             pane.setStyle("-fx-background-image: url('/styles/background-image.png');");
         }
     }
+
+    @FXML
+    private void activateExtremos(ActionEvent event) {
+        if (extremosOverlay == null) return;
+
+        extremosOverlay.toggle();
+
+        // Si acabamos de activarlo, dibujar para el POI seleccionado (si existe)
+        if (extremosOverlay.isEnabled()) {
+            Poi selected = map_listview.getSelectionModel().getSelectedItem();
+            extremosOverlay.showFor(selected);
+        }
+
+        updateToolButtons();
+    }
+    
 }

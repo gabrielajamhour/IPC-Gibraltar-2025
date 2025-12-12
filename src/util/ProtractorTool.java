@@ -33,6 +33,11 @@ public class ProtractorTool {
 
     // escala de zoom que se modifica con la rueda
     private double zoomScale = 1.0;
+    
+    // rotación acumulada (grados). OJO: el nodo empieza con 180º en el ctor.
+    private double rotationDeg = 180.0;
+    private static final double DEFAULT_ROTATION = 180.0;
+
 
 
     public ProtractorTool(Group zoomGroup, ScrollPane scrollPane) {
@@ -49,7 +54,7 @@ public class ProtractorTool {
         // Clase CSS -> coincide con ".transportador" en protractor.css
         protractorNode.getStyleClass().add("transportador");
         
-        protractorNode.setRotate(180);
+        protractorNode.setRotate(rotationDeg);
         
         // aplicar la combinación base + zoom
         protractorNode.setScaleX(baseScaleX * zoomScale);
@@ -115,17 +120,32 @@ public class ProtractorTool {
             dragging = false;
         });
 
-        // Scroll sobre el transportador = cambiar tamaño
+        // Scroll sobre el transportador:
+        //  - sin modificadores -> cambiar tamaño
+        //  - con SHIFT -> rotar
         protractorNode.addEventHandler(ScrollEvent.SCROLL, e -> {
+            // con SHIFT, muchas veces deltaY = 0 y el scroll viene en deltaX
             double delta = e.getDeltaY();
-            double step = (delta > 0) ? 0.15 : -0.15;
+            if (delta == 0) delta = e.getDeltaX();
 
-            zoomScale = Math.max(0.1, Math.min(8.0, zoomScale + step));
+            if (e.isShiftDown()) {
+                // aunque delta sea 0, consumimos para evitar que el ScrollPane haga scroll horizontal
+                if (delta != 0) {
+                    double rotStep = (delta > 0) ? 5.0 : -5.0;
+                    rotationDeg = (rotationDeg + rotStep) % 360.0;
+                    protractorNode.setRotate(rotationDeg);
+                }
+                e.consume();
+                return;
+            }
 
-            // aplicamos orientación base * escala de zoom
-            protractorNode.setScaleX(baseScaleX * zoomScale);
-            protractorNode.setScaleY(baseScaleY * zoomScale);
-
+            // scroll normal -> escala
+            if (delta != 0) {
+                double step = (delta > 0) ? 0.15 : -0.15;
+                zoomScale = Math.max(0.1, Math.min(8.0, zoomScale + step));
+                protractorNode.setScaleX(baseScaleX * zoomScale);
+                protractorNode.setScaleY(baseScaleY * zoomScale);
+            }
             e.consume();
         });
     }
@@ -228,6 +248,10 @@ public class ProtractorTool {
         if (visible) {
             adjustScaleForCurrentZoom(); // primero tamaño acorde al zoom actual
             
+            // Poner a la rotación default
+            rotationDeg = DEFAULT_ROTATION;
+            protractorNode.setRotate(rotationDeg);
+
             centerOnViewport();   // ahora sí, centramos
             protractorNode.toFront();
         }
