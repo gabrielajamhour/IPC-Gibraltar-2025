@@ -14,6 +14,10 @@ import model.Problem;
 import model.Session;
 import model.User;
 
+/**
+ * @author Gabriela Rego & Rafael Alonso
+ */
+
 public class SessionManager {
 
     private static User activeUser;

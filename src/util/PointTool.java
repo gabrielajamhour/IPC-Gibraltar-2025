@@ -24,7 +24,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
- *
  * @author Rafael Alonso
  */
 public class PointTool implements MapTool {

@@ -62,6 +62,9 @@ import util.SessionManager;
 import util.SettingsUtil;
 import util.TextTool;
 
+/**
+ * @author Gabriela Rego & Rafael Alonso
+ */
 
 public class MainController implements Initializable {
 

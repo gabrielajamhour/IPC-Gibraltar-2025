@@ -23,10 +23,9 @@ import model.User;
 import util.SessionManager;
 
 /**
- * FXML Controller class
- *
  * @author Rafael Alonso
  */
+
 public class AuthController implements Initializable {
 
     // Set "true" para que el usuario tenga un feedback del requisito de la contrasena inmediato,

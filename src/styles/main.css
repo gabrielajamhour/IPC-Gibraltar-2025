@@ -2,6 +2,10 @@
  *      MAIN PAGE STYLING
  *******************************/
 
+/**
+ * @author Gabriela Rego
+ */
+
 .root {
     -fx-bg-main: #b7deeb;
     -fx-bg-sidebar: #EEF2F6;

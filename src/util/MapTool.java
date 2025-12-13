@@ -3,7 +3,6 @@ package util;
 import javafx.scene.input.MouseEvent;
 
 /**
- *
  * @author Rafael Alonso
  */
 public interface MapTool {

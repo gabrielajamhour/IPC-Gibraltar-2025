@@ -9,6 +9,10 @@ import javafx.stage.Stage;
 import util.SessionManager;
 import util.SettingsUtil;
 
+/**
+ * @author Gabriela Rego & Rafael Alonso
+ */
+
 public class App extends Application {
     private SettingsUtil settings = SettingsUtil.getInstance();
     

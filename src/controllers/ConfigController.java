@@ -14,6 +14,10 @@ import util.ProblemUtil;
 import util.SessionManager;
 import util.SettingsUtil;
 
+/**
+ * @author Gabriela Rego
+ */
+
 public class ConfigController implements Initializable {
 
     @FXML    private Button btnResetProblem;

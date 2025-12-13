@@ -10,6 +10,10 @@ import java.time.format.DateTimeFormatter;
 import javafx.stage.Stage;
 import util.SessionManager;
 
+/**
+ * @author Gabriela Rego
+ */
+
 public class SessionsController {
 
     @FXML private DatePicker dateFilter;

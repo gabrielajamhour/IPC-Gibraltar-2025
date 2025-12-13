@@ -13,11 +13,7 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.event.EventHandler;
 
 /*
- *
- * @author Rafael Alonso
- */
-
-/*
+ * @author Rafael Alonso 
  * Herramienta para trazar líneas sobre el mapa.
  *
  * Comportamiento híbrido:

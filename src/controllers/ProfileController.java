@@ -16,6 +16,10 @@ import javafx.stage.Stage;
 import model.User;
 import util.SessionManager;
 
+/**
+ * @author Gabriela Rego
+ */
+
 public class ProfileController implements Initializable{
 
     @FXML private ImageView avatarImage;

@@ -8,7 +8,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.input.ScrollEvent;
 
 /**
- *
  * @author Rafael Alonso
  */
 public class ZoomManager {

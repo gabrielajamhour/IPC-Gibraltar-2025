@@ -31,8 +31,6 @@ import model.Navigation;
 import util.SessionManager;
 
 /**
- * FXML Controller class
- *
  * @author Rafael Alonso
  */
 public class RegisterController implements Initializable {

@@ -2,6 +2,9 @@ package util;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
+/**
+ * @author Jose Soler
+ */
 
 public class Poi {
     

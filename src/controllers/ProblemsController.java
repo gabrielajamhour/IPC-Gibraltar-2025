@@ -12,6 +12,10 @@ import javafx.fxml.Initializable;
 import javafx.stage.Stage;
 import util.SessionManager;
 
+/**
+ * @author Gabriela Rego
+ */
+
 public class ProblemsController implements Initializable {
 
     @FXML private TextField searchField;

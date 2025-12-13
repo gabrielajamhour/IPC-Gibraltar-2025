@@ -3,6 +3,10 @@ package util;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
+/**
+ * @author Gabriela Rego
+ */
+
 public class SettingsUtil {
     private static SettingsUtil instance = new SettingsUtil();
 

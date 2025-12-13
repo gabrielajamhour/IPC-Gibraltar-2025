@@ -14,6 +14,10 @@ import model.Navigation;
 import model.Problem;
 import util.SessionManager;
 
+/**
+ * @author Gabriela Rego
+ */
+
 public class ProblemUtil {
     // Referencia global a la instancia actual
     private static ProblemUtil instance;
