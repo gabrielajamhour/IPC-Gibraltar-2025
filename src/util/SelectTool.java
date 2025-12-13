@@ -52,7 +52,7 @@ public class SelectTool implements MapTool {
             zoomGroup.setCursor(Cursor.HAND);
         }
         // Instrucción inicial al activar la herramienta de selección
-        updateInstruction("Primero selecciona las nuevas configuraciones del elemento a seleccionar");
+        updateInstruction("Primero selecciona las nuevas\nconfiguraciones del elemento a seleccionar");
     }
 
     @Override

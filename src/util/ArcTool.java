@@ -236,7 +236,7 @@ public class ArcTool implements MapTool {
         step = Step.WAIT_CENTER;
         
         // Indicar que se ha terminado y qué hacer ahora
-        updateInstruction("Haz un clic para seleccionar el centro de otro arco.");
+        updateInstruction("Haz un clic para seleccionar\nel centro de otro arco.");
     }
     
     // ============ INSTRUCCIONES DINAMICAS ============

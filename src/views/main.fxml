@@ -56,16 +56,13 @@
                 </ScrollPane>
                 <HBox alignment="CENTER">
                     <children>
-                        <Label fx:id="labelIntrucciones" prefHeight="46.0" prefWidth="142.0" text="Instrucciones herramientas" textAlignment="CENTER" wrapText="true">
+                        <Label fx:id="labelIntrucciones" text="Instrucciones herramientas" textAlignment="CENTER" wrapText="true" HBox.hgrow="ALWAYS">
                             <HBox.margin>
                                 <Insets right="100.0" />
                             </HBox.margin>
                             <styleClass>
                                 <String fx:value="text-box" />
                             </styleClass>
-                            <padding>
-                                <Insets left="5.0" />
-                            </padding>
                             <font>
                                 <Font name="Segoe UI" size="12.0" />
                             </font>
