@@ -20,14 +20,14 @@ import util.SettingsUtil;
 
 public class ConfigController implements Initializable {
 
-    @FXML    private Button btnResetProblem;
-    @FXML    private CheckBox chkDynamicPoiSize;
-    
     private SettingsUtil settings;
-    @FXML    private CheckBox chkColorSolido;
-    @FXML    private Button btnBack;
     private Boolean valorOriginalColorFondo;
     private boolean valorOriginalDynamicPoiSize;
+    
+    @FXML    private CheckBox chkDynamicPoiSize;    
+    @FXML    private CheckBox chkColorSolido;
+    @FXML    private Button btnResetProblem;
+    @FXML    private Button btnBack;
     @FXML    private Button btnSave;
 
 

@@ -493,7 +493,7 @@
                                     <items>
                                         <MenuItem fx:id="profileButton" mnemonicParsing="false" onAction="#openProfile" text="Mi Perfil" />
                                         <MenuItem fx:id="sessionsButton" mnemonicParsing="false" onAction="#openSessions" text="Historial de sesiones" />
-                                        <MenuItem fx:id="resultsButton1" mnemonicParsing="false" onAction="#openConfig" text="Configuraciones" />
+                                        <MenuItem fx:id="resultsButton" mnemonicParsing="false" onAction="#openConfig" text="Configuraciones" />
                                         <SeparatorMenuItem mnemonicParsing="false" />
                                         <MenuItem mnemonicParsing="false" onAction="#logout" text="Cerrar sesión" />
                                     </items>

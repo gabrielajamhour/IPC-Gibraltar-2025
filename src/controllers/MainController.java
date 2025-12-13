@@ -84,13 +84,11 @@ public class MainController implements Initializable {
     @FXML    private Button btnPoint;
     @FXML    private Button btnLine;
     @FXML    private ToggleGroup questionGroup;
-    @FXML
-    private Button btnBorrar;
+    @FXML    private Button btnBorrar;
     @FXML    private Slider sliderGrosor;
     @FXML    private ColorPicker colorPicker;
     @FXML    private Button btnArco;
-    @FXML
-    private Button btnSeleccionar;
+    @FXML    private Button btnSeleccionar;
     @FXML    private Button randomProblem;
     @FXML    private Label enunciadoProblema;
     @FXML    private Button btnComprobarRespuesta;
@@ -101,17 +99,12 @@ public class MainController implements Initializable {
     @FXML    private Label textErrorCompResp;
     @FXML    private Button btnTexto;
     @FXML    private MenuButton profileMain;
-    @FXML
-    private Button btnTransportador;
-    @FXML
-    private Button btnRegla;
+    @FXML    private Button btnTransportador;
+    @FXML    private Button btnRegla;
     @FXML    private Label labelIntrucciones;
-    @FXML
-    private Button btnDistancia;
+    @FXML    private Button btnDistancia;
     @FXML    private Label tituloPuntosMapa;
-    @FXML    private MenuItem resultsButton1;    
-    @FXML
-    private Button btnExtremos;
+    @FXML    private Button btnExtremos;
     @FXML    private MenuItem sessionsButton;
     @FXML    private BorderPane pane;
 
@@ -158,22 +151,17 @@ public class MainController implements Initializable {
     
     private ZoomManager zoomManager;
     
+    private ProblemUtil problemUtil;
+    private SettingsUtil settings;
+    
     @FXML    private Label contadorProblemas;
     @FXML    private Label tituloProbActual;
-    private ProblemUtil problemUtil;
     @FXML    private ImageView avatarMain;
-    
-    private SettingsUtil settings;
-    @FXML
-    private Label tituloHerramientasDibujo;
-    @FXML
-    private Label tituloHerramientasMedicion;
-    @FXML
-    private Label tituloEdicion;
-    @FXML
-    private Button btnBorrarTodo;
-    
-    
+    @FXML    private Label tituloHerramientasDibujo;
+    @FXML    private Label tituloHerramientasMedicion;
+    @FXML    private Label tituloEdicion;
+    @FXML    private Button btnBorrarTodo;
+    @FXML    private MenuItem resultsButton;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
