@@ -68,11 +68,7 @@ import util.TextTool;
 
 public class MainController implements Initializable {
 
-    // ======================================
-    // la variable zoomGroup se utiliza para dar soporte al zoom
-    // el escalado se realiza sobre este nodo, al escalar el Group no mueve sus nodos
-    private Group zoomGroup;
-    
+    // ======================================  
     @FXML    private ListView<Poi> map_listview;
     @FXML    private ScrollPane map_scrollpane;
     @FXML    private Slider zoom_slider;
@@ -107,8 +103,17 @@ public class MainController implements Initializable {
     @FXML    private Button btnExtremos;
     @FXML    private MenuItem sessionsButton;
     @FXML    private BorderPane pane;
+    @FXML    private Button btnBorrarTodo;
+    @FXML    private Label contadorProblemas;
+    @FXML    private Label tituloProbActual;
+    @FXML    private ImageView avatarMain;
+    @FXML    private Label tituloHerramientasDibujo;
+    @FXML    private Label tituloHerramientasMedicion;
+    @FXML    private Label tituloEdicion;
+    @FXML    private MenuItem resultsButton;
+    
 
-    // En vez de enum Tool, tendremos objetos:
+    // Tools
     private MapTool currentTool;
     private MapTool pointTool;
     private MapTool lineTool;
@@ -149,19 +154,14 @@ public class MainController implements Initializable {
 
     private ObservableList<Poi> data;
     
+    // la variable zoomGroup se utiliza para dar soporte al zoom
+    // el escalado se realiza sobre este nodo, al escalar el Group no mueve sus nodos
+    private Group zoomGroup;
     private ZoomManager zoomManager;
     
     private ProblemUtil problemUtil;
     private SettingsUtil settings;
     
-    @FXML    private Label contadorProblemas;
-    @FXML    private Label tituloProbActual;
-    @FXML    private ImageView avatarMain;
-    @FXML    private Label tituloHerramientasDibujo;
-    @FXML    private Label tituloHerramientasMedicion;
-    @FXML    private Label tituloEdicion;
-    @FXML    private Button btnBorrarTodo;
-    @FXML    private MenuItem resultsButton;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -229,6 +229,14 @@ public class MainController implements Initializable {
         
         settings = SettingsUtil.getInstance();
         updateBackground();
+        
+        extremosOverlay.setOnPoiPicked(poi -> {
+        if (poi == null) return;
+
+        map_listview.getSelectionModel().select(poi); // mantiene coherencia con la UI
+        centerOnPoi(poi);                             // centra igual que listClicked
+        extremosOverlay.showFor(poi);                 // dibuja los extremos
+        });
     }
     
     public void setUser(User u) {
@@ -290,42 +298,46 @@ public class MainController implements Initializable {
         // Color de fondo del botón-pin
         map_pin.setStyle("-fx-background-color: " + webColor + ";");
     }
-
     
     @FXML
     void listClicked(MouseEvent event) {
         Poi itemSelected = map_listview.getSelectionModel().getSelectedItem();
         if (itemSelected == null) return;
 
-        // 1) Datos básicos
-        double scale = zoomGroup.getScaleX(); // asumimos zoom uniforme X = Y
+        centerOnPoi(itemSelected);
 
-        // tamaño del contenido SIN zoom (en coordenadas locales)
+        if (extremosOverlay != null && extremosOverlay.isEnabled()) {
+            extremosOverlay.showFor(itemSelected);
+        }
+    }
+    
+    private void centerOnPoi(Poi poi) {
+        if (poi == null || poi.getPosition() == null) return;
+
+        double scale = zoomGroup.getScaleX();
         double contentWLocal = zoomGroup.getBoundsInLocal().getWidth();
         double contentHLocal = zoomGroup.getBoundsInLocal().getHeight();
 
-        // tamaño del contenido CON zoom (lo que ve realmente el ScrollPane)
         double contentW = contentWLocal * scale;
         double contentH = contentHLocal * scale;
 
-        // tamaño del viewport (parte visible del ScrollPane)
         Bounds viewport = map_scrollpane.getViewportBounds();
         double viewportW = viewport.getWidth();
         double viewportH = viewport.getHeight();
 
-        // 2) Posición del POI en coordenadas de contenido (con zoom)
-        double x = itemSelected.getPosition().getX() * scale;
-        double y = itemSelected.getPosition().getY() * scale;
+        double x = poi.getPosition().getX() * scale;
+        double y = poi.getPosition().getY() * scale;
 
-        // 3) Queremos que el POI quede en el centro del viewport
-        double targetH = (x - viewportW / 2) / (contentW - viewportW);
-        double targetV = (y - viewportH / 2) / (contentH - viewportH);
+        double denomW = (contentW - viewportW);
+        double denomH = (contentH - viewportH);
+        if (denomW <= 0 || denomH <= 0) return;
 
-        // 4) Limitar entre 0 y 1 para que no se salga
+        double targetH = (x - viewportW / 2) / denomW;
+        double targetV = (y - viewportH / 2) / denomH;
+
         targetH = Math.max(0, Math.min(1, targetH));
         targetV = Math.max(0, Math.min(1, targetV));
 
-        // 5) Animación de scroll
         Timeline timeline = new Timeline(
             new KeyFrame(Duration.millis(500),
                 new KeyValue(map_scrollpane.hvalueProperty(), targetH),
@@ -333,12 +345,8 @@ public class MainController implements Initializable {
             )
         );
         timeline.play();
-        
-        // Si están activos los extremos, actualizarlos al POI seleccionado
-        if (extremosOverlay != null && extremosOverlay.isEnabled()) {
-            extremosOverlay.showFor(itemSelected);
-        }
     }
+    
     
     private void dibujar(){
         // Inicializar el dibujado de POIs (esta llamada sustituye a tu antiguo dibujar())

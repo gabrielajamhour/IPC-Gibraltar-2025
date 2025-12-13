@@ -1,5 +1,6 @@
 package util;
 
+import java.util.function.Consumer;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -8,18 +9,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 
 /**
  * @author Rafael Alonso
- * 
- * Draws the "extremes marking" overlay (guide lines to the map borders/scales) for a POI.
- *
- * Typical usage:
- *   ExtremosOverlay eo = new ExtremosOverlay(zoomGroup);
- *   eo.setEnabled(true/false);
- *   eo.showFor(selectedPoi);
- *
- * Note: it adds an overlay (Group) inside zoomGroup and it is mouseTransparent.
  */
 public final class ExtremosOverlay {
 
@@ -34,7 +30,15 @@ public final class ExtremosOverlay {
     private double dashB = 6.0;
     // Make it clearly visible by default (user complained it was too thin)
     private double strokeWidth = 2.5;
+    
+    // Click-to-select POI sobre el mapa (sin depender de la lista)
+    private static final double HIT_TOLERANCE = 40.0;
 
+    private final EventHandler<MouseEvent> pickPoiHandler = this::onZoomGroupPressed;
+    
+    private Consumer<Poi> onPoiPicked;
+
+    
     public ExtremosOverlay(Group zoomGroup) {
         if (zoomGroup == null) throw new IllegalArgumentException("zoomGroup cannot be null");
         this.zoomGroup = zoomGroup;
@@ -45,11 +49,16 @@ public final class ExtremosOverlay {
 
     /** Enables/disables the overlay. When disabled, it clears current marks. */
     public void setEnabled(boolean enabled) {
+        if (this.enabled == enabled) return;
         this.enabled = enabled;
-        if (!enabled) {
-            clear();
-        } else {
+
+        if (enabled) {
+            // Capturamos clicks en POIs sobre el mapa
+            zoomGroup.addEventFilter(MouseEvent.MOUSE_PRESSED, pickPoiHandler);
             redraw();
+        } else {
+            zoomGroup.removeEventFilter(MouseEvent.MOUSE_PRESSED, pickPoiHandler);
+            clear();
         }
     }
 
@@ -155,4 +164,49 @@ public final class ExtremosOverlay {
     public void setDash(double a, double b) { this.dashA = a; this.dashB = b; redraw(); }
     public void setStrokeWidth(double w) { this.strokeWidth = w; redraw(); }
     // Ticks removed: the user only wants the guide lines.
+    
+    private void onZoomGroupPressed(MouseEvent event) {
+        Point2D p = zoomGroup.sceneToLocal(event.getSceneX(), event.getSceneY());
+        Poi poi = findPoiAt(p.getX(), p.getY());
+
+        if (poi != null) {
+            if (onPoiPicked != null) onPoiPicked.accept(poi);
+            else showFor(poi);
+
+            event.consume(); // clave: evita el “pan raro”
+        }
+
+    }
+
+    private Poi findPoiAt(double px, double py) {
+        Poi bestPoi = null;
+        double bestDist = Double.MAX_VALUE;
+
+        for (Node child : zoomGroup.getChildren()) {
+            if (!(child instanceof Region region)) continue;
+            if (!(region.getUserData() instanceof Poi poi)) continue;
+
+            // 1) Hit-test real: si el click cae dentro del marker (pin)
+            Bounds bb = region.getBoundsInParent();
+            if (bb != null && bb.contains(px, py)) {
+                return poi; // hit exacto
+            }
+
+            // 2) Fallback por distancia a la posición lógica (punta)
+            Point2D pos = poi.getPosition();
+            if (pos == null) continue;
+
+            double d = Math.hypot(px - pos.getX(), py - pos.getY());
+            if (d <= HIT_TOLERANCE && d < bestDist) {
+                bestDist = d;
+                bestPoi = poi;
+            }
+        }
+        return bestPoi;
+    }
+
+    public void setOnPoiPicked(Consumer<Poi> handler) {
+        this.onPoiPicked = handler;
+    }
+
 }

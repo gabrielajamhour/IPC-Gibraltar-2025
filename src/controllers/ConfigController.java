@@ -15,7 +15,7 @@ import util.SessionManager;
 import util.SettingsUtil;
 
 /**
- * @author Gabriela Rego
+ * @author Gabriela Rego & Rafael Alonso
  */
 
 public class ConfigController implements Initializable {

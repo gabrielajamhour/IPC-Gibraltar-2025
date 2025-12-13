@@ -8,6 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
@@ -127,18 +128,25 @@ public class EraserTool implements MapTool {
     // ---------------- POIs ----------------
 
     private Poi findPoiNear(Point2D point) {
-        // AUMENTA este valor para que sea más fácil acertar
         final double MAX_DISTANCE_POI = 40;
 
+        // 1) Primero: hit real sobre la forma del marker (más natural)
+        for (Node n : zoomGroup.getChildren()) {
+            if (n instanceof Region region && region.getUserData() instanceof Poi poi) {
+                Point2D pInMarker = region.parentToLocal(point);
+                if (region.contains(pInMarker)) {
+                    return poi;
+                }
+            }
+        }
+
+        // 2) Si no hay hit por forma: fallback por distancia al punto del POI
         Poi closest = null;
         double closestDist = Double.MAX_VALUE;
 
         for (Poi poi : poiListView.getItems()) {
-            Point2D poiPos = poi.getPosition(); // mismas coords en las que lo dibujas
-
-            double dx = poiPos.getX() - point.getX();
-            double dy = poiPos.getY() - point.getY();
-            double dist = Math.hypot(dx, dy);
+            Point2D poiPos = poi.getPosition();
+            double dist = poiPos.distance(point);
 
             if (dist <= MAX_DISTANCE_POI && dist < closestDist) {
                 closestDist = dist;

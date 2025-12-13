@@ -125,15 +125,27 @@ public class SelectTool implements MapTool {
                 }
             }
             
-            // 4) Pins de POI (usamos la misma lógica de distancia que el EraserTool)
+            // 4) Pins de POI: hit por forma (contains) + fallback por distancia
             else if (child instanceof Region region && region.getUserData() instanceof Poi poi) {
 
-                // La posición del POI está en las mismas coords que usamos para dibujarlo
-                Point2D poiPos = poi.getPosition();
-                double d = Math.hypot(px - poiPos.getX(), py - poiPos.getY());
+                // Coordenadas del click en el sistema local del marker (Region)
+                Point2D pInMarker = region.parentToLocal(px, py);
 
-                if (d < bestDist && d <= HIT_TOLERANCE_POI) {
-                    bestDist = d;
+                // 1) Hit real sobre la forma del pin (si tiene -fx-shape funciona muy bien)
+                boolean hitShape = region.contains(pInMarker);
+
+                // 2) Fallback por distancia al "punto" (punta del pin)
+                Point2D poiPos = poi.getPosition();
+                double dCenter = Math.hypot(px - poiPos.getX(), py - poiPos.getY());
+
+                if (hitShape) {
+                    // Si estás encima del dibujo del pin, priorízalo
+                    if (0.0 < bestDist) {
+                        bestDist = 0.0;
+                        nearest = region;
+                    }
+                } else if (dCenter < bestDist && dCenter <= HIT_TOLERANCE_POI) {
+                    bestDist = dCenter;
                     nearest = region;
                 }
             }
