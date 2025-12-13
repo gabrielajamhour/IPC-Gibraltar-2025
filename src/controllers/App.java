@@ -27,6 +27,8 @@ public class App extends Application {
         controller.setSettings(settings);
         
         stage.setScene(scene);
+        stage.setMinWidth(stage.getWidth());
+        stage.setMinHeight(stage.getHeight());
         stage.show();
         
         SessionManager.goToLogIn(stage);

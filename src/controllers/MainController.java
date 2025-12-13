@@ -81,12 +81,11 @@ public class MainController implements Initializable {
     @FXML    private Button btnPoint;
     @FXML    private Button btnLine;
     @FXML    private ToggleGroup questionGroup;
-    @FXML    private Button btnBorrar;
+    private Button btnBorrar;
     @FXML    private Slider sliderGrosor;
     @FXML    private ColorPicker colorPicker;
-    @FXML    private Button btnBorrarTodo;
     @FXML    private Button btnArco;
-    @FXML    private Button btnSeleccionar;
+    private Button btnSeleccionar;
     @FXML    private Button randomProblem;
     @FXML    private Label enunciadoProblema;
     @FXML    private Button btnComprobarRespuesta;
@@ -97,13 +96,13 @@ public class MainController implements Initializable {
     @FXML    private Label textErrorCompResp;
     @FXML    private Button btnTexto;
     @FXML    private MenuButton profileMain;
-    @FXML    private Button btnTransportador;
-    @FXML    private Button btnRegla;
+    private Button btnTransportador;
+    private Button btnRegla;
     @FXML    private Label labelIntrucciones;
-    @FXML    private Button btnDistancia;
+    private Button btnDistancia;
     @FXML    private Label tituloPuntosMapa;
     @FXML    private MenuItem resultsButton1;    
-    @FXML    private Button btnExtremos;
+    private Button btnExtremos;
     @FXML    private MenuItem sessionsButton;
     @FXML    private BorderPane pane;
 
@@ -156,6 +155,26 @@ public class MainController implements Initializable {
     @FXML    private ImageView avatarMain;
     
     private SettingsUtil settings;
+    @FXML
+    private Label tituloHerramientasDibujo;
+    @FXML
+    private Label tituloHerramientasMedicion;
+    @FXML
+    private Button btnDistancia1;
+    @FXML
+    private Button btnRegla1;
+    @FXML
+    private Button btnTransportador1;
+    @FXML
+    private Button btnExtremos1;
+    @FXML
+    private Label tituloEdicion;
+    @FXML
+    private Button btnSeleccionar11;
+    @FXML
+    private Button btnBorrar11;
+    @FXML
+    private Button btnBorrarTodo11;
     
     
 
@@ -442,6 +461,8 @@ public class MainController implements Initializable {
             Stage stage = (Stage) zoom_slider.getScene().getWindow();
 
             stage.setScene(new Scene(root));
+            stage.setMinWidth(stage.getWidth());
+            stage.setMinHeight(stage.getHeight());
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -745,6 +766,9 @@ public class MainController implements Initializable {
             pane.setStyle("-fx-background-color: #dbdbdb;");
             tituloProbActual.setStyle("-fx-text-fill: #246f80;");
             tituloPuntosMapa.setStyle("-fx-text-fill: #246f80;");
+            tituloHerramientasDibujo.setStyle("-fx-text-fill: #246f80;");
+            tituloHerramientasMedicion.setStyle("-fx-text-fill: #246f80;");
+            tituloEdicion.setStyle("-fx-text-fill: #246f80;");
         } else {
             pane.setStyle("-fx-background-image: url('/styles/background-image.png');");
         }

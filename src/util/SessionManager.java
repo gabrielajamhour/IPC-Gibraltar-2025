@@ -50,6 +50,8 @@ public class SessionManager {
             mainController.setSettings(SettingsUtil.getInstance());
 
             stage.setScene(new Scene(root));
+            stage.setMinWidth(stage.getWidth());
+            stage.setMinHeight(stage.getHeight());
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -60,6 +62,8 @@ public class SessionManager {
         try {
             Parent root = FXMLLoader.load(SessionManager.class.getResource("/views/register.fxml"));
             stage.setScene(new Scene(root));
+            stage.setMinWidth(stage.getWidth());
+            stage.setMinHeight(stage.getHeight());
             stage.show();
         } catch (IOException e) {}
     }
@@ -69,6 +73,8 @@ public class SessionManager {
             FXMLLoader loader = new FXMLLoader(SessionManager.class.getResource("/views/auth.fxml"));
             Parent root = loader.load();            
             stage.setScene(new Scene(root));
+            stage.setMinWidth(stage.getWidth());
+            stage.setMinHeight(stage.getHeight());
             stage.show();
         } catch (IOException e) {}
     }
@@ -88,6 +94,8 @@ public class SessionManager {
             }
 
             stage.setScene(new Scene(root));
+            stage.setMinWidth(stage.getWidth());
+            stage.setMinHeight(stage.getHeight());
             stage.show();
             
         } catch (IOException e) {

@@ -24,13 +24,12 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-<BorderPane fx:id="pane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="645.0" prefWidth="1400.0" stylesheets="@../styles/main.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
+<BorderPane fx:id="pane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="645.0" prefWidth="1450.0" stylesheets="@../styles/main.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
     <center>
-        <VBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="561.0" prefWidth="800.0">
+        <VBox alignment="BOTTOM_CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="561.0" prefWidth="800.0">
             <children>
-                <ScrollPane fx:id="map_scrollpane" hbarPolicy="ALWAYS" minHeight="-Infinity" minWidth="-Infinity" onMouseMoved="#showPosition" pannable="true" prefHeight="550.0" prefWidth="600.0" vbarPolicy="ALWAYS">
+                <ScrollPane fx:id="map_scrollpane" hbarPolicy="ALWAYS" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseMoved="#showPosition" pannable="true" prefHeight="550.0" prefWidth="600.0" vbarPolicy="ALWAYS" VBox.vgrow="ALWAYS">
                     <content>
                         <Pane>
                             <children>
@@ -52,10 +51,10 @@
                         </Pane>
                     </content>
                     <VBox.margin>
-                        <Insets top="10.0" />
+                        <Insets top="5.0" />
                     </VBox.margin>
                 </ScrollPane>
-                <HBox alignment="CENTER_RIGHT">
+                <HBox alignment="CENTER">
                     <children>
                         <Label fx:id="labelIntrucciones" prefHeight="46.0" prefWidth="142.0" text="Instrucciones herramientas" textAlignment="CENTER" wrapText="true">
                             <HBox.margin>
@@ -67,9 +66,9 @@
                             <padding>
                                 <Insets left="5.0" />
                             </padding>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
+                            <font>
+                                <Font name="Segoe UI" size="12.0" />
+                            </font>
                         </Label>
                         <Button alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#zoomOut" prefHeight="30.0" prefWidth="30.0" text="-" textAlignment="CENTER"> 
                             <styleClass>
@@ -107,15 +106,15 @@
                                     <styleClass>
                                         <String fx:value="text-box" />
                                     </styleClass>
-                           <font>
-                              <Font name="Segoe UI Semibold" size="12.0" />
-                           </font>
+                                    <font>
+                                        <Font name="Segoe UI Semibold" size="12.0" />
+                                    </font>
                                 </Label>
                             </children>
                         </Pane>
                     </children>
                     <VBox.margin>
-                        <Insets top="15.0" />
+                        <Insets bottom="10.0" top="15.0" />
                     </VBox.margin>
                 </HBox>
             </children>
@@ -132,251 +131,312 @@
         </HBox>
     </top>
     <left>
-        <VBox alignment="TOP_CENTER" minWidth="-Infinity" prefWidth="210.0" BorderPane.alignment="CENTER">
+        <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="250.0" BorderPane.alignment="CENTER">
             <children>
-                <GridPane alignment="CENTER" hgap="10.0" minHeight="-Infinity" vgap="10.0">
-                    <columnConstraints>
-                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                    <children>
-                        <Button fx:id="btnPoint" mnemonicParsing="false" onAction="#activatePointTool" text="Marcar punto" GridPane.rowIndex="1">
-                            <styleClass>
-                                <String fx:value="small-btn" />
-                                <String fx:value="tool-btn" />
-                            </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/addPOI.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                        </Button>
-                        <Button fx:id="btnLine" mnemonicParsing="false" onAction="#activateLineTool" text="Trazar línea" GridPane.rowIndex="2">
-                            <styleClass>
-                                <String fx:value="small-btn" />
-                                <String fx:value="tool-btn" />
-                            </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/addLine.png" />
-                           </image></ImageView>
-                     </graphic>
-                        </Button>
-                        <Button fx:id="btnBorrar" alignment="CENTER" mnemonicParsing="false" onAction="#activateBorrar" text="Borrar" GridPane.rowIndex="8">
-                            <styleClass>
-                                <String fx:value="small-btn" />
-                                <String fx:value="tool-btn" />
-                            </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/eraser.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                        </Button>
-                        <Slider fx:id="sliderGrosor" min="2.0" minWidth="-Infinity" prefWidth="150.0" GridPane.columnSpan="2" GridPane.rowIndex="9">
-                            <styleClass>
-                                <String fx:value="zoom-tool" />
-                            </styleClass>
-                            <GridPane.margin>
-                                <Insets left="15.0" right="15.0" />
-                            </GridPane.margin>
-                        </Slider>
-                        <ColorPicker fx:id="colorPicker" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="10">
-                            <styleClass>
-                                <String fx:value="small-btn" />
-                                <String fx:value="tool-btn" />
-                            </styleClass>
-                        </ColorPicker>
-                        <Button fx:id="btnBorrarTodo" mnemonicParsing="false" onAction="#activateBorrarTodo" text="Borrar todo" GridPane.columnIndex="1" GridPane.rowIndex="8">
-                            <styleClass>
-                                <String fx:value="small-btn" />
-                                <String fx:value="tool-btn" />
-                            </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/clearAll.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                        </Button>
-                        <Button fx:id="btnArco" layoutX="21.0" layoutY="55.0" mnemonicParsing="false" onAction="#activateArcoTool" text="Trazar arco" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                            <styleClass>
-                                <String fx:value="small-btn" />
-                                <String fx:value="tool-btn" />
-                            </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/Trazar%20arco.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                        </Button>
-                        <Button fx:id="btnSeleccionar" layoutX="16.0" layoutY="16.0" mnemonicParsing="false" onAction="#activateSeleccionarTool" text="Seleccionar" GridPane.columnSpan="2" GridPane.rowIndex="7">
-                            <styleClass>
-                                <String fx:value="small-btn" />
-                                <String fx:value="tool-btn" />
-                            </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/Seleccionar.png" />
-                           </image></ImageView>
-                     </graphic>
-                        </Button>
-                        <Button fx:id="btnTexto" layoutX="20.0" layoutY="48.0" mnemonicParsing="false" onAction="#activateTextTool" text="Añadir texto" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                            <styleClass>
-                                <String fx:value="small-btn" />
-                                <String fx:value="tool-btn" />
-                            </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/addText.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                        </Button>
-                        <Button fx:id="btnTransportador" layoutX="18.0" layoutY="89.0" mnemonicParsing="false" onAction="#activateTransportadorTool" prefWidth="118.0" text="Transportador" GridPane.rowIndex="4">
-                            <styleClass>
-                                <String fx:value="small-btn" />
-                                <String fx:value="tool-btn" />
-                            </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/Transportador.png" />
-                           </image></ImageView>
-                     </graphic>
-                        </Button>
-                        <Button fx:id="btnRegla" layoutX="9.0" layoutY="130.0" mnemonicParsing="false" onAction="#activateReglaTool" text="Regla" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                            <styleClass>
-                                <String fx:value="small-btn" />
-                                <String fx:value="tool-btn" />
-                            </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/regla.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                        </Button>
-                        <Button fx:id="btnDistancia" mnemonicParsing="false" onAction="#activateDistanceTool" text="Distancia" GridPane.rowIndex="5">
-                            <styleClass>
-                                <String fx:value="small-btn" />
-                                <String fx:value="tool-btn" />
-                            </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/distancia.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                        </Button>
-                  <Button fx:id="btnExtremos" alignment="CENTER" layoutX="10.0" layoutY="172.0" mnemonicParsing="false" onAction="#activateExtremos" text="Extremos" GridPane.columnIndex="1" GridPane.rowIndex="5">
-                     <styleClass>
-                        <String fx:value="small-btn" />
-                        <String fx:value="tool-btn" />
-                     </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/extremos.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
+            <Label fx:id="tituloHerramientasDibujo" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 12, 0.2, 0, 3);" text="Herramientas de dibujo" textFill="WHITE">
+               <font>
+                  <Font name="Segoe UI Bold" size="20.0" />
+               </font>
+            </Label>
+                  <GridPane alignment="CENTER" hgap="10.0" minHeight="-Infinity" vgap="10.0">
+                      <columnConstraints>
+                          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="220.8" minWidth="10.0" prefWidth="122.39998168945313" />
+                          <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="124.79998626708985" minWidth="0.0" prefWidth="117.60001831054686" />
+                      </columnConstraints>
+                      <rowConstraints>
+                          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      </rowConstraints>
+                      <children>
+                          <Button fx:id="btnPoint" mnemonicParsing="false" onAction="#activatePointTool" text="Marcar punto">
+                              <styleClass>
+                                  <String fx:value="small-btn" />
+                                  <String fx:value="tool-btn" />
+                              </styleClass>
+                              <font>
+                                  <Font name="Segoe UI" size="12.0" />
+                              </font>
+                              <graphic>
+                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                          <Image url="@../resources/addPOI.png" />
+                                      </image>
+                                  </ImageView>
+                              </graphic>
+                              <padding>
+                                  <Insets bottom="4.0" left="2.0" right="2.0" top="4.0" />
+                              </padding>
+                          </Button>
+                          <Button fx:id="btnLine" mnemonicParsing="false" onAction="#activateLineTool" text="Trazar línea" GridPane.columnIndex="1">
+                              <styleClass>
+                                  <String fx:value="small-btn" />
+                                  <String fx:value="tool-btn" />
+                              </styleClass>
+                              <font>
+                                  <Font name="Segoe UI" size="12.0" />
+                              </font>
+                              <graphic>
+                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                          <Image url="@../resources/addLine.png" />
+                                      </image>
+                                  </ImageView>
+                              </graphic>
+                              <padding>
+                                  <Insets bottom="4.0" top="4.0" />
+                              </padding>
+                          </Button>
+                          <Button fx:id="btnTexto" layoutX="20.0" layoutY="48.0" mnemonicParsing="false" onAction="#activateTextTool" text="Añadir texto" GridPane.rowIndex="1">
+                              <styleClass>
+                                  <String fx:value="small-btn" />
+                                  <String fx:value="tool-btn" />
+                              </styleClass>
+                              <font>
+                                  <Font name="Segoe UI" size="12.0" />
+                              </font>
+                              <graphic>
+                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                          <Image url="@../resources/addText.png" />
+                                      </image>
+                                  </ImageView>
+                              </graphic>
+                              <padding>
+                                  <Insets bottom="4.0" top="4.0" />
+                              </padding>
+                          </Button>
+                          <Button fx:id="btnArco" layoutX="21.0" layoutY="55.0" mnemonicParsing="false" onAction="#activateArcoTool" text="Trazar arco" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <styleClass>
+                                  <String fx:value="small-btn" />
+                                  <String fx:value="tool-btn" />
+                              </styleClass>
+                              <font>
+                                  <Font name="Segoe UI" size="12.0" />
+                              </font>
+                              <graphic>
+                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                          <Image url="@../resources/Trazar%20arco.png" />
+                                      </image>
+                                  </ImageView>
+                              </graphic>
+                              <padding>
+                                  <Insets bottom="4.0" top="4.0" />
+                              </padding>
+                          </Button>
+                      </children>
+                      <VBox.margin>
+                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                      </VBox.margin>
+                  </GridPane>
+            <Label fx:id="tituloHerramientasMedicion" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 12, 0.2, 0, 3);" text="Medición" textFill="WHITE">
+               <font>
+                  <Font name="Segoe UI Bold" size="20.0" />
+               </font>
+            </Label>
+                  <GridPane alignment="CENTER" hgap="10.0" minHeight="-Infinity" vgap="10.0">
+                      <columnConstraints>
+                          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="220.8" minWidth="10.0" prefWidth="122.39998168945313" />
+                          <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="124.79998626708985" minWidth="0.0" prefWidth="117.60001831054686" />
+                      </columnConstraints>
+                      <rowConstraints>
+                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      </rowConstraints>
+                      <children>
+                          <Button fx:id="btnDistancia1" mnemonicParsing="false" onAction="#activateDistanceTool" text="Distancia">
+                              <styleClass>
+                                  <String fx:value="small-btn" />
+                                  <String fx:value="tool-btn" />
+                              </styleClass>
+                              <font>
+                                  <Font name="Segoe UI" size="12.0" />
+                              </font>
+                              <graphic>
+                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                          <Image url="@../resources/distancia.png" />
+                                      </image>
+                                  </ImageView>
+                              </graphic>
+                              <padding>
+                                  <Insets bottom="4.0" top="4.0" />
+                              </padding>
+                          </Button>
+                          <Button fx:id="btnRegla1" layoutX="9.0" layoutY="130.0" mnemonicParsing="false" onAction="#activateReglaTool" text="Regla" GridPane.columnIndex="1">
+                              <styleClass>
+                                  <String fx:value="small-btn" />
+                                  <String fx:value="tool-btn" />
+                              </styleClass>
+                              <font>
+                                  <Font name="Segoe UI" size="12.0" />
+                              </font>
+                              <graphic>
+                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                          <Image url="@../resources/regla.png" />
+                                      </image>
+                                  </ImageView>
+                              </graphic>
+                              <padding>
+                                  <Insets bottom="4.0" top="4.0" />
+                              </padding>
+                          </Button>
+                          <Button fx:id="btnTransportador1" layoutX="18.0" layoutY="89.0" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#activateTransportadorTool" text="Transportador" GridPane.rowIndex="1">
+                              <styleClass>
+                                  <String fx:value="small-btn" />
+                                  <String fx:value="tool-btn" />
+                              </styleClass>
+                              <font>
+                                  <Font name="Segoe UI" size="12.0" />
+                              </font>
+                              <graphic>
+                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                          <Image url="@../resources/Transportador.png" />
+                                      </image>
+                                  </ImageView>
+                              </graphic>
+                              <padding>
+                                  <Insets bottom="4.0" top="4.0" />
+                              </padding>
+                          </Button>
+                          <Button fx:id="btnExtremos1" alignment="CENTER" layoutX="10.0" layoutY="172.0" mnemonicParsing="false" onAction="#activateExtremos" text="Extremos" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <styleClass>
+                                  <String fx:value="small-btn" />
+                                  <String fx:value="tool-btn" />
+                              </styleClass>
+                              <font>
+                                  <Font name="Segoe UI" size="12.0" />
+                              </font>
+                              <graphic>
+                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                          <Image url="@../resources/extremos.png" />
+                                      </image>
+                                  </ImageView>
+                              </graphic>
+                              <padding>
+                                  <Insets bottom="4.0" top="4.0" />
+                              </padding>
+                          </Button>
+                      </children>
+                      <VBox.margin>
+                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                      </VBox.margin>
+                  </GridPane>
+            <Label fx:id="tituloEdicion" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 12, 0.2, 0, 3);" text="Edición" textFill="WHITE">
+               <font>
+                  <Font name="Segoe UI Bold" size="20.0" />
+               </font>
+            </Label>
+                  <Button fx:id="btnSeleccionar11" maxWidth="1.7976931348623157E308" minWidth="-Infinity" mnemonicParsing="false" onAction="#activateSeleccionarTool" prefWidth="170.0" text="Seleccionar">
+                      <styleClass>
+                          <String fx:value="small-btn" />
+                          <String fx:value="tool-btn" />
+                      </styleClass>
+                      <font>
+                          <Font name="Segoe UI" size="12.0" />
+                      </font>
+                      <graphic>
+                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                              <image>
+                                  <Image url="@../resources/Seleccionar.png" />
+                              </image>
+                          </ImageView>
+                      </graphic>
+                      <padding>
+                          <Insets bottom="3.0" top="3.0" />
+                      </padding>
+                      <VBox.margin>
+                          <Insets bottom="10.0" left="60.0" right="60.0" top="10.0" />
+                      </VBox.margin>
                   </Button>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Herramientas de dibujo" GridPane.columnSpan="2">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Text>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Medición" GridPane.columnSpan="2" GridPane.rowIndex="3">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Text>
-                  <Text layoutX="87.0" layoutY="151.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Edición" GridPane.columnSpan="2" GridPane.rowIndex="6">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Text>
-                    </children>
-                    <VBox.margin>
-                        <Insets top="10.0" />
-                    </VBox.margin>
-                </GridPane>
-                <Region prefHeight="21.0" prefWidth="200.0" />
+                  <Slider fx:id="sliderGrosor" min="2.0" minWidth="-Infinity" prefHeight="30.0" prefWidth="112.0" styleClass="zoom-tool">
+                      <VBox.margin>
+                          <Insets bottom="10.0" left="30.0" right="30.0" />
+                      </VBox.margin>
+                  </Slider>
+                  <ColorPicker fx:id="colorPicker" maxWidth="1.7976931348623157E308">
+                      <styleClass>
+                          <String fx:value="small-btn" />
+                          <String fx:value="tool-btn" />
+                      </styleClass>
+                      <VBox.margin>
+                          <Insets bottom="5.0" left="30.0" right="30.0" />
+                      </VBox.margin>
+                  </ColorPicker>
+                  <GridPane alignment="CENTER" hgap="10.0" minHeight="-Infinity" vgap="10.0">
+                      <columnConstraints>
+                          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="220.8" minWidth="10.0" prefWidth="122.39998168945313" />
+                          <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="124.79998626708985" minWidth="0.0" prefWidth="117.60001831054686" />
+                      </columnConstraints>
+                      <rowConstraints>
+                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      </rowConstraints>
+                      <children>
+                          <Button fx:id="btnBorrar11" alignment="CENTER" mnemonicParsing="false" onAction="#activateBorrar" text="Borrar">
+                              <styleClass>
+                                  <String fx:value="small-btn" />
+                                  <String fx:value="tool-btn" />
+                              </styleClass>
+                              <font>
+                                  <Font name="Segoe UI" size="12.0" />
+                              </font>
+                              <graphic>
+                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                          <Image url="@../resources/eraser.png" />
+                                      </image>
+                                  </ImageView>
+                              </graphic>
+                              <padding>
+                                  <Insets bottom="4.0" top="4.0" />
+                              </padding>
+                          </Button>
+                          <Button fx:id="btnBorrarTodo11" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#activateBorrarTodo" text="Borrar todo" GridPane.columnIndex="1">
+                              <styleClass>
+                                  <String fx:value="small-btn" />
+                                  <String fx:value="tool-btn" />
+                              </styleClass>
+                              <font>
+                                  <Font name="Segoe UI" size="12.0" />
+                              </font>
+                              <graphic>
+                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                          <Image url="@../resources/clearAll.png" />
+                                      </image>
+                                  </ImageView>
+                              </graphic>
+                              <padding>
+                                  <Insets bottom="4.0" top="4.0" />
+                              </padding>
+                          </Button>
+                      </children>
+                      <VBox.margin>
+                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                      </VBox.margin>
+                  </GridPane>
                 <Label fx:id="tituloPuntosMapa" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 12, 0.2, 0, 3)" text="Puntos del mapa" textFill="WHITE">
                     <font>
-                        <Font name="System Bold" size="24.0" />
+                        <Font name="Segoe UI Bold" size="24.0" />
                     </font>
                     <VBox.margin>
                         <Insets bottom="5.0" top="10.0" />
                     </VBox.margin>
                 </Label>
-                <ListView fx:id="map_listview" minHeight="-Infinity" onMouseClicked="#listClicked" prefHeight="195.0" prefWidth="200.0">
+                <ListView fx:id="map_listview" minHeight="-Infinity" onMouseClicked="#listClicked" prefHeight="115.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                     <styleClass>
                         <String fx:value="object-list" />
                     </styleClass>
+               <VBox.margin>
+                  <Insets bottom="15.0" left="20.0" right="20.0" />
+               </VBox.margin>
                 </ListView>
             </children>
             <BorderPane.margin>
-                <Insets left="15.0" right="15.0" top="20.0" />
+                <Insets left="10.0" right="10.0" top="20.0" />
             </BorderPane.margin>
         </VBox>
     </left>
@@ -392,9 +452,9 @@
                             <styleClass>
                                 <String fx:value="small-btn" />
                             </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
+                            <font>
+                                <Font name="Segoe UI" size="12.0" />
+                            </font>
                         </Button>
                         <Button fx:id="problemsButton" alignment="BOTTOM_CENTER" mnemonicParsing="false" onAction="#openProblems" text="Seleccionar problema">
                             <VBox.margin>
@@ -403,9 +463,9 @@
                             <styleClass>
                                 <String fx:value="small-btn" />
                             </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
+                            <font>
+                                <Font name="Segoe UI" size="12.0" />
+                            </font>
                         </Button>
                         <Label fx:id="contadorProblemas" text="Contador problemas">
                             <VBox.margin>
@@ -414,12 +474,12 @@
                             <styleClass>
                                 <String fx:value="text-box" />
                             </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
-                     <padding>
-                        <Insets left="10.0" right="10.0" />
-                     </padding>
+                            <font>
+                                <Font name="Segoe UI" size="12.0" />
+                            </font>
+                            <padding>
+                                <Insets left="10.0" right="10.0" />
+                            </padding>
                         </Label>
                     </children>
                 </VBox>
@@ -446,15 +506,15 @@
                                     <styleClass>
                                         <String fx:value="profile-btn" />
                                     </styleClass>
-                           <font>
-                              <Font name="Segoe UI" size="12.0" />
-                           </font>
+                                    <font>
+                                        <Font name="Segoe UI" size="12.0" />
+                                    </font>
                                 </MenuButton>
                             </children>
                         </Pane>
-                        <Label fx:id="tituloProbActual" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 12, 0.2, 0, 3)" text="Problema ##" textFill="WHITE">
+                        <Label fx:id="tituloProbActual" text="Problema ##" textFill="WHITE">
                             <font>
-                                <Font name="System Bold" size="24.0" />
+                                <Font name="Segoe UI Bold" size="24.0" />
                             </font>
                             <VBox.margin>
                                 <Insets bottom="10.0" />
@@ -470,9 +530,9 @@
                             <styleClass>
                                 <String fx:value="card" />
                             </styleClass>
-                     <font>
-                        <Font name="Segoe UI" size="12.0" />
-                     </font>
+                            <font>
+                                <Font name="Segoe UI" size="12.0" />
+                            </font>
                         </Label>
                         <VBox>
                             <VBox.margin>
@@ -494,9 +554,9 @@
                                             <padding>
                                                 <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
                                             </padding>
-                                 <font>
-                                    <Font name="Segoe UI" size="12.0" />
-                                 </font>
+                                            <font>
+                                                <Font name="Segoe UI" size="12.0" />
+                                            </font>
                                         </RadioButton>
                                         <RadioButton fx:id="tBAlternativaB" mnemonicParsing="false" text="Alternativa B" toggleGroup="$questionGroup">
                                             <VBox.margin>
@@ -505,9 +565,9 @@
                                             <padding>
                                                 <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
                                             </padding>
-                                 <font>
-                                    <Font name="Segoe UI" size="12.0" />
-                                 </font>
+                                            <font>
+                                                <Font name="Segoe UI" size="12.0" />
+                                            </font>
                                         </RadioButton>
                                         <RadioButton fx:id="tBAlternativaC" mnemonicParsing="false" text="Alternativa C" toggleGroup="$questionGroup">
                                             <VBox.margin>
@@ -516,9 +576,9 @@
                                             <padding>
                                                 <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
                                             </padding>
-                                 <font>
-                                    <Font name="Segoe UI" size="12.0" />
-                                 </font>
+                                            <font>
+                                                <Font name="Segoe UI" size="12.0" />
+                                            </font>
                                         </RadioButton>
                                         <RadioButton fx:id="tBAlternativaD" mnemonicParsing="false" text="Alternativa D" toggleGroup="$questionGroup">
                                             <VBox.margin>
@@ -527,9 +587,9 @@
                                             <padding>
                                                 <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
                                             </padding>
-                                 <font>
-                                    <Font name="Segoe UI" size="12.0" />
-                                 </font>
+                                            <font>
+                                                <Font name="Segoe UI" size="12.0" />
+                                            </font>
                                         </RadioButton>
                                     </children>
                                 </VBox>
@@ -542,9 +602,9 @@
                             <styleClass>
                                 <String fx:value="check-ans-btn" />
                             </styleClass>
-                     <font>
-                        <Font name="Segoe UI Semibold" size="12.0" />
-                     </font>
+                            <font>
+                                <Font name="Segoe UI Semibold" size="12.0" />
+                            </font>
                         </Button>
                         <Label fx:id="textErrorCompResp" text="Selecciona una opción" textFill="RED" visible="false">
                             <VBox.margin>

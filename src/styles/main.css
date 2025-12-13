@@ -7,6 +7,7 @@
     -fx-bg-sidebar: #EEF2F6;
     -fx-bg-card: #FFFFFF;
     -fx-bg-card-light: #FFFFFFcc;
+    -fx-bg-card-lighter: #FFFFFFaa;
 
     -fx-blue: #2a8396;
     -fx-blue-light: #E5EEFFaa;
@@ -37,6 +38,13 @@
 
 .text-box {
     -fx-background-color: -fx-bg-card-light;
+    -fx-background-radius: 14px;
+    -fx-padding: 2 5 2 5;
+    -fx-opacity: 1;
+}
+
+.tool-box {
+    -fx-background-color: -fx-bg-card-lighter;
     -fx-background-radius: 14px;
     -fx-padding: 2 5 2 5;
     -fx-opacity: 1;
@@ -113,6 +121,7 @@
     -fx-background-color: -fx-bg-card;
     -fx-background-radius: 14px;
     -fx-padding: 6 10 6 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0.2, 0, 3);
 }
 
 /* SLIDER */
