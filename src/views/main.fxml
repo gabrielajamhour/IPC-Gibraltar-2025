@@ -241,7 +241,7 @@
                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       </rowConstraints>
                       <children>
-                          <Button fx:id="btnDistancia1" mnemonicParsing="false" onAction="#activateDistanceTool" text="Distancia">
+                          <Button fx:id="btnDistancia" mnemonicParsing="false" onAction="#activateDistanceTool" text="Distancia">
                               <styleClass>
                                   <String fx:value="small-btn" />
                                   <String fx:value="tool-btn" />
@@ -260,7 +260,7 @@
                                   <Insets bottom="4.0" top="4.0" />
                               </padding>
                           </Button>
-                          <Button fx:id="btnRegla1" layoutX="9.0" layoutY="130.0" mnemonicParsing="false" onAction="#activateReglaTool" text="Regla" GridPane.columnIndex="1">
+                          <Button fx:id="btnRegla" layoutX="9.0" layoutY="130.0" mnemonicParsing="false" onAction="#activateReglaTool" text="Regla" GridPane.columnIndex="1">
                               <styleClass>
                                   <String fx:value="small-btn" />
                                   <String fx:value="tool-btn" />
@@ -279,7 +279,7 @@
                                   <Insets bottom="4.0" top="4.0" />
                               </padding>
                           </Button>
-                          <Button fx:id="btnTransportador1" layoutX="18.0" layoutY="89.0" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#activateTransportadorTool" text="Transportador" GridPane.rowIndex="1">
+                          <Button fx:id="btnTransportador" layoutX="18.0" layoutY="89.0" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#activateTransportadorTool" text="Transportador" GridPane.rowIndex="1">
                               <styleClass>
                                   <String fx:value="small-btn" />
                                   <String fx:value="tool-btn" />
@@ -298,7 +298,7 @@
                                   <Insets bottom="4.0" top="4.0" />
                               </padding>
                           </Button>
-                          <Button fx:id="btnExtremos1" alignment="CENTER" layoutX="10.0" layoutY="172.0" mnemonicParsing="false" onAction="#activateExtremos" text="Extremos" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                          <Button fx:id="btnExtremos" alignment="CENTER" layoutX="10.0" layoutY="172.0" mnemonicParsing="false" onAction="#activateExtremos" text="Extremos" GridPane.columnIndex="1" GridPane.rowIndex="1">
                               <styleClass>
                                   <String fx:value="small-btn" />
                                   <String fx:value="tool-btn" />
@@ -327,7 +327,7 @@
                   <Font name="Segoe UI Bold" size="20.0" />
                </font>
             </Label>
-                  <Button fx:id="btnSeleccionar11" maxWidth="1.7976931348623157E308" minWidth="-Infinity" mnemonicParsing="false" onAction="#activateSeleccionarTool" prefWidth="170.0" text="Seleccionar">
+                  <Button fx:id="btnSeleccionar" maxWidth="1.7976931348623157E308" minWidth="-Infinity" mnemonicParsing="false" onAction="#activateSeleccionarTool" prefWidth="170.0" text="Seleccionar">
                       <styleClass>
                           <String fx:value="small-btn" />
                           <String fx:value="tool-btn" />
@@ -372,7 +372,7 @@
                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       </rowConstraints>
                       <children>
-                          <Button fx:id="btnBorrar11" alignment="CENTER" mnemonicParsing="false" onAction="#activateBorrar" text="Borrar">
+                          <Button fx:id="btnBorrar" alignment="CENTER" mnemonicParsing="false" onAction="#activateBorrar" text="Borrar">
                               <styleClass>
                                   <String fx:value="small-btn" />
                                   <String fx:value="tool-btn" />
@@ -391,7 +391,7 @@
                                   <Insets bottom="4.0" top="4.0" />
                               </padding>
                           </Button>
-                          <Button fx:id="btnBorrarTodo11" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#activateBorrarTodo" text="Borrar todo" GridPane.columnIndex="1">
+                          <Button fx:id="btnBorrarTodo" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#activateBorrarTodo" text="Borrar todo" GridPane.columnIndex="1">
                               <styleClass>
                                   <String fx:value="small-btn" />
                                   <String fx:value="tool-btn" />

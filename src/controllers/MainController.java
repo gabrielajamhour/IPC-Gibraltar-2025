@@ -84,10 +84,12 @@ public class MainController implements Initializable {
     @FXML    private Button btnPoint;
     @FXML    private Button btnLine;
     @FXML    private ToggleGroup questionGroup;
+    @FXML
     private Button btnBorrar;
     @FXML    private Slider sliderGrosor;
     @FXML    private ColorPicker colorPicker;
     @FXML    private Button btnArco;
+    @FXML
     private Button btnSeleccionar;
     @FXML    private Button randomProblem;
     @FXML    private Label enunciadoProblema;
@@ -99,12 +101,16 @@ public class MainController implements Initializable {
     @FXML    private Label textErrorCompResp;
     @FXML    private Button btnTexto;
     @FXML    private MenuButton profileMain;
+    @FXML
     private Button btnTransportador;
+    @FXML
     private Button btnRegla;
     @FXML    private Label labelIntrucciones;
+    @FXML
     private Button btnDistancia;
     @FXML    private Label tituloPuntosMapa;
     @FXML    private MenuItem resultsButton1;    
+    @FXML
     private Button btnExtremos;
     @FXML    private MenuItem sessionsButton;
     @FXML    private BorderPane pane;
@@ -163,21 +169,9 @@ public class MainController implements Initializable {
     @FXML
     private Label tituloHerramientasMedicion;
     @FXML
-    private Button btnDistancia1;
-    @FXML
-    private Button btnRegla1;
-    @FXML
-    private Button btnTransportador1;
-    @FXML
-    private Button btnExtremos1;
-    @FXML
     private Label tituloEdicion;
     @FXML
-    private Button btnSeleccionar11;
-    @FXML
-    private Button btnBorrar11;
-    @FXML
-    private Button btnBorrarTodo11;
+    private Button btnBorrarTodo;
     
     
 
