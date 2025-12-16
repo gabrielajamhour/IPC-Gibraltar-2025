@@ -74,7 +74,6 @@ public class MainController implements Initializable {
     @FXML    private Slider zoom_slider;
     @FXML    private MenuButton map_pin;
     @FXML    private MenuItem pin_info;
-    @FXML    private Label mousePosition;
     @FXML    private MenuItem profileButton;
     @FXML    private Button problemsButton;
     @FXML    private Button btnPoint;
@@ -213,8 +212,6 @@ public class MainController implements Initializable {
         zoomGroup.addEventFilter(MouseEvent.MOUSE_DRAGGED,  this::onMapDragged);
         zoomGroup.addEventFilter(MouseEvent.MOUSE_RELEASED, this::onMapReleased);
         
-        mousePosition.setText("X: " + 0 + ",   Y: " + 0);
-        
         problemUtil = new ProblemUtil(
             enunciadoProblema,
             tBAlternativaA,
@@ -265,19 +262,6 @@ public class MainController implements Initializable {
     @FXML
     void zoomOut(ActionEvent event) {
         zoom_slider.setValue(zoom_slider.getValue() - 0.1);
-    }
-    
-    @FXML
-    private void showPosition(MouseEvent event) {
-        if (zoomGroup == null) return;
-
-        // Convertimos la posición del ratón (en coordenadas de escena)
-        // al sistema de coordenadas del zoomGroup (el mapa)
-        Point2D mapPoint = zoomGroup.sceneToLocal(event.getSceneX(), event.getSceneY());
-
-        mousePosition.setText(
-            "X: " + (int) mapPoint.getX() + ",   Y: " + (int) mapPoint.getY()
-        );
     }
 
     private void closeApp(ActionEvent event) {

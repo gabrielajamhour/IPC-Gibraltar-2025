@@ -29,7 +29,7 @@
     <center>
         <VBox alignment="BOTTOM_CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="561.0" prefWidth="800.0">
             <children>
-                <ScrollPane fx:id="map_scrollpane" hbarPolicy="ALWAYS" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseMoved="#showPosition" pannable="true" prefHeight="550.0" prefWidth="600.0" vbarPolicy="ALWAYS" VBox.vgrow="ALWAYS">
+                <ScrollPane fx:id="map_scrollpane" hbarPolicy="ALWAYS" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" pannable="true" prefHeight="550.0" prefWidth="600.0" vbarPolicy="ALWAYS" VBox.vgrow="ALWAYS">
                     <content>
                         <Pane>
                             <children>
@@ -91,24 +91,6 @@
                                 <Insets right="150.0" />
                             </HBox.margin>
                         </Button>
-                        <Pane nodeOrientation="RIGHT_TO_LEFT" prefWidth="80.0" HBox.hgrow="NEVER">
-                            <HBox.margin>
-                                <Insets />
-                            </HBox.margin>
-                            <children>
-                                <Label fx:id="mousePosition" alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" text="X: 0,   Y: 0" wrapText="true">
-                                    <padding>
-                                        <Insets left="6.0" top="2.0" />
-                                    </padding>
-                                    <styleClass>
-                                        <String fx:value="text-box" />
-                                    </styleClass>
-                                    <font>
-                                        <Font name="Segoe UI Semibold" size="12.0" />
-                                    </font>
-                                </Label>
-                            </children>
-                        </Pane>
                     </children>
                     <VBox.margin>
                         <Insets bottom="10.0" top="15.0" />
