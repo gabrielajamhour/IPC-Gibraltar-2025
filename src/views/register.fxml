@@ -122,11 +122,6 @@
                               <Insets left="20.0" right="10.0" />
                            </VBox.margin>
                         </DatePicker>
-                        <Label fx:id="lageNotOldEnought" text="Debes tener al menos 16 años." textFill="#ca0505" visible="false">
-                           <VBox.margin>
-                              <Insets bottom="-5.0" left="20.0" right="10.0" top="5.0" />
-                           </VBox.margin>
-                        </Label>
                      </children>
                      <HBox.margin>
                         <Insets top="20.0" />
@@ -157,6 +152,11 @@
                   </VBox>
                </children>
             </HBox>
+            <Label fx:id="lageNotOldEnought" text="Debes tener al menos 16 años." textFill="#ca0505" visible="false">
+               <VBox.margin>
+                  <Insets bottom="-5.0" left="20.0" right="10.0" top="5.0" />
+               </VBox.margin>
+            </Label>
             <HBox alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT" spacing="25.0">
                <children>
                   <Button fx:id="bCancel" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="100.0" styleClass="cancel-btn" text="Cancelar" textFill="#2a8396">
