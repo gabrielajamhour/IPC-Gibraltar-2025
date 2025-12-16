@@ -101,11 +101,11 @@
             </font></Label>
       
           <HBox alignment="TOP_CENTER" spacing="20.0">
-              <Button onAction="#onCancel" styleClass="cancel-btn" text="Cancelar">
+              <Button maxWidth="-Infinity" minWidth="-Infinity" onAction="#onCancel" prefWidth="90.0" styleClass="cancel-btn" text="Volver">
                <font>
                   <Font name="Segoe UI Semibold" size="15.0" />
                </font></Button>
-              <Button onAction="#onSave" styleClass="save-btn" text="Guardar">
+              <Button maxWidth="-Infinity" minWidth="-Infinity" onAction="#onSave" prefWidth="90.0" styleClass="save-btn" text="Guardar">
                <font>
                   <Font name="Segoe UI Semibold" size="15.0" />
                </font></Button>
