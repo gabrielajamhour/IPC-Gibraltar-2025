@@ -39,13 +39,13 @@
                      <children>
                         <Label prefWidth="100.0" text="Usuario:">
                            <VBox.margin>
-                              <Insets left="20.0" right="10.0" />
+                              <Insets bottom="2.0" left="20.0" right="10.0" />
                            </VBox.margin>
                            <font>
-                              <Font name="Segoe UI Semibold" size="12.0" />
+                              <Font name="Segoe UI Semibold" size="13.0" />
                            </font>
                         </Label>
-                        <TextField fx:id="eUsername" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="170.0" promptText="yourUsername">
+                        <TextField fx:id="eUsername" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="170.0" promptText="yourUsername">
                            <VBox.margin>
                               <Insets left="20.0" right="10.0" />
                            </VBox.margin>
@@ -55,19 +55,6 @@
                               <Insets bottom="-5.0" left="20.0" right="10.0" top="5.0" />
                            </VBox.margin>
                         </Label>
-                        <Label prefWidth="100.0" text="Email:">
-                           <VBox.margin>
-                              <Insets left="20.0" right="10.0" top="10.0" />
-                           </VBox.margin>
-                           <font>
-                              <Font name="Segoe UI Semibold" size="12.0" />
-                           </font>
-                        </Label>
-                        <TextField fx:id="eemail" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="200.0" promptText="yourEmail@domain.com">
-                           <VBox.margin>
-                              <Insets left="20.0" right="10.0" />
-                           </VBox.margin>
-                        </TextField>
                         <Label fx:id="lIncorrectEmail" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="200.0" text="Correo electrónico no válido." textFill="#ca0505" visible="false">
                            <VBox.margin>
                               <Insets bottom="-5.0" left="20.0" right="10.0" top="5.0" />
@@ -75,13 +62,13 @@
                         </Label>
                         <Label minWidth="-Infinity" prefWidth="100.0" text="Contraseña:">
                            <VBox.margin>
-                              <Insets left="20.0" right="10.0" top="10.0" />
+                              <Insets bottom="2.0" left="20.0" right="10.0" top="10.0" />
                            </VBox.margin>
                            <font>
-                              <Font name="Segoe UI Semibold" size="12.0" />
+                              <Font name="Segoe UI Semibold" size="13.0" />
                            </font>
                         </Label>
-                        <TextField fx:id="epassword" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="170.0" promptText="LettersNumbersSymbols">
+                        <TextField fx:id="epassword" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="170.0" promptText="LettersNumbersSymbols">
                            <VBox.margin>
                               <Insets left="20.0" right="10.0" />
                            </VBox.margin>
@@ -93,13 +80,26 @@
                         </Label>
                         <Label minWidth="-Infinity" text="Repite la contraseña:">
                            <VBox.margin>
-                              <Insets left="20.0" right="10.0" top="10.0" />
+                              <Insets bottom="2.0" left="20.0" right="10.0" top="10.0" />
                            </VBox.margin>
                            <font>
-                              <Font name="Segoe UI Semibold" size="12.0" />
+                              <Font name="Segoe UI Semibold" size="13.0" />
                            </font>
                         </Label>
-                        <TextField fx:id="epassword2" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="170.0" promptText="LettersNumbersSymbols">
+                        <TextField fx:id="epassword2" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="170.0" promptText="LettersNumbersSymbols">
+                           <VBox.margin>
+                              <Insets left="20.0" right="10.0" />
+                           </VBox.margin>
+                        </TextField>
+                        <Label prefWidth="100.0" text="Email:">
+                           <VBox.margin>
+                              <Insets bottom="2.0" left="20.0" right="10.0" top="10.0" />
+                           </VBox.margin>
+                           <font>
+                              <Font name="Segoe UI Semibold" size="13.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="eemail" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" promptText="yourEmail@domain.com">
                            <VBox.margin>
                               <Insets left="20.0" right="10.0" />
                            </VBox.margin>
@@ -111,13 +111,13 @@
                         </Label>
                         <Label text="Fecha de nacimiento:">
                            <VBox.margin>
-                              <Insets left="20.0" right="10.0" top="10.0" />
+                              <Insets bottom="2.0" left="20.0" right="10.0" top="10.0" />
                            </VBox.margin>
                            <font>
-                              <Font name="Segoe UI Semibold" size="12.0" />
+                              <Font name="Segoe UI Semibold" size="13.0" />
                            </font>
                         </Label>
-                        <DatePicker fx:id="eAge" prefHeight="25.0" prefWidth="115.0" promptText="DD/MM/YYYY">
+                        <DatePicker fx:id="eAge" prefHeight="30.0" prefWidth="115.0" promptText="DD/MM/YYYY">
                            <VBox.margin>
                               <Insets left="20.0" right="10.0" />
                            </VBox.margin>
@@ -143,7 +143,7 @@
                         </StackPane>
                         <Button fx:id="bChangeAvatar" mnemonicParsing="false" onMousePressed="#onChangeAvatar" styleClass="avatar-btn" text="Cambiar avatar" textFill="#2a8396">
                            <font>
-                              <Font name="Segoe UI Semibold" size="12.0" />
+                              <Font name="Segoe UI Semibold" size="13.0" />
                            </font></Button>
                      </children>
                      <HBox.margin>
@@ -185,7 +185,7 @@
                   </Button>
                </children>
                <VBox.margin>
-                  <Insets bottom="15.0" top="25.0" />
+                  <Insets bottom="20.0" top="25.0" />
                </VBox.margin>
             </HBox>
          </children>
