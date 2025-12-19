@@ -36,9 +36,9 @@ public class ZoomManager {
         scrollPane.setContent(contentGroup);
 
         // Configuración del slider
-        slider.setMin(0.1);
-        slider.setMax(1.5);
-        slider.setValue(0.1);
+        slider.setMin(0.14);
+        slider.setMax(2.0);
+        slider.setValue(0.5);
         slider.valueProperty().addListener((o, oldVal, newVal) ->
                 applyZoomCentered((Double) newVal)
         );

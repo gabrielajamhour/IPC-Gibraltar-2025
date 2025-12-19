@@ -21,6 +21,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.IOException;
 import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -42,6 +44,8 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Arc;
 import javafx.scene.text.Text;
 import model.NavDAOException;
@@ -69,10 +73,8 @@ public class MainController implements Initializable {
 
     // ======================================  
     @FXML    private ListView<Poi> map_listview;
-    @FXML    private ScrollPane map_scrollpane;
     @FXML    private Slider zoom_slider;
     @FXML    private MenuButton map_pin;
-    @FXML    private MenuItem pin_info;
     @FXML    private MenuItem profileButton;
     @FXML    private Button problemsButton;
     @FXML    private Button btnPoint;
@@ -104,9 +106,6 @@ public class MainController implements Initializable {
     @FXML    private Button btnBorrarTodo;
     @FXML    private Label tituloProbActual;
     @FXML    private ImageView avatarMain;
-    @FXML    private Label tituloHerramientasDibujo;
-    @FXML    private Label tituloHerramientasMedicion;
-    @FXML    private Label tituloEdicion;
     @FXML    private MenuItem resultsButton;
     
 
@@ -159,12 +158,18 @@ public class MainController implements Initializable {
     private ProblemUtil problemUtil;
     private SettingsUtil settings;
     
+    @FXML    private Button toggleDrawerButton;
+    @FXML    private VBox panelProblemas;
+    @FXML    private ImageView imageView;
+    @FXML    private ScrollPane scrollPane;
+    @FXML    private HBox hBoxProblemas;
+    
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         initData();
         
-        zoomManager = new ZoomManager(map_scrollpane, zoom_slider);
+        zoomManager = new ZoomManager(scrollPane, zoom_slider);
         zoomGroup   = zoomManager.getZoomGroup();
         
         // Cada vez que cambie el slider de zoom, avisamos a PointTool
@@ -193,8 +198,8 @@ public class MainController implements Initializable {
         distanceTool = new DistanceTool(zoomGroup, currentLineWidth, currentColor);
         
         // Transportador (overlay auxiliar)
-        protractorTool = new ProtractorTool(zoomGroup, map_scrollpane);
-        reglaTool = new ReglaTool(zoomGroup, map_scrollpane);
+        protractorTool = new ProtractorTool(zoomGroup, scrollPane);
+        reglaTool = new ReglaTool(zoomGroup, scrollPane);
         
         // Dibujar todos los elementos
         dibujar();
@@ -225,11 +230,50 @@ public class MainController implements Initializable {
         updateBackground();
         
         extremosOverlay.setOnPoiPicked(poi -> {
-        if (poi == null) return;
+            if (poi == null) return;
 
-        map_listview.getSelectionModel().select(poi); // mantiene coherencia con la UI
-        centerOnPoi(poi);                             // centra igual que listClicked
-        extremosOverlay.showFor(poi);                 // dibuja los extremos
+            map_listview.getSelectionModel().select(poi); // mantiene coherencia con la UI
+            centerOnPoi(poi);                             // centra igual que listClicked
+            extremosOverlay.showFor(poi);                 // dibuja los extremos
+        });
+        
+        panelProblemas.setVisible(false);
+        panelProblemas.setManaged(false);
+        panelProblemas.setPrefWidth(0);
+        
+        // Dentro de initialize en MainController:
+        imageView.setPreserveRatio(true);
+
+        // 1. Forzamos a la imagen a tener su tamaño real de píxeles
+        // Esto evita que el Group sea de 0x0 al inicio
+        if (imageView.getImage() != null) {
+            imageView.setFitWidth(imageView.getImage().getWidth());
+            imageView.setFitHeight(imageView.getImage().getHeight());
+        }
+
+        // 2. Ajustamos el slider para que empiece en un punto visible
+        // Si tu slider va de 0.1 a 1.5, el 0.1 es MUY pequeño (10% del tamaño)
+        Platform.runLater(() -> {
+            // Calculamos qué escala se necesita para que el mapa cubra el ScrollPane
+            double anchoMapa = imageView.getImage().getWidth();
+            double anchoVisible = scrollPane.getViewportBounds().getWidth();
+
+            if (anchoVisible > 0 && anchoMapa > 0) {
+                double escalaInicial = anchoVisible / anchoMapa;
+                // Ajustamos el slider a esa escala (asegúrate de que esté en el rango 0.1 - 1.5)
+                zoom_slider.setValue(escalaInicial); 
+            }
+        });
+        
+        scrollPane.viewportBoundsProperty().addListener((obs, oldBounds, newBounds) -> {
+            // Si queremos que al abrir/cerrar el panel el mapa se re-ajuste al ancho
+            if (newBounds.getWidth() > 0) {
+                double anchoMapa = imageView.getImage().getWidth();
+                double nuevaEscala = newBounds.getWidth() / anchoMapa;
+
+                // Solo si quieres que sea automático:
+                // zoom_slider.setValue(nuevaEscala);
+            }
         });
     }
     
@@ -302,7 +346,7 @@ public class MainController implements Initializable {
         double contentW = contentWLocal * scale;
         double contentH = contentHLocal * scale;
 
-        Bounds viewport = map_scrollpane.getViewportBounds();
+        Bounds viewport = scrollPane.getViewportBounds();
         double viewportW = viewport.getWidth();
         double viewportH = viewport.getHeight();
 
@@ -321,8 +365,8 @@ public class MainController implements Initializable {
 
         Timeline timeline = new Timeline(
             new KeyFrame(Duration.millis(500),
-                new KeyValue(map_scrollpane.hvalueProperty(), targetH),
-                new KeyValue(map_scrollpane.vvalueProperty(), targetV)
+                new KeyValue(scrollPane.hvalueProperty(), targetH),
+                new KeyValue(scrollPane.vvalueProperty(), targetV)
             )
         );
         timeline.play();
@@ -643,8 +687,8 @@ public class MainController implements Initializable {
         }
 
         // importante: solo dejamos mover el mapa cuando no hay herramienta de dibujo
-        if (map_scrollpane != null) {
-            map_scrollpane.setPannable(currentTool == null);
+        if (scrollPane != null) {
+            scrollPane.setPannable(currentTool == null);
         }
         
     }
@@ -741,12 +785,39 @@ public class MainController implements Initializable {
         if (settings.usarColorSolidoProperty().get()) {
             pane.setStyle("-fx-background-color: #dbdbdb;");
             tituloProbActual.setStyle("-fx-text-fill: #246f80;");
-            tituloPuntosMapa.setStyle("-fx-text-fill: #246f80;");
-            tituloHerramientasDibujo.setStyle("-fx-text-fill: #246f80;");
-            tituloHerramientasMedicion.setStyle("-fx-text-fill: #246f80;");
-            tituloEdicion.setStyle("-fx-text-fill: #246f80;");
         } else {
             pane.setStyle("-fx-background-image: url('/styles/background-image.png');");
+        }
+    }
+
+    @FXML
+    private void toggleDrawer(ActionEvent event) {
+        boolean isVisible = panelProblemas.isVisible();
+
+        if (isVisible) {
+            toggleDrawerButton.setText("▼ Problemas");
+            Timeline timeline = new Timeline();
+            KeyValue kv = new KeyValue(panelProblemas.prefWidthProperty(), 0.0);
+            KeyFrame kf = new KeyFrame(Duration.millis(300), kv);
+            timeline.getKeyFrames().add(kf);
+
+            timeline.setOnFinished(e -> {
+                panelProblemas.setVisible(false);
+                panelProblemas.setManaged(false); // Esto hace que deje de ocupar espacio
+            });
+
+            timeline.play();
+        } else {
+            toggleDrawerButton.setText("▲ Problemas");
+
+            panelProblemas.setManaged(true);
+            panelProblemas.setVisible(true);
+
+            Timeline timeline = new Timeline();
+            KeyValue kv = new KeyValue(panelProblemas.prefWidthProperty(), 280.0);
+            KeyFrame kf = new KeyFrame(Duration.millis(300), kv);
+            timeline.getKeyFrames().add(kf);
+            timeline.play();
         }
     }
 }
