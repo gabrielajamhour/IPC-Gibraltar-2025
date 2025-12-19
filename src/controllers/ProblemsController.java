@@ -10,7 +10,10 @@ import java.util.List;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import util.SessionManager;
 
@@ -79,18 +82,17 @@ public class ProblemsController implements Initializable {
         }
         
         if (selectedProblem != null && mainController != null) {
-        mainController.loadProblem(selectedProblem); // carga el problema en la ventana principal
+        mainController.loadProblem(selectedProblem);
 
-        // cerrar la modal
         Stage modalStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         modalStage.close();
     }
     }
 
     @FXML
-    private void goBack() throws IOException {
-        Stage stage = (Stage) searchField.getScene().getWindow();
-        SessionManager.goToMain(stage);
+    private void goBack(ActionEvent event) {
+        Stage modalStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        modalStage.close();
     }
 
     private void showAlert(String msg) {
@@ -102,12 +104,28 @@ public class ProblemsController implements Initializable {
     }
     
     public class ProblemCell extends ListCell<Problem> {
-        
-        private final Label label = new Label();
-        
+
+        private final Label numberLabel = new Label();
+        private final Label textLabel = new Label();
+        private final HBox row = new HBox(10);
+
         public ProblemCell() {
-            label.setWrapText(true);
-            label.setMaxWidth(Double.MAX_VALUE);
+            numberLabel.setMinWidth(40);
+            numberLabel.setAlignment(Pos.CENTER);
+            numberLabel.setStyle(
+                "-fx-text-fill: white;" +    
+                "-fx-font-weight: bold;" +
+                "-fx-background-color: #2a8396;" +
+                "-fx-background-radius: 6;" +
+                "-fx-padding: 2 0;"
+            );
+
+            textLabel.setWrapText(true);
+            textLabel.setMaxWidth(Double.MAX_VALUE);
+
+            HBox.setHgrow(textLabel, Priority.ALWAYS);
+            row.getChildren().addAll(numberLabel, textLabel);
+
             setPrefWidth(0);
         }
 
@@ -117,17 +135,16 @@ public class ProblemsController implements Initializable {
 
             if (empty || problem == null) {
                 setGraphic(null);
-                setText(null);
                 setStyle("");
                 return;
             }
-            
-            label.setText(problem.getText());
-            label.setMaxWidth(getListView().getWidth() - 20);
-            setGraphic(label);
-            
-            Boolean result = SessionManager.getProblemResult(problem);
 
+            numberLabel.setText(String.valueOf(getIndex() + 1));
+            textLabel.setText(problem.getText());
+
+            setGraphic(row);
+
+            Boolean result = SessionManager.getProblemResult(problem);
             if (result == null) {
                 setStyle("");
             } else if (result) {
@@ -137,4 +154,5 @@ public class ProblemsController implements Initializable {
             }
         }
     }
+
 }

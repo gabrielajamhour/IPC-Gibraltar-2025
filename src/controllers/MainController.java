@@ -162,7 +162,7 @@ public class MainController implements Initializable {
     @FXML    private VBox panelProblemas;
     @FXML    private ImageView imageView;
     @FXML    private ScrollPane scrollPane;
-    @FXML    private HBox hBoxProblemas;
+    @FXML    private VBox problemContainer;
     
 
     @Override
@@ -243,6 +243,12 @@ public class MainController implements Initializable {
         panelProblemas.setVisible(false);
         panelProblemas.setManaged(false);
         panelProblemas.setPrefWidth(0);
+        
+        try {
+            problemUtil.loadFirstProblem();
+        } catch (NavDAOException ex) {
+            System.getLogger(MainController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
         
         imageView.setPreserveRatio(true);
 
@@ -489,17 +495,16 @@ public class MainController implements Initializable {
             Parent root = loader.load();
             
             ProblemsController modalController = loader.getController();
-            modalController.setMainController(this); // 'this' = MainController actual
+            modalController.setMainController(this);
             modalController.setUser(userToInject);
 
             // Crear nuevo stage para la ventana modal
             Stage modalStage = new Stage();
-            modalStage.initModality(Modality.APPLICATION_MODAL); // esto hace que sea modal
-            modalStage.setTitle("Problemas"); // título opcional
+            modalStage.initModality(Modality.APPLICATION_MODAL);
             modalStage.setScene(new Scene(root));
-            modalStage.setResizable(false); // opcional
+            modalStage.setResizable(false);
 
-            modalStage.showAndWait(); // bloquea la ventana principal hasta cerrar
+            modalStage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -766,14 +771,20 @@ public class MainController implements Initializable {
         }
     }
 
-
     @FXML
     private void generateRandomProblem(ActionEvent event) throws NavDAOException {
         problemUtil.generateRandomProblem();
+        showProblemArea();
     }
     
     public void loadProblem(Problem selected){
         problemUtil.loadProblem(selected);
+        problemUtil.updateProblemTitle(selected);
+        showProblemArea();
+    }
+    
+    public void showProblemArea() {
+        problemContainer.setVisible(true);
     }
 
     @FXML

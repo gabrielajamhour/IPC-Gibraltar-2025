@@ -63,16 +63,37 @@ public class ProblemUtil {
         this.questionGroup = questionGroup;
         this.tituloProbActual = tituloProbActual;
         try {
-            generateRandomProblem();
+            loadFirstProblem();
         } catch (NavDAOException ex) {
             System.getLogger(ProblemUtil.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-        updateProblemTitle();
     }
+    
+    private int getProblemNumber(Problem problem) {
+        try {
+            List<Problem> allProblems = Navigation.getInstance().getProblems();
+            int index = allProblems.indexOf(problem);
+            return index >= 0 ? index + 1 : -1;
+        } catch (NavDAOException e) {
+            return -1;
+        }
+    }
+
     
     
     public static ProblemUtil getInstance() {
         return instance;
+    }
+    
+    public void loadFirstProblem() throws NavDAOException {
+        List<Problem> allProblems = Navigation.getInstance().getProblems();
+
+        if (allProblems == null || allProblems.isEmpty()) return;
+
+        Problem first = allProblems.get(0);
+        
+        loadProblem(first);
+        updateProblemTitle(first);
     }
     
     
@@ -112,9 +133,8 @@ public class ProblemUtil {
         Problem problem = remaining.get(index);
         loadProblem(problem);
 
-        updateProblemTitle();
+        updateProblemTitle(problem);
     }
-
 
     /** Equivale a tu loadProblem(Problem selected) */
     public void loadProblem(Problem selected) {
@@ -152,6 +172,16 @@ public class ProblemUtil {
         tBAlternativaB.setText("B. " + ansAlternativaB.getText());
         tBAlternativaC.setText("C. " + ansAlternativaC.getText());
         tBAlternativaD.setText("D. " + ansAlternativaD.getText());
+    }
+    
+    public void updateProblemTitle(Problem problem) {
+        int number = getProblemNumber(problem);
+
+        if (number > 0) {
+            tituloProbActual.setText("Problema #" + number);
+        } else {
+            tituloProbActual.setText("Problema");
+        }
     }
 
     public void comprobarRespuesta() {
@@ -248,11 +278,6 @@ public class ProblemUtil {
         if (ans == ansAlternativaB) return tBAlternativaB;
         if (ans == ansAlternativaC) return tBAlternativaC;
         return tBAlternativaD;
-    }
-
-    public void updateProblemTitle() {
-        int nextProblemNumber = SessionManager.getProblemsSolved() + 1;
-        tituloProbActual.setText("Problema #" + nextProblemNumber);
     }
     
     public void resetAnsweredProblems() {

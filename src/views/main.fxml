@@ -49,7 +49,7 @@
                   </StackPane>
                     </content>
                <StackPane.margin>
-                  <Insets bottom="10.0" right="10.0" />
+                  <Insets bottom="20.0" right="10.0" />
                </StackPane.margin>
                 </ScrollPane>
             <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" StackPane.alignment="TOP_RIGHT">
@@ -367,7 +367,7 @@
         </VBox>
     </left>
    <right>
-      <HBox fx:id="hBoxProblemas">
+      <HBox>
          <children>
             <Button fx:id="toggleDrawerButton" contentDisplay="CENTER" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#toggleDrawer" rotate="90.0" text="▼ Problemas">
                <styleClass>
@@ -382,6 +382,14 @@
             </Button>
             <VBox fx:id="panelProblemas" alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="290.0">
                <children>
+                  <Label text="Selecciona una opción para practicar:" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Bold" size="14.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </Label>
                   <HBox alignment="CENTER" spacing="10.0">
                      <children>
                               <Button fx:id="problemsButton" alignment="BOTTOM_CENTER" mnemonicParsing="false" onAction="#openProblems" text="Lista">
@@ -416,39 +424,44 @@
                               </Button>
                      </children>
                      <VBox.margin>
-                        <Insets bottom="20.0" top="10.0" />
+                        <Insets bottom="15.0" top="10.0" />
                      </VBox.margin>
                   </HBox>
-                        <Label fx:id="tituloProbActual" text="Problema ##" textFill="WHITE">
-                            <font>
-                                <Font name="Segoe UI Bold" size="24.0" />
-                            </font>
-                            <VBox.margin>
-                                <Insets bottom="10.0" />
-                            </VBox.margin>
-                            <styleClass>
-                                <String fx:value="effect" />
-                            </styleClass>
-                        </Label>
-                        <Label fx:id="enunciadoProblema" maxWidth="350.0" text="Enunciado" textAlignment="JUSTIFY" wrapText="true">
-                            <VBox.margin>
-                                <Insets left="20.0" right="20.0" top="-5.0" />
-                            </VBox.margin>
-                            <styleClass>
-                                <String fx:value="card" />
-                            </styleClass>
-                            <font>
-                                <Font name="Segoe UI" size="12.0" />
-                            </font>
-                        </Label>
-                        <VBox>
-                            <VBox.margin>
-                                <Insets left="20.0" top="20.0" />
-                            </VBox.margin>
-                            <children>
+                  <Separator prefWidth="200.0">
+                     <VBox.margin>
+                        <Insets bottom="10.0" left="30.0" right="30.0" />
+                     </VBox.margin>
+                  </Separator>
+                  <VBox fx:id="problemContainer" alignment="TOP_CENTER">
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
+                     <children>
+                              <Label fx:id="tituloProbActual" text="Problema ##" textFill="WHITE">
+                                  <font>
+                                      <Font name="Segoe UI Bold" size="24.0" />
+                                  </font>
+                                  <styleClass>
+                                      <String fx:value="effect" />
+                                  </styleClass>
+                           <VBox.margin>
+                              <Insets bottom="15.0" />
+                           </VBox.margin>
+                              </Label>
+                              <Label fx:id="enunciadoProblema" maxWidth="350.0" text="Enunciado" textAlignment="JUSTIFY" wrapText="true">
+                                  <VBox.margin>
+                                      <Insets left="20.0" right="20.0" top="-5.0" />
+                                  </VBox.margin>
+                                  <styleClass>
+                                      <String fx:value="card" />
+                                  </styleClass>
+                                  <font>
+                                      <Font name="Segoe UI" size="12.0" />
+                                  </font>
+                              </Label>
                                 <VBox>
                                     <VBox.margin>
-                                        <Insets bottom="2.0" left="5.0" right="20.0" top="-10.0" />
+                                        <Insets left="20.0" right="20.0" top="10.0" />
                                     </VBox.margin>
                                     <styleClass>
                                         <String fx:value="text-box" />
@@ -503,19 +516,19 @@
                                         </RadioButton>
                                     </children>
                                 </VBox>
-                            </children>
-                        </VBox>
-                        <Button fx:id="btnComprobarRespuesta" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#comprobarRespuesta" prefHeight="27.0" prefWidth="150.0" text="Comprobar respuesta" VBox.vgrow="ALWAYS">
-                            <VBox.margin>
-                                <Insets top="10.0" />
-                            </VBox.margin>
-                            <styleClass>
-                                <String fx:value="blue-btn" />
-                            </styleClass>
-                            <font>
-                                <Font name="Segoe UI Semibold" size="12.0" />
-                            </font>
-                        </Button>
+                              <Button fx:id="btnComprobarRespuesta" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#comprobarRespuesta" prefHeight="27.0" prefWidth="150.0" text="Comprobar respuesta" VBox.vgrow="ALWAYS">
+                                  <VBox.margin>
+                                      <Insets top="10.0" />
+                                  </VBox.margin>
+                                  <styleClass>
+                                      <String fx:value="blue-btn" />
+                                  </styleClass>
+                                  <font>
+                                      <Font name="Segoe UI Semibold" size="12.0" />
+                                  </font>
+                              </Button>
+                     </children>
+                  </VBox>
                       <Label fx:id="tituloPuntosMapa" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 12, 0.2, 0, 3)" text="Puntos del mapa" textFill="WHITE">
                           <font>
                               <Font name="Segoe UI Bold" size="24.0" />
