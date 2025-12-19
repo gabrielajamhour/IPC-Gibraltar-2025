@@ -9,7 +9,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -103,7 +102,6 @@ public class MainController implements Initializable {
     @FXML    private MenuItem sessionsButton;
     @FXML    private BorderPane pane;
     @FXML    private Button btnBorrarTodo;
-    @FXML    private Label contadorProblemas;
     @FXML    private Label tituloProbActual;
     @FXML    private ImageView avatarMain;
     @FXML    private Label tituloHerramientasDibujo;
@@ -220,7 +218,6 @@ public class MainController implements Initializable {
             tBAlternativaD,
             textErrorCompResp,
             questionGroup,
-            contadorProblemas,
             tituloProbActual
         );
         
@@ -428,7 +425,9 @@ public class MainController implements Initializable {
             Object controller = loader.getController();
         
             if (controller instanceof SessionsController) {
-                ((SessionsController) controller).setUser(userToInject);
+                SessionsController sc = (SessionsController) controller;
+                sc.setUser(userToInject);
+                sc.setCurrentSession(SessionManager.getCurrentSession());
             }
             
             if (controller instanceof ConfigController) {

@@ -1,5 +1,6 @@
 package util;
 
+import controllers.SessionsController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,7 +13,7 @@ import model.Answer;
 import model.NavDAOException;
 import model.Navigation;
 import model.Problem;
-import util.SessionManager;
+import model.Session;
 
 /**
  * @author Gabriela Rego
@@ -30,7 +31,6 @@ public class ProblemUtil {
     private final RadioButton tBAlternativaD;
     private final Label textErrorCompResp;
     private final ToggleGroup questionGroup;
-    private final Label contadorProblemas;
     private final Label tituloProbActual;
 
     // Estado interno (lo mismo que tienes ahora en MainController)
@@ -52,7 +52,6 @@ public class ProblemUtil {
             RadioButton tBAlternativaD,
             Label textErrorCompResp,
             ToggleGroup questionGroup,
-            Label contadorProblemas,
             Label tituloProbActual
     ) {
         // guardar la instancia global
@@ -65,14 +64,12 @@ public class ProblemUtil {
         this.tBAlternativaD = tBAlternativaD;
         this.textErrorCompResp = textErrorCompResp;
         this.questionGroup = questionGroup;
-        this.contadorProblemas = contadorProblemas;
         this.tituloProbActual = tituloProbActual;
         try {
             generateRandomProblem();
         } catch (NavDAOException ex) {
             System.getLogger(ProblemUtil.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-        updateSessionCounters();
         updateProblemTitle();
     }
     
@@ -207,11 +204,18 @@ public class ProblemUtil {
         }
         
         SessionManager.registerProblemResult(currentProblem, isCorrect);
-        updateSessionCounters();
         
         if (currentProblem != null && !answeredProblems.contains(currentProblem)) {
             answeredProblems.add(currentProblem);
         }
+        
+        Session updated = SessionManager.getCurrentSession();
+
+        SessionsController sc = SessionManager.getSessionsController();
+        if (sc != null) {
+            sc.updateCurrentSession(updated);
+}
+
     }
 
     private void correctAnswer() {
@@ -255,18 +259,6 @@ public class ProblemUtil {
         if (ans == ansAlternativaB) return tBAlternativaB;
         if (ans == ansAlternativaC) return tBAlternativaC;
         return tBAlternativaD;
-    }
-
-    public void updateSessionCounters() {
-        int total = SessionManager.getProblemsSolved();
-        int correct = SessionManager.getProblemsCorrect();
-        int incorrect = SessionManager.getProblemsIncorrect();
-
-        contadorProblemas.setText(
-                "Aciertos: " + correct +
-                "  |  Fallos: " + incorrect +
-                "  |  Total: " + total
-        );
     }
 
     public void updateProblemTitle() {

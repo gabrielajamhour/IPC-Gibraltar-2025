@@ -1,7 +1,7 @@
 package util;
 
-import controllers.AuthController;
 import controllers.MainController;
+import controllers.SessionsController;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -21,6 +21,8 @@ import model.User;
 public class SessionManager {
 
     private static User activeUser;
+    private static Session currentSession;
+    private static SessionsController sessionsController;
     
     private static int problemsSolved = 0; 
     private static int problemsCorrect = 0;   
@@ -30,16 +32,31 @@ public class SessionManager {
     
     private static final Map<Integer, Boolean> problemResults = new HashMap<>();
 
+    public static void setSessionsController(SessionsController sc) {
+        sessionsController = sc;
+    }
+
+    public static SessionsController getSessionsController() {
+        return sessionsController;
+    }
+    
     public static void startNewSession(User user) {
         problemsSolved = 0;
         problemsCorrect = 0;
         problemsIncorrect = 0;
+        
         sessionStartTime = LocalDateTime.now();
         activeUser = user;
+        
+        currentSession = new Session(sessionStartTime, 0, 0);
     }
 
     public static User getActiveUser() {
         return activeUser;
+    }
+    
+    public static Session getCurrentSession() {
+        return currentSession;
     }
     
     // Trocar a cena para main.fxml
@@ -114,13 +131,25 @@ public class SessionManager {
     public static void registerCorrectAttempt() {
         problemsSolved++;
         problemsCorrect++;
+        rebuildCurrentSession();
     }
     
     public static void registerIncorrectAttempt() {
         problemsSolved++;
         problemsIncorrect++;
+        rebuildCurrentSession();
     }
     
+    private static void rebuildCurrentSession() {
+        if (sessionStartTime != null) {
+            currentSession = new Session(
+                sessionStartTime,
+                problemsCorrect,
+                problemsIncorrect
+            );
+        }
+    }
+
     public static void clearSessionCounters() {
         problemsSolved = 0;
         problemsCorrect = 0;
@@ -128,12 +157,18 @@ public class SessionManager {
     }
     
     public static void finalizeAndSaveSession() {
-        activeUser.addSession(problemsCorrect, problemsIncorrect);
-        
+        if (activeUser != null && currentSession != null) {
+            activeUser.addSession(
+                currentSession.getHits(),
+                currentSession.getFaults()
+            );
+        }
+
+        currentSession = null;
         activeUser = null;
+
         clearSessionCounters();
         sessionStartTime = null;
-        
         problemResults.clear();
     }
     

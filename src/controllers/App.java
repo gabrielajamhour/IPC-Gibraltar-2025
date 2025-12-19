@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import util.SessionManager;
 import util.SettingsUtil;
@@ -24,7 +23,6 @@ public class App extends Application {
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/styles/main.css").toExternalForm());
         
-        stage.getIcons().add(new Image(getClass().getResourceAsStream("/resources/logo.png")));
         stage.setTitle("Carta Náutica - Estrecho de Gibraltar");
         
         MainController controller = loader.getController();
