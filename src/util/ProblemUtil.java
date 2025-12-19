@@ -29,7 +29,6 @@ public class ProblemUtil {
     private final RadioButton tBAlternativaB;
     private final RadioButton tBAlternativaC;
     private final RadioButton tBAlternativaD;
-    private final Label textErrorCompResp;
     private final ToggleGroup questionGroup;
     private final Label tituloProbActual;
 
@@ -50,7 +49,6 @@ public class ProblemUtil {
             RadioButton tBAlternativaB,
             RadioButton tBAlternativaC,
             RadioButton tBAlternativaD,
-            Label textErrorCompResp,
             ToggleGroup questionGroup,
             Label tituloProbActual
     ) {
@@ -62,7 +60,6 @@ public class ProblemUtil {
         this.tBAlternativaB = tBAlternativaB;
         this.tBAlternativaC = tBAlternativaC;
         this.tBAlternativaD = tBAlternativaD;
-        this.textErrorCompResp = textErrorCompResp;
         this.questionGroup = questionGroup;
         this.tituloProbActual = tituloProbActual;
         try {
@@ -80,7 +77,6 @@ public class ProblemUtil {
     
     
     public void generateRandomProblem() throws NavDAOException {
-        textErrorCompResp.setVisible(false);
         List<Problem> allProblems = Navigation.getInstance().getProblems();
 
         if (allProblems.isEmpty()) {
@@ -165,13 +161,6 @@ public class ProblemUtil {
         List<Answer> answers = currentProblem.getAnswers();
 
         Toggle selectedToggle = questionGroup.getSelectedToggle();
-
-        if (selectedToggle == null) {
-            textErrorCompResp.setVisible(true);
-            return;
-        }
-
-        textErrorCompResp.setVisible(false);
 
         RadioButton selected = (RadioButton) selectedToggle;
 

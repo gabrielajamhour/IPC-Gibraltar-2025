@@ -8,7 +8,9 @@ import javafx.collections.*;
 import model.*;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.stage.Stage;
 import util.SessionManager;
 
@@ -24,6 +26,9 @@ public class ProblemsController implements Initializable {
     private List<Problem> allProblems;
     @FXML    private Button btnOpenProblem;
     
+    private MainController mainController;
+    private User user;
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
@@ -35,6 +40,15 @@ public class ProblemsController implements Initializable {
 
         } catch (NavDAOException ex) {} 
     }
+    
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    
     @FXML
     private void searchProblems() {
         String query = searchField.getText().toLowerCase();
@@ -56,16 +70,21 @@ public class ProblemsController implements Initializable {
     }
 
     @FXML
-    private void openProblem() {
-        Problem selected = problemsList.getSelectionModel().getSelectedItem();
+    private void openProblem(ActionEvent event) {
+        Problem selectedProblem = problemsList.getSelectionModel().getSelectedItem();
 
-        if (selected == null) {
+        if (selectedProblem == null) {
             showAlert("Debes seleccionar un problema");
             return;
         }
         
-        Stage stage = (Stage) searchField.getScene().getWindow();
-        SessionManager.goToMainAndLoadProblem(stage, selected);
+        if (selectedProblem != null && mainController != null) {
+        mainController.loadProblem(selectedProblem); // carga el problema en la ventana principal
+
+        // cerrar la modal
+        Stage modalStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        modalStage.close();
+    }
     }
 
     @FXML

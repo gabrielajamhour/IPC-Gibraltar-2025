@@ -26,10 +26,6 @@
 
 /* ====== GENERAL ====== */
 
-.scroll-pane {
-    -fx-background-color: transparent;
-}
-
 .card {
     -fx-background-color: -fx-bg-card;
     -fx-background-radius: 16px;
@@ -102,6 +98,10 @@
 
 .blue-btn:hover {
     -fx-background-color: -fx-blue-dark;
+}
+
+.blue-btn:disabled {
+    -fx-opacity: 0.7;
 }
 
 .small-btn {

@@ -100,30 +100,6 @@ public class SessionManager {
         } catch (IOException e) {}
     }
     
-    public static void goToMainAndLoadProblem(Stage stage, Problem problemToLoad) {
-        try {
-            FXMLLoader loader = new FXMLLoader(SessionManager.class.getResource("/views/main.fxml"));
-            Parent root = loader.load();
-            
-            MainController mainController = loader.getController();
-            mainController.setUser(activeUser);
-            
-            mainController.setSettings(SettingsUtil.getInstance());
-
-            if (problemToLoad != null) {
-                mainController.loadProblem(problemToLoad); 
-            }
-
-            stage.setScene(new Scene(root));
-            stage.setMinWidth(stage.getWidth());
-            stage.setMinHeight(stage.getHeight());
-            stage.show();
-            
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
     public static int getProblemsSolved() { return problemsSolved; }
     public static int getProblemsCorrect() { return problemsCorrect; }
     public static int getProblemsIncorrect() { return problemsIncorrect; }

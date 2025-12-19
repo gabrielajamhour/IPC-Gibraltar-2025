@@ -48,6 +48,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Arc;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import model.NavDAOException;
 import model.Problem;
 import model.User;
@@ -92,7 +93,6 @@ public class MainController implements Initializable {
     @FXML    private RadioButton tBAlternativaB;
     @FXML    private RadioButton tBAlternativaC;
     @FXML    private RadioButton tBAlternativaD;
-    @FXML    private Label textErrorCompResp;
     @FXML    private Button btnTexto;
     @FXML    private MenuButton profileMain;
     @FXML    private Button btnTransportador;
@@ -183,9 +183,11 @@ public class MainController implements Initializable {
         extremosOverlay = new ExtremosOverlay(zoomGroup);
         
         // Color actual = valor del ColorPicker
+        colorPicker.setValue(Color.BLACK);
         currentColor.bind(colorPicker.valueProperty());
 
         // Grosor actual = valor del slider
+        sliderGrosor.setValue((sliderGrosor.getMin() + sliderGrosor.getMax()) / 2);
         currentLineWidth.bind(sliderGrosor.valueProperty());
         
         // Crear herramientas
@@ -221,10 +223,11 @@ public class MainController implements Initializable {
             tBAlternativaB,
             tBAlternativaC,
             tBAlternativaD,
-            textErrorCompResp,
             questionGroup,
             tituloProbActual
         );
+        
+        btnComprobarRespuesta.disableProperty().bind(questionGroup.selectedToggleProperty().isNull());
         
         settings = SettingsUtil.getInstance();
         updateBackground();
@@ -241,38 +244,27 @@ public class MainController implements Initializable {
         panelProblemas.setManaged(false);
         panelProblemas.setPrefWidth(0);
         
-        // Dentro de initialize en MainController:
         imageView.setPreserveRatio(true);
 
-        // 1. Forzamos a la imagen a tener su tamaño real de píxeles
-        // Esto evita que el Group sea de 0x0 al inicio
         if (imageView.getImage() != null) {
             imageView.setFitWidth(imageView.getImage().getWidth());
             imageView.setFitHeight(imageView.getImage().getHeight());
         }
-
-        // 2. Ajustamos el slider para que empiece en un punto visible
-        // Si tu slider va de 0.1 a 1.5, el 0.1 es MUY pequeño (10% del tamaño)
+        
         Platform.runLater(() -> {
-            // Calculamos qué escala se necesita para que el mapa cubra el ScrollPane
             double anchoMapa = imageView.getImage().getWidth();
             double anchoVisible = scrollPane.getViewportBounds().getWidth();
 
             if (anchoVisible > 0 && anchoMapa > 0) {
                 double escalaInicial = anchoVisible / anchoMapa;
-                // Ajustamos el slider a esa escala (asegúrate de que esté en el rango 0.1 - 1.5)
                 zoom_slider.setValue(escalaInicial); 
             }
         });
         
         scrollPane.viewportBoundsProperty().addListener((obs, oldBounds, newBounds) -> {
-            // Si queremos que al abrir/cerrar el panel el mapa se re-ajuste al ancho
             if (newBounds.getWidth() > 0) {
                 double anchoMapa = imageView.getImage().getWidth();
                 double nuevaEscala = newBounds.getWidth() / anchoMapa;
-
-                // Solo si quieres que sea automático:
-                // zoom_slider.setValue(nuevaEscala);
             }
         });
     }
@@ -433,19 +425,19 @@ public class MainController implements Initializable {
     @FXML
     private void openProfile(ActionEvent event) {
         User currentUser = SessionManager.getActiveUser();
-        openPage("/views/profile.fxml", event, currentUser);
+        openPage("/views/profile.fxml", currentUser);
     }
 
     @FXML
     private void openProblems(ActionEvent event) {
         User currentUser = SessionManager.getActiveUser();
-        openPage("/views/problems.fxml", event, currentUser);
+        openModal("/views/problems.fxml", currentUser);
     }
 
     @FXML
     private void openSessions(ActionEvent event) {
         User currentUser = SessionManager.getActiveUser();
-        openPage("/views/session-history.fxml", event, currentUser);
+        openPage("/views/session-history.fxml", currentUser);
     }
     
         @FXML
@@ -458,10 +450,10 @@ public class MainController implements Initializable {
     @FXML
     private void openConfig(ActionEvent event) {
         User currentUser = SessionManager.getActiveUser();
-        openPage("/views/config.fxml", event, currentUser);
+        openPage("/views/config.fxml", currentUser);
     }
 
-    private void openPage(String fxmlPath, ActionEvent event, User userToInject) {
+    private void openPage(String fxmlPath, User userToInject) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
@@ -490,7 +482,28 @@ public class MainController implements Initializable {
             e.printStackTrace();
         }
     }
+    
+    private void openModal(String fxmlPath, User userToInject) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+            
+            ProblemsController modalController = loader.getController();
+            modalController.setMainController(this); // 'this' = MainController actual
+            modalController.setUser(userToInject);
 
+            // Crear nuevo stage para la ventana modal
+            Stage modalStage = new Stage();
+            modalStage.initModality(Modality.APPLICATION_MODAL); // esto hace que sea modal
+            modalStage.setTitle("Problemas"); // título opcional
+            modalStage.setScene(new Scene(root));
+            modalStage.setResizable(false); // opcional
+
+            modalStage.showAndWait(); // bloquea la ventana principal hasta cerrar
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     
     // Botones de la toolbar:
     @FXML
@@ -814,7 +827,7 @@ public class MainController implements Initializable {
             panelProblemas.setVisible(true);
 
             Timeline timeline = new Timeline();
-            KeyValue kv = new KeyValue(panelProblemas.prefWidthProperty(), 280.0);
+            KeyValue kv = new KeyValue(panelProblemas.prefWidthProperty(), 290.0);
             KeyFrame kf = new KeyFrame(Duration.millis(300), kv);
             timeline.getKeyFrames().add(kf);
             timeline.play();
