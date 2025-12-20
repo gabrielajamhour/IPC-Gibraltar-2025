@@ -173,7 +173,7 @@ public class MainController implements Initializable {
         // Cada vez que cambie el slider de zoom, avisamos a PointTool
         zoom_slider.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (pointTool instanceof util.PointTool pt) {
-                pt.onZoomChanged(newVal.doubleValue()); // o zoomManager.getCurrentScale()
+                pt.onZoomChanged(newVal.doubleValue());
             }
         });
         
@@ -213,6 +213,18 @@ public class MainController implements Initializable {
         // Transportador (overlay auxiliar)
         protractorTool = new ProtractorTool(zoomGroup, scrollPane);
         reglaTool = new ReglaTool(zoomGroup, scrollPane);
+        
+        zoomManager.setBeforeZoomHook((oldS, newS) -> {
+            if (reglaTool != null && reglaTool.isVisible()) {
+                reglaTool.beforeMapZoomChange();
+            }
+        });
+
+        zoomManager.setAfterZoomHook((oldS, newS) -> {
+            if (reglaTool != null && reglaTool.isVisible()) {
+                reglaTool.afterMapZoomChange(newS);
+            }
+        });
         
         // Dibujar todos los elementos
         dibujar();

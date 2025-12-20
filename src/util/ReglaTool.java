@@ -3,153 +3,528 @@ package util;
 import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Scale;
 
-/**
- * @author Rafael Alonso
- * Overlay para el transportador: se muestra/oculta,
- * se mueve con el ratón y se puede escalar.
- */
 public class ReglaTool {
 
     private final Group zoomGroup;
     private final ScrollPane scrollPane;
+
+    private final Group reglaGroup;
     private final Region reglaNode;
 
+    private final Circle handleL;
+    private final Circle handleR;
+
     private boolean visible = false;
-    private boolean dragging = false;
+
+    // mover regla
+    private boolean draggingBody = false;
     private double lastParentX;
     private double lastParentY;
-    
-    // escala base para corregir orientación (flip, etc.)
-    private double baseScaleX = 1.0;
-    private double baseScaleY = 1.0;
 
-    // escala de zoom que se modifica con la rueda
-    private double zoomScale = 1.0;
-    
-    // rotación acumulada (grados)
-    private double rotationDeg = DEFAULT_ROTATION;
+    // gesto "extremos"
+    private boolean draggingHandle = false;
+    private Circle activeHandle;
+    private Circle anchorHandle;
+    private Point2D anchorLocal;        // coords locales (reglaGroup)
+    private Point2D anchorParentFixed;  // coords del zoomGroup (ancla fija en pantalla)
+    private double baseDistLocal = 1.0;
+    private double baseAngleLocalDeg = 0.0;
+
+    // tamaño usuario + compensación zoom
+    private double userScale = 1.0;
+    private double mapCompScale = 1.0;
+
+    private double rotationDeg = 0.0;
+
+    private boolean anchorsComputed = false;
+
+    // Centro VISUAL real (detectado por snapshot)
+    private Point2D visualCenterLocal = null; // si null, fallback al centro del Region
+
+    // bloquear panning ScrollPane mientras interactúas
+    private boolean pannableLocked = false;
+    private boolean prevPannable = true;
+
+    private static final double BASE_SIZE = 350.0;
+
+    private static final double HANDLE_RADIUS = 9.0;
+    private static final double HANDLE_OFFSET = 16.0;
+
+    private static final double MIN_USER_SCALE = 0.25;
+    private static final double MAX_USER_SCALE = 8.0;
+
     private static final double DEFAULT_ROTATION = 0.0;
 
+    private final Scale scaleTx;
+    private final Rotate rotateTx;
+    
+    private final Node mapNode; // el contenido real del mapa (NO overlays)
+
+    private Point2D windowAnchorScene = null;
+
+    // true = los handles cambian tamaño+rotación
+    // false = solo rotación (tamaño bloqueado)
+    private boolean handleScalingEnabled = false;
+
+    // radio fijo (en coords del zoomGroup) cuando la escala está bloqueada
+    private double pressDistParentFixed = 1.0;
+    
     
     public ReglaTool(Group zoomGroup, ScrollPane scrollPane) {
         this.zoomGroup = zoomGroup;
         this.scrollPane = scrollPane;
 
+        reglaGroup = new Group();
         reglaNode = new Region();
 
-        // Tamaño base (el CSS también marca pref-width/height)
-        reglaNode.setPrefSize(350, 350);
+        reglaNode.setPrefSize(BASE_SIZE, BASE_SIZE);
         reglaNode.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         reglaNode.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 
-        // Clase CSS -> coincide con ".transportador" en protractor.css
         reglaNode.getStyleClass().add("regla");
-        
-        // aplicar la combinación base + zoom
-        reglaNode.setScaleX(baseScaleX * zoomScale);
-        reglaNode.setScaleY(baseScaleY * zoomScale);
-
-        // IMPORTANTE: cargar el CSS del transportador
-        // (como protractor.css está en el mismo paquete "util" que esta clase)
         String css = getClass().getResource("protractor.css").toExternalForm();
         reglaNode.getStylesheets().add(css);
 
-        // Para que el path del CSS se adapte al tamaño del Region
         reglaNode.setScaleShape(true);
         reglaNode.setCenterShape(true);
 
-        reglaNode.setVisible(false);
-        reglaNode.setMouseTransparent(false);
+        handleL = new Circle(HANDLE_RADIUS);
+        handleR = new Circle(HANDLE_RADIUS);
+        styleHandle(handleL);
+        styleHandle(handleR);
 
-        // Posición inicial (dentro del mapa, ajusta si quieres)
-        reglaNode.setTranslateX(300);
-        reglaNode.setTranslateY(200);
+        // posición provisional (luego se recalcula con snapshot)
+        handleL.setCenterX(-HANDLE_OFFSET);
+        handleL.setCenterY(BASE_SIZE / 2.0);
 
-        zoomGroup.getChildren().add(reglaNode);
+        handleR.setCenterX(BASE_SIZE + HANDLE_OFFSET);
+        handleR.setCenterY(BASE_SIZE / 2.0);
 
+        reglaGroup.getChildren().addAll(reglaNode, handleL, handleR);
+
+        double pivotX = BASE_SIZE / 2.0;
+        double pivotY = BASE_SIZE / 2.0;
+
+        scaleTx = new Scale(1.0, 1.0, pivotX, pivotY);
+        rotateTx = new Rotate(DEFAULT_ROTATION, pivotX, pivotY);
+        reglaGroup.getTransforms().addAll(scaleTx, rotateTx);
+
+        reglaGroup.setVisible(false);
+        reglaGroup.setMouseTransparent(false);
+
+        reglaGroup.setTranslateX(300);
+        reglaGroup.setTranslateY(200);
+
+        // En ZoomManager, el contenido original del ScrollPane se mete como primer hijo del zoomGroup
+        this.mapNode = zoomGroup.getChildren().isEmpty() ? null : zoomGroup.getChildren().get(0);
+        zoomGroup.getChildren().add(reglaGroup);
+
+        installScrollPanePanningLock();
         installHandlers();
     }
 
-    private void installHandlers() {
-        // Empezar arrastre
-        reglaNode.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
-            if (e.getButton() != MouseButton.PRIMARY) return;
+    private void styleHandle(Circle c) {
+        c.setFill(Color.rgb(255, 255, 255, 0.85));
+        c.setStroke(Color.BLACK);
+        c.setStrokeWidth(1.0);
+        c.setCursor(Cursor.HAND);
+    }
 
-            dragging = true;
+    private Point2D mouseInZoomGroup(MouseEvent e) {
+        return zoomGroup.sceneToLocal(e.getSceneX(), e.getSceneY());
+    }
 
-            // Pasar de coords locales del nodo a coords del padre
-            var parentPoint = reglaNode.localToParent(e.getX(), e.getY());
-            lastParentX = parentPoint.getX();
-            lastParentY = parentPoint.getY();
+    private static double clamp(double v, double min, double max) {
+        return Math.max(min, Math.min(max, v));
+    }
 
-            e.consume(); // que no vaya a la herramienta de dibujo
-        });
+    private static double angleDeg(Point2D from, Point2D to) {
+        double ang = Math.toDegrees(Math.atan2(to.getY() - from.getY(), to.getX() - from.getX()));
+        return (ang % 360.0 + 360.0) % 360.0;
+    }
 
-        // Arrastrar siguiendo al ratón (sin "ir lento" con el zoom)
-        reglaNode.addEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
-            if (!dragging) return;
+    private void applyTransforms() {
+        double total = mapCompScale * userScale;
+        scaleTx.setX(total);
+        scaleTx.setY(total);
+        rotateTx.setAngle(rotationDeg);
+    }
 
-            var parentPoint = reglaNode.localToParent(e.getX(), e.getY());
-            double parentX = parentPoint.getX();
-            double parentY = parentPoint.getY();
+    private Point2D regionCenterLocal() {
+        return new Point2D(BASE_SIZE / 2.0, BASE_SIZE / 2.0);
+    }
 
-            double dx = parentX - lastParentX;
-            double dy = parentY - lastParentY;
+    // Centro para centrar/anclar zoom: VISUAL si existe, si no fallback al centro del Region
+    private Point2D centerForAnchoringLocal() {
+        return (visualCenterLocal != null) ? visualCenterLocal : regionCenterLocal();
+    }
 
-            reglaNode.setTranslateX(reglaNode.getTranslateX() + dx);
-            reglaNode.setTranslateY(reglaNode.getTranslateY() + dy);
+    private Point2D handleLocal(Circle h) {
+        return new Point2D(h.getCenterX(), h.getCenterY());
+    }
 
-            lastParentX = parentX;
-            lastParentY = parentY;
+    private void moveLocalPointToParent(Point2D localPoint, Point2D desiredParentPoint) {
+        Point2D current = reglaGroup.localToParent(localPoint);
+        double dx = desiredParentPoint.getX() - current.getX();
+        double dy = desiredParentPoint.getY() - current.getY();
+        reglaGroup.setTranslateX(reglaGroup.getTranslateX() + dx);
+        reglaGroup.setTranslateY(reglaGroup.getTranslateY() + dy);
+    }
 
-            e.consume();
-        });
+    /**
+     * Cambia pivote de Scale/Rotate sin que se mueva en pantalla el punto fixedLocal.
+     */
+    private void setPivotKeepingLocalPointFixed(Point2D newPivotLocal, Point2D fixedLocal) {
+        Point2D before = reglaGroup.localToParent(fixedLocal);
 
-        reglaNode.addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
-            dragging = false;
-        });
+        scaleTx.setPivotX(newPivotLocal.getX());
+        scaleTx.setPivotY(newPivotLocal.getY());
+        rotateTx.setPivotX(newPivotLocal.getX());
+        rotateTx.setPivotY(newPivotLocal.getY());
 
-        // Scroll sobre la regla:
-        //  - sin modificadores -> cambiar tamaño
-        //  - con SHIFT -> rotar
-        reglaNode.addEventFilter(ScrollEvent.SCROLL, e -> {
-            // con SHIFT, muchas veces deltaY = 0 y el scroll viene en deltaX
-            double delta = e.getDeltaY();
-            if (delta == 0) delta = e.getDeltaX();
+        applyTransforms();
 
-            if (e.isShiftDown()) {
-                // aunque delta sea 0, consumimos para evitar que el ScrollPane haga scroll horizontal
-                if (delta != 0) {
-                    double rotStep = (delta > 0) ? 5.0 : -5.0;
-                    rotationDeg = (rotationDeg + rotStep) % 360.0;
-                    reglaNode.setRotate(rotationDeg);
+        Point2D after = reglaGroup.localToParent(fixedLocal);
+
+        double dx = before.getX() - after.getX();
+        double dy = before.getY() - after.getY();
+        reglaGroup.setTranslateX(reglaGroup.getTranslateX() + dx);
+        reglaGroup.setTranslateY(reglaGroup.getTranslateY() + dy);
+    }
+
+    // ====== CLAMPS ======
+    private Bounds mapBoundsLocal() {
+        if (mapNode != null) {
+            // bounds del mapa real en coords del zoomGroup (NO incluye la regla)
+            return mapNode.getBoundsInParent();
+        }
+        // fallback (no ideal, pero evita NPE)
+        return zoomGroup.getLayoutBounds();
+    }
+
+    private Point2D clampPointToMap(Point2D p, double margin) {
+        Bounds m = mapBoundsLocal();
+        double minX = m.getMinX() + margin;
+        double maxX = m.getMaxX() - margin;
+        double minY = m.getMinY() + margin;
+        double maxY = m.getMaxY() - margin;
+
+        return new Point2D(
+                clamp(p.getX(), minX, maxX),
+                clamp(p.getY(), minY, maxY)
+        );
+    }
+
+    private void clampGroupToMap() {
+        Bounds m = mapBoundsLocal();
+        double margin = HANDLE_RADIUS + 2.0;
+
+        Bounds b = reglaGroup.getBoundsInParent(); // parent == zoomGroup
+
+        double minX = m.getMinX() + margin;
+        double maxX = m.getMaxX() - margin;
+        double minY = m.getMinY() + margin;
+        double maxY = m.getMaxY() - margin;
+
+        double availableW = Math.max(1.0, maxX - minX);
+        double availableH = Math.max(1.0, maxY - minY);
+
+        double dx = 0.0;
+        double dy = 0.0;
+
+        if (b.getWidth() <= availableW) {
+            if (b.getMinX() < minX) dx = minX - b.getMinX();
+            if (b.getMaxX() > maxX) dx = maxX - b.getMaxX();
+        } else {
+            // si es más grande que el mapa, al menos centramos dentro
+            double targetCenterX = minX + availableW / 2.0;
+            double curCenterX = b.getMinX() + b.getWidth() / 2.0;
+            dx = targetCenterX - curCenterX;
+        }
+
+        if (b.getHeight() <= availableH) {
+            if (b.getMinY() < minY) dy = minY - b.getMinY();
+            if (b.getMaxY() > maxY) dy = maxY - b.getMaxY();
+        } else {
+            double targetCenterY = minY + availableH / 2.0;
+            double curCenterY = b.getMinY() + b.getHeight() / 2.0;
+            dy = targetCenterY - curCenterY;
+        }
+
+        if (dx != 0.0 || dy != 0.0) {
+            reglaGroup.setTranslateX(reglaGroup.getTranslateX() + dx);
+            reglaGroup.setTranslateY(reglaGroup.getTranslateY() + dy);
+        }
+    }
+    
+    private static final double HARD_MIN_USER_SCALE = 0.05; // para garantizar que siempre pueda “caber”
+
+    private void enforceScaleToFitMap() {
+        Bounds map = mapBoundsLocal();
+        double margin = HANDLE_RADIUS + 2.0;
+
+        double availW = Math.max(1.0, map.getWidth()  - 2.0 * margin);
+        double availH = Math.max(1.0, map.getHeight() - 2.0 * margin);
+
+        Bounds b = reglaGroup.getBoundsInParent(); // coords del zoomGroup
+
+        if (b.getWidth() <= availW && b.getHeight() <= availH) return;
+
+        double factor = Math.min(availW / b.getWidth(), availH / b.getHeight());
+        if (factor >= 1.0) return;
+
+        // reducimos userScale lo justo para que quepa (sin depender de MIN_USER_SCALE)
+        userScale = clamp(userScale * factor, HARD_MIN_USER_SCALE, MAX_USER_SCALE);
+        applyTransforms();
+    }
+
+    // ====================
+
+    /**
+     * Detecta el bbox "visual" real de la regla (dibujada por CSS) y coloca los handles
+     * en los extremos reales, no en el centro del Region.
+     */
+    private void computeHandlesFromSnapshot() {
+        try {
+            reglaNode.applyCss();
+            reglaNode.layout();
+
+            SnapshotParameters sp = new SnapshotParameters();
+            sp.setFill(Color.TRANSPARENT);
+
+            WritableImage img = reglaNode.snapshot(sp, null);
+            PixelReader pr = img.getPixelReader();
+            if (pr == null) return;
+
+            int w = (int) img.getWidth();
+            int h = (int) img.getHeight();
+
+            int minX = w, minY = h, maxX = -1, maxY = -1;
+
+            for (int y = 0; y < h; y++) {
+                for (int x = 0; x < w; x++) {
+                    Color c = pr.getColor(x, y);
+
+                    // "contenido" = no transparente y no casi-blanco
+                    if (c.getOpacity() > 0.02 && !(c.getRed() > 0.97 && c.getGreen() > 0.97 && c.getBlue() > 0.97)) {
+                        if (x < minX) minX = x;
+                        if (y < minY) minY = y;
+                        if (x > maxX) maxX = x;
+                        if (y > maxY) maxY = y;
+                    }
                 }
-                e.consume();
+            }
+
+            if (maxX < 0 || maxY < 0) {
+                // fallback
+                visualCenterLocal = regionCenterLocal();
+                handleL.setCenterX(-HANDLE_OFFSET);
+                handleL.setCenterY(BASE_SIZE / 2.0);
+                handleR.setCenterX(BASE_SIZE + HANDLE_OFFSET);
+                handleR.setCenterY(BASE_SIZE / 2.0);
                 return;
             }
 
-            // scroll normal -> escala
-            if (delta != 0) {
-                double step = (delta > 0) ? 0.15 : -0.15;
-                zoomScale = Math.max(0.1, Math.min(8.0, zoomScale + step));
-                reglaNode.setScaleX(baseScaleX * zoomScale);
-                reglaNode.setScaleY(baseScaleY * zoomScale);
+            double cy = (minY + maxY) / 2.0;
+
+            handleL.setCenterX(minX - HANDLE_OFFSET);
+            handleL.setCenterY(cy);
+
+            handleR.setCenterX(maxX + HANDLE_OFFSET);
+            handleR.setCenterY(cy);
+
+            handleL.toFront();
+            handleR.toFront();
+
+            // ESTE es el centro “real” que debes usar para centrar y para zoom
+            visualCenterLocal = new Point2D((minX + maxX) / 2.0, (minY + maxY) / 2.0);
+
+            anchorsComputed = true;
+        } catch (Exception ignored) {
+        }
+    }
+
+    private boolean targetIsInsideRegla(Object target) {
+        if (!(target instanceof Node n)) return false;
+        Node cur = n;
+        while (cur != null) {
+            if (cur == reglaGroup) return true;
+            cur = cur.getParent();
+        }
+        return false;
+    }
+
+    /**
+     * Evita que el ScrollPane "panee" cuando estás manipulando la regla.
+     */
+    private void installScrollPanePanningLock() {
+        if (scrollPane == null) return;
+
+        scrollPane.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+            if (!visible) return;
+            if (!targetIsInsideRegla(e.getTarget())) return;
+
+            if (!pannableLocked) {
+                prevPannable = scrollPane.isPannable();
+                scrollPane.setPannable(false);
+                pannableLocked = true;
             }
-            e.consume();
+        });
+
+        scrollPane.addEventFilter(MouseEvent.MOUSE_RELEASED, e -> {
+            if (!pannableLocked) return;
+            scrollPane.setPannable(prevPannable);
+            pannableLocked = false;
         });
     }
-    
+
+    private void installHandlers() {
+        // mover cuerpo
+        reglaNode.setCursor(Cursor.MOVE);
+
+        reglaNode.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
+            if (e.getButton() != MouseButton.PRIMARY) return;
+            if (draggingHandle) return;
+
+            draggingBody = true;
+            Point2D p = mouseInZoomGroup(e);
+            lastParentX = p.getX();
+            lastParentY = p.getY();
+            e.consume();
+        });
+
+        reglaNode.addEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
+            if (!draggingBody) return;
+
+            Point2D p = mouseInZoomGroup(e);
+            double dx = p.getX() - lastParentX;
+            double dy = p.getY() - lastParentY;
+
+            reglaGroup.setTranslateX(reglaGroup.getTranslateX() + dx);
+            reglaGroup.setTranslateY(reglaGroup.getTranslateY() + dy);
+
+            clampGroupToMap();
+
+            lastParentX = p.getX();
+            lastParentY = p.getY();
+            e.consume();
+        });
+
+        reglaNode.addEventHandler(MouseEvent.MOUSE_RELEASED, e -> draggingBody = false);
+
+        // ambos handles: rotación + tamaño
+        handleL.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> beginHandleDrag(handleL, e));
+        handleR.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> beginHandleDrag(handleR, e));
+
+        handleL.addEventHandler(MouseEvent.MOUSE_DRAGGED, this::dragHandle);
+        handleR.addEventHandler(MouseEvent.MOUSE_DRAGGED, this::dragHandle);
+
+        handleL.addEventHandler(MouseEvent.MOUSE_RELEASED, this::endHandleDrag);
+        handleR.addEventHandler(MouseEvent.MOUSE_RELEASED, this::endHandleDrag);
+    }
+
+    private void beginHandleDrag(Circle pressed, MouseEvent e) {
+        if (e.getButton() != MouseButton.PRIMARY) return;
+
+        draggingHandle = true;
+
+        activeHandle = pressed;
+        anchorHandle = (pressed == handleL) ? handleR : handleL;
+
+        Point2D activeLocal = handleLocal(activeHandle);
+        anchorLocal = handleLocal(anchorHandle);
+
+        baseDistLocal = Math.max(1.0, anchorLocal.distance(activeLocal));
+        baseAngleLocalDeg = angleDeg(anchorLocal, activeLocal);
+
+        // pivote en el ancla, sin saltos
+        setPivotKeepingLocalPointFixed(anchorLocal, anchorLocal);
+
+        // fijamos dónde está el ancla en pantalla (coords del zoomGroup)
+        anchorParentFixed = reglaGroup.localToParent(anchorLocal);
+
+        e.consume();
+    }
+
+    private void dragHandle(MouseEvent e) {
+        if (!draggingHandle) return;
+
+        // CLAMP: el handle activo nunca puede salir del perímetro del mapa
+        Point2D mouseParentRaw = mouseInZoomGroup(e);
+        Point2D mouseParent = clampPointToMap(mouseParentRaw, HANDLE_RADIUS + 2.0);
+
+        // ángulo deseado (siempre)
+        double ang = angleDeg(anchorParentFixed, mouseParent);
+
+        // si NO permitimos escalar, proyectamos el punto del ratón al círculo de radio fijo
+        Point2D effectivePoint = mouseParent;
+        if (!handleScalingEnabled) {
+            double rad = Math.toRadians(ang);
+            effectivePoint = new Point2D(
+                    anchorParentFixed.getX() + Math.cos(rad) * pressDistParentFixed,
+                    anchorParentFixed.getY() + Math.sin(rad) * pressDistParentFixed
+            );
+            effectivePoint = clampPointToMap(effectivePoint, HANDLE_RADIUS + 2.0);
+        }
+
+        double targetAngleParent = angleDeg(anchorParentFixed, effectivePoint);
+        double targetDistParent = Math.max(1.0, anchorParentFixed.distance(effectivePoint));
+
+        // rotación siempre
+        rotationDeg = targetAngleParent - baseAngleLocalDeg;
+        rotationDeg = (rotationDeg % 360.0 + 360.0) % 360.0;
+
+        // escala solo si está permitido
+        if (handleScalingEnabled) {
+            double desiredTotalScale = targetDistParent / baseDistLocal;
+            userScale = desiredTotalScale / Math.max(mapCompScale, 1e-6);
+            userScale = clamp(userScale, MIN_USER_SCALE, MAX_USER_SCALE);
+        }
+
+        applyTransforms();
+
+        // si escaló, igual puede necesitar ajuste para que no agrande el ScrollPane
+        enforceScaleToFitMap();
+
+        // ancla fija
+        moveLocalPointToParent(anchorLocal, anchorParentFixed);
+
+        // clamp final
+        clampGroupToMap();
+
+        e.consume();
+    }
+
+    private void endHandleDrag(MouseEvent e) {
+        if (!draggingHandle) return;
+
+        draggingHandle = false;
+
+        // IMPORTANTE: volver a pivote en el CENTRO VISUAL para que el zoom no “ancle” a un lado
+        Point2D center = centerForAnchoringLocal();
+        setPivotKeepingLocalPointFixed(center, center);
+
+        clampGroupToMap();
+        e.consume();
+    }
+
     /**
-     * Coloca el transportador en el centro de la parte visible del mapa,
-     * teniendo en cuenta zoom y transformaciones.
+     * Tu método "MAGIA NEGRA" (lo mantenemos), pero usando el CENTRO VISUAL real.
      */
     // MAGIA NEGRA - NO DOT TOUCH
     public void centerOnViewport() {
@@ -161,76 +536,47 @@ public class ReglaTool {
         double viewportW = viewportBounds.getWidth();
         double viewportH = viewportBounds.getHeight();
 
-        // Si todavía no hay tamaño de viewport, centramos en el contenido completo
         if (viewportW <= 0 || viewportH <= 0) {
             double centerX = (contentBounds.getMinX() + contentBounds.getMaxX()) / 2.0;
             double centerY = (contentBounds.getMinY() + contentBounds.getMaxY()) / 2.0;
 
-            Bounds nodeBounds = reglaNode.getBoundsInLocal();
-            double nodeW = nodeBounds.getWidth();
-            double nodeH = nodeBounds.getHeight();
-
-            reglaNode.setTranslateX(centerX - nodeW / 2.0);
-            reglaNode.setTranslateY(centerY - nodeH / 2.0);
+            Point2D pivot = centerForAnchoringLocal();
+            reglaGroup.setTranslateX(centerX - pivot.getX());
+            reglaGroup.setTranslateY(centerY - pivot.getY());
+            clampGroupToMap();
             return;
         }
 
-        // Escala actual del mapa (la que pone el ZoomManager)
         double scale = zoomGroup.getScaleX();
         if (scale <= 0) scale = 1.0;
 
-        // Tamaño del contenido ya escalado
         double contentWScaled = contentBounds.getWidth()  * scale;
         double contentHScaled = contentBounds.getHeight() * scale;
 
         double maxX = Math.max(contentWScaled - viewportW, 0);
         double maxY = Math.max(contentHScaled - viewportH, 0);
 
-        // Esquina superior izquierda visible, en coordenadas ESCALADAS
         double visibleXScaled = scrollPane.getHvalue() * maxX;
         double visibleYScaled = scrollPane.getVvalue() * maxY;
 
-        // Centro del viewport en coordenadas LOCALES (no escaladas)
         double centerXLocal = (visibleXScaled + viewportW / 2.0) / scale;
         double centerYLocal = (visibleYScaled + viewportH / 2.0) / scale;
 
-        Bounds nodeBounds = reglaNode.getBoundsInLocal();
-        double nodeW = nodeBounds.getWidth();
-        double nodeH = nodeBounds.getHeight();
-
-        // Colocamos la regla centrada en ese punto local
-        reglaNode.setTranslateX(centerXLocal - nodeW / 2.0);
-        reglaNode.setTranslateY(centerYLocal - nodeH / 2.0);
+        Point2D pivot = centerForAnchoringLocal();
+        reglaGroup.setTranslateX(centerXLocal - pivot.getX());
+        reglaGroup.setTranslateY(centerYLocal - pivot.getY());
+        clampGroupToMap();
     }
 
-    
-    /**
-     * Ajusta la escala de la regla en función del zoom actual del mapa,
-     * para que el tamaño en pantalla sea razonable al activarla.
-     */
     private void adjustScaleForCurrentZoom() {
-        // Escala que está aplicando el ZoomManager al mapa
         double mapScale = zoomGroup.getScaleX();
+        if (mapScale <= 0) mapScale = 1.0;
 
-        if (mapScale <= 0) {
-            mapScale = 1.0; // por seguridad
-        }
-
-        // Queremos que la regla salga con un tamaño "fijo" en pantalla:
-        // ancho en píxeles ≈ prefWidth (350). Como la regla está dentro
-        // de zoomGroup, en pantalla mide:
-        //   prefWidth * mapScale * zoomScale
-        // Si ponemos zoomScale = 1 / mapScale, el tamaño en pantalla
-        // queda ≈ prefWidth.
-        zoomScale = 0.75 / mapScale;
-
-        // Aplicamos orientación base * escala de zoom calculada
-        reglaNode.setScaleX(baseScaleX * zoomScale);
-        reglaNode.setScaleY(baseScaleY * zoomScale);
+        mapCompScale = 0.75 / mapScale;
+        applyTransforms();
     }
 
-
-    // --- API para MainController ---
+    // --- API ---
 
     public boolean toggleVisible() {
         setVisible(!visible);
@@ -240,24 +586,131 @@ public class ReglaTool {
     // MAGIA NEGRA - NO DOT TOUCH
     public void setVisible(boolean visible) {
         this.visible = visible;
-        reglaNode.setVisible(visible);
-        if (visible) {
-            adjustScaleForCurrentZoom(); // primero tamaño acorde al zoom actual
-            
-            // Poner a la rotación default
-            rotationDeg = DEFAULT_ROTATION;
-            reglaNode.setRotate(rotationDeg);
-            
-            // Esperamos al siguiente pulso de JavaFX para que el ScrollPane tenga bien el viewport
-            Platform.runLater(() -> {
-                centerOnViewport();   // ahora sí, centramos
-                reglaNode.toFront();
-            });
-        }
-    }
+        reglaGroup.setVisible(visible);
 
+        if (!visible) {
+            if (pannableLocked && scrollPane != null) {
+                scrollPane.setPannable(prevPannable);
+                pannableLocked = false;
+            }
+            return;
+        }
+
+        // reset TOTAL al activar
+        userScale = 1.0;
+        rotationDeg = DEFAULT_ROTATION;
+
+        // pivote inicial al centro (luego lo movemos al centro visual en runLater)
+        Point2D c = regionCenterLocal();
+        scaleTx.setPivotX(c.getX());
+        scaleTx.setPivotY(c.getY());
+        rotateTx.setPivotX(c.getX());
+        rotateTx.setPivotY(c.getY());
+
+        adjustScaleForCurrentZoom();
+        applyTransforms();
+
+        Platform.runLater(() -> {
+            if (!anchorsComputed) computeHandlesFromSnapshot();
+
+            // pivot en centro VISUAL (evita “anclaje raro” al hacer zoom)
+            Point2D center = centerForAnchoringLocal();
+            setPivotKeepingLocalPointFixed(center, center);
+
+            // centrar SIEMPRE al activar (ahora con pivot correcto)
+            centerOnViewport();
+
+            reglaGroup.toFront();
+        });
+    }
 
     public boolean isVisible() {
         return visible;
+    }
+
+    /**
+     * Mantener tamaño constante en pantalla al cambiar zoom SIN mover la regla.
+     * Anclaje en el CENTRO VISUAL.
+     */
+    public void onMapZoomChanged(double newMapScale) {
+        if (newMapScale <= 0) newMapScale = 1.0;
+        if (!visible) return;
+
+        Point2D fixedLocal = centerForAnchoringLocal();
+
+        // aseguramos pivote en el mismo punto (centro visual)
+        setPivotKeepingLocalPointFixed(fixedLocal, fixedLocal);
+
+        // guardamos dónde está ese centro en pantalla
+        Point2D fixedParentBefore = reglaGroup.localToParent(fixedLocal);
+
+        mapCompScale = 0.75 / newMapScale;
+
+        applyTransforms();
+
+        // si el zoom deja la regla “demasiado grande”, la ajustamos
+        enforceScaleToFitMap();
+
+        // restaurar posición para que no se mueva con el zoom
+        moveLocalPointToParent(fixedLocal, fixedParentBefore);
+
+        clampGroupToMap();
+
+        // restaurar posición para que no "derrape" con el zoom
+        moveLocalPointToParent(fixedLocal, fixedParentBefore);
+
+        clampGroupToMap();
+    }
+    
+    public void setHandleScalingEnabled(boolean enabled) {
+        this.handleScalingEnabled = enabled;
+    }
+
+    public boolean isHandleScalingEnabled() {
+        return handleScalingEnabled;
+    }
+    
+    public void beforeMapZoomChange() {
+        if (!visible) return;
+        Point2D fixedLocal = centerForAnchoringLocal();
+        windowAnchorScene = reglaGroup.localToScene(fixedLocal);
+    }
+
+    public void afterMapZoomChange(double newScale) {
+        if (!visible) return;
+
+        Point2D fixedLocal = centerForAnchoringLocal();
+
+        // pivote en centro visual (evita anclajes raros)
+        setPivotKeepingLocalPointFixed(fixedLocal, fixedLocal);
+
+        mapCompScale = 0.75 / newScale;
+        applyTransforms();
+
+        // restaurar a la MISMA posición en ventana
+        restoreWindowAnchor();
+
+        // 2º pase por si ScrollPane/zoom ajustan layout este tick
+        Platform.runLater(this::restoreWindowAnchor);
+    }
+
+    private void restoreWindowAnchor() {
+        if (!visible || windowAnchorScene == null) return;
+
+        Point2D fixedLocal = centerForAnchoringLocal();
+
+        Point2D curScene = reglaGroup.localToScene(fixedLocal);
+        Point2D curParent = zoomGroup.sceneToLocal(curScene);
+
+        Point2D desiredParent = zoomGroup.sceneToLocal(windowAnchorScene);
+
+        double dx = desiredParent.getX() - curParent.getX();
+        double dy = desiredParent.getY() - curParent.getY();
+
+        reglaGroup.setTranslateX(reglaGroup.getTranslateX() + dx);
+        reglaGroup.setTranslateY(reglaGroup.getTranslateY() + dy);
+
+        enforceScaleToFitMap();
+        clampGroupToMap();
     }
 }

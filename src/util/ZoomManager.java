@@ -68,6 +68,22 @@ public class ZoomManager {
     public double getCurrentScale() {
         return currentScale;
     }
+    
+    public interface ZoomHook {
+        void onZoom(double oldScale, double newScale);
+    }
+
+    private ZoomHook beforeZoomHook;
+    private ZoomHook afterZoomHook;
+
+    public void setBeforeZoomHook(ZoomHook hook) {
+        this.beforeZoomHook = hook;
+    }
+
+    public void setAfterZoomHook(ZoomHook hook) {
+        this.afterZoomHook = hook;
+    }
+
 
 
     /**
@@ -76,6 +92,10 @@ public class ZoomManager {
      */
     private void applyZoomCentered(double newScale) {
         if (zoomGroup == null) return;
+        
+        double oldScale = currentScale;
+        if (beforeZoomHook != null) beforeZoomHook.onZoom(oldScale, newScale);
+
 
         Bounds viewportBounds = scrollPane.getViewportBounds();
         Bounds contentBounds  = zoomGroup.getBoundsInLocal();
@@ -88,12 +108,15 @@ public class ZoomManager {
             zoomGroup.setScaleX(newScale);
             zoomGroup.setScaleY(newScale);
             currentScale = newScale;
+            
+            if (afterZoomHook != null) afterZoomHook.onZoom(oldScale, newScale);
+
             return;
         }
 
         // --- 1) Punto actual en el centro del viewport (antes del zoom) ---
 
-        double oldScale = currentScale; // escala anterior
+        //double oldScale = currentScale; // escala anterior
 
         double contentWOld = contentBounds.getWidth()  * oldScale;
         double contentHOld = contentBounds.getHeight() * oldScale;
@@ -141,6 +164,8 @@ public class ZoomManager {
 
         scrollPane.setHvalue(hValueNew);
         scrollPane.setVvalue(vValueNew);
+        
+        if (afterZoomHook != null) afterZoomHook.onZoom(oldScale, newScale);
     }
 
 }
