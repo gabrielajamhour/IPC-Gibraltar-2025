@@ -8,8 +8,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Toggle;
 import javafx.stage.Stage;
 import util.PointTool;
+import util.ReglaTool;
 import util.ProblemUtil;
 import util.SessionManager;
 import util.SettingsUtil;
@@ -23,21 +25,30 @@ public class ConfigController implements Initializable {
     private SettingsUtil settings;
     private Boolean valorOriginalColorFondo;
     private boolean valorOriginalDynamicPoiSize;
+    private boolean valorOriginalReglaHandleScaling;
     
     @FXML    private CheckBox chkDynamicPoiSize;    
     @FXML    private CheckBox chkColorSolido;
     @FXML    private Button btnResetProblem;
     @FXML    private Button btnBack;
     @FXML    private Button btnSave;
+    @FXML    private CheckBox chkSizeTool;
 
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         chkDynamicPoiSize.setSelected(PointTool.isDynamicPoiSizeEnabled());
+        if (chkSizeTool != null) {
+            chkSizeTool.setSelected(ReglaTool.isDefaultHandleScalingEnabled());
+        }
         if (settings != null) {
             valorOriginalColorFondo = settings.isUsarColorSolido();
         }
         chkDynamicPoiSize.setSelected(valorOriginalDynamicPoiSize);
+        if (chkSizeTool != null) chkSizeTool.setSelected(valorOriginalReglaHandleScaling);
+        
+        chkDynamicPoiSize.setSelected(valorOriginalDynamicPoiSize);
+        if (chkSizeTool != null) chkSizeTool.setSelected(valorOriginalReglaHandleScaling);
     }
     
     @FXML
@@ -55,15 +66,18 @@ public class ConfigController implements Initializable {
         this.settings = settings;
         valorOriginalColorFondo = settings.isUsarColorSolido();
         valorOriginalDynamicPoiSize = PointTool.isDynamicPoiSizeEnabled();
+        valorOriginalReglaHandleScaling = ReglaTool.isDefaultHandleScalingEnabled();
         
         chkColorSolido.selectedProperty().bindBidirectional(settings.usarColorSolidoProperty());
         chkDynamicPoiSize.setSelected(valorOriginalDynamicPoiSize);
+        if (chkSizeTool != null) chkSizeTool.setSelected(valorOriginalReglaHandleScaling);
     }
 
     @FXML
     private void activateVolver(ActionEvent event) throws IOException {
         settings.setUsarColorSolido(valorOriginalColorFondo);
         PointTool.setDynamicPoiSizeEnabled(valorOriginalDynamicPoiSize);
+        ReglaTool.setDefaultHandleScalingEnabled(valorOriginalReglaHandleScaling);
         
         Stage stage = (Stage) btnResetProblem.getScene().getWindow();
         SessionManager.goToMain(stage);
@@ -72,8 +86,8 @@ public class ConfigController implements Initializable {
     @FXML
     private void activateGuardar(ActionEvent event) throws IOException {
         PointTool.setDynamicPoiSizeEnabled(chkDynamicPoiSize.isSelected());
+        if (chkSizeTool != null) ReglaTool.setDefaultHandleScalingEnabled(chkSizeTool.isSelected());
         Stage stage = (Stage) btnSave.getScene().getWindow();
         SessionManager.goToMain(stage);
     }
-
 }

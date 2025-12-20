@@ -169,6 +169,27 @@ public class MainController implements Initializable {
         
         zoomManager = new ZoomManager(scrollPane, zoom_slider);
         zoomGroup   = zoomManager.getZoomGroup();
+
+
+        // --- HUD overlay para herramientas (NO se escala con el zoom) ---
+        // Lo metemos en el StackPane del FXML (scrollPane + controles de zoom) para no perder el slider.
+        javafx.scene.layout.Pane toolOverlay = new javafx.scene.layout.Pane();
+        toolOverlay.setPickOnBounds(false); // clic en vacío pasa al ScrollPane
+        toolOverlay.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        javafx.scene.Parent parent = scrollPane.getParent();
+        if (parent instanceof javafx.scene.layout.StackPane centerStack) {
+            int scrollIdx = centerStack.getChildren().indexOf(scrollPane);
+            int insertIdx = (scrollIdx >= 0) ? (scrollIdx + 1) : centerStack.getChildren().size();
+            centerStack.getChildren().add(insertIdx, toolOverlay);
+
+            toolOverlay.prefWidthProperty().bind(centerStack.widthProperty());
+            toolOverlay.prefHeightProperty().bind(centerStack.heightProperty());
+        } else if (pane != null) {
+            // Fallback por si cambia el FXML
+            javafx.scene.layout.StackPane mapStack = new javafx.scene.layout.StackPane(scrollPane, toolOverlay);
+            pane.setCenter(mapStack);
+        }
         
         // Cada vez que cambie el slider de zoom, avisamos a PointTool
         zoom_slider.valueProperty().addListener((obs, oldVal, newVal) -> {
@@ -212,7 +233,7 @@ public class MainController implements Initializable {
         
         // Transportador (overlay auxiliar)
         protractorTool = new ProtractorTool(zoomGroup, scrollPane);
-        reglaTool = new ReglaTool(zoomGroup, scrollPane);
+        reglaTool = new ReglaTool(toolOverlay, scrollPane);
         
         zoomManager.setBeforeZoomHook((oldS, newS) -> {
             if (reglaTool != null && reglaTool.isVisible()) {

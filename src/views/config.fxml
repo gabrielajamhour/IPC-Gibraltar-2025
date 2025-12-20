@@ -38,47 +38,47 @@
                </VBox.margin>
             </Label>
             <Separator maxWidth="-Infinity" minWidth="-Infinity" prefWidth="310.0" />
-            <VBox prefWidth="341.0">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="174.4" />
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="145.20001220703125" minWidth="10.0" prefWidth="86.4" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+              </rowConstraints>
                <children>
-                  <GridPane>
-                    <columnConstraints>
-                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="174.4" />
-                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="145.20001220703125" minWidth="10.0" prefWidth="86.4" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Label text="Tamaño Dinámico de POI" GridPane.rowIndex="1">
-                           <font>
-                              <Font name="Segoe UI Semibold" size="13.0" />
-                           </font>
-                           <GridPane.margin>
-                              <Insets left="10.0" />
-                           </GridPane.margin>
-                        </Label>
-                        <Label text="Fondo de color sólido" GridPane.rowIndex="2">
-                           <font>
-                              <Font name="Segoe UI Semibold" size="13.0" />
-                           </font>
-                           <GridPane.margin>
-                              <Insets right="10.0" />
-                           </GridPane.margin>
-                        </Label>
-                        <CheckBox fx:id="chkDynamicPoiSize" mnemonicParsing="false" onAction="#alternateDinamicPOISize" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <CheckBox fx:id="chkColorSolido" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                     </children>
-                     <VBox.margin>
-                        <Insets left="40.0" right="40.0" />
-                     </VBox.margin>
-                  </GridPane>
+                  <Label text="Tamaño Dinámico de POI" GridPane.rowIndex="1">
+                     <font>
+                        <Font name="Segoe UI Semibold" size="13.0" />
+                     </font>
+                     <GridPane.margin>
+                        <Insets left="10.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <Label text="Fondo de color sólido" GridPane.rowIndex="2">
+                     <font>
+                        <Font name="Segoe UI Semibold" size="13.0" />
+                     </font>
+                     <GridPane.margin>
+                        <Insets right="10.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <CheckBox fx:id="chkDynamicPoiSize" mnemonicParsing="false" onAction="#alternateDinamicPOISize" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <CheckBox fx:id="chkColorSolido" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label layoutX="28.0" layoutY="52.0" minWidth="-Infinity" prefWidth="200.0" text="Cambiar tamaño herramientas" GridPane.rowIndex="3">
+                     <font>
+                        <Font name="Segoe UI Semibold" size="13.0" />
+                     </font>
+                  </Label>
+                  <CheckBox fx:id="chkSizeTool" layoutX="220.0" layoutY="52.0" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                </children>
-            </VBox>
+               <VBox.margin>
+                  <Insets left="40.0" right="40.0" />
+               </VBox.margin>
+            </GridPane>
             <Label layoutX="78.0" layoutY="103.0" text="Datos y Sesión" textFill="#2a8396">
                <font>
                   <Font name="Arial Rounded MT Bold" size="20.0" />
