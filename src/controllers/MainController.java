@@ -460,9 +460,16 @@ public class MainController implements Initializable {
         openPage("/views/session-history.fxml", currentUser);
     }
     
-        @FXML
+    @FXML
     private void logout(ActionEvent event) {
         SessionManager.finalizeAndSaveSession();
+
+        // Resetear el “canvas” al cerrar sesión (sin diálogo)
+        ClearAll.clearAll(zoomGroup, data, lineData, arcData, sharedTextData, map_pin);
+
+        // opcional: dejar todo consistente
+        setCurrentTool(null);
+
         Stage stage = (Stage) zoom_slider.getScene().getWindow();
         SessionManager.goToLogIn(stage);
     }
