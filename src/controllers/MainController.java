@@ -130,8 +130,6 @@ public class MainController implements Initializable {
     private final DoubleProperty currentLineWidth = new SimpleDoubleProperty(2.0);
 
     
-    private ListView<Poi> map_listview;
-    
     // Lista compartida de líneas para TODA la app (sobrevive a cambiar de escena)
     private static final ObservableList<Line> lineData =
         FXCollections.observableArrayList();
@@ -179,9 +177,6 @@ public class MainController implements Initializable {
             }
         });
         
-        // Overlay de marcación de extremos (queda dentro del zoomGroup)
-        extremosOverlay = new ExtremosOverlay(zoomGroup);
-        
         // Color actual = valor del ColorPicker
         colorPicker.setValue(Color.BLACK);
         currentColor.bind(colorPicker.valueProperty());
@@ -213,6 +208,7 @@ public class MainController implements Initializable {
         arcTool    = new ArcTool(zoomGroup, arcData, currentLineWidth, currentColor); 
         textTool   = new TextTool(zoomGroup, currentColor, currentLineWidth, sharedTextData);
         distanceTool = new DistanceTool(zoomGroup, currentLineWidth, currentColor);
+        extremosOverlay = new ExtremosOverlay(zoomGroup, data);
         
         // Transportador (overlay auxiliar)
         protractorTool = new ProtractorTool(zoomGroup, scrollPane);
@@ -639,10 +635,9 @@ public class MainController implements Initializable {
 
         extremosOverlay.toggle();
 
-        // Si lo acabamos de activar, dibujamos para el POI seleccionado (si lo hay)
+        // Si lo acabamos de activar, redibujar usando el último POI (si existe)
         if (extremosOverlay.isEnabled()) {
-            Poi selected = map_listview.getSelectionModel().getSelectedItem();
-            extremosOverlay.showFor(selected);
+            extremosOverlay.redraw();
         }
 
         updateToolButtons();

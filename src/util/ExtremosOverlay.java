@@ -1,6 +1,8 @@
 package util;
 
 import java.util.function.Consumer;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -33,6 +35,20 @@ public final class ExtremosOverlay {
     
     // Click-to-select POI sobre el mapa (sin depender de la lista)
     private static final double HIT_TOLERANCE = 40.0;
+    
+    // Fuente de datos: nueva lista compartida de POIs (no depende de nodos en el mapa)
+    private ObservableList<Poi> poiData;
+
+    private final ListChangeListener<Poi> poiListListener = change -> {
+        if (lastPoi == null) return;
+        while (change.next()) {
+            if (change.wasRemoved() && change.getRemoved().contains(lastPoi)) {
+                lastPoi = null;
+                clear();
+                break;
+            }
+        }
+    };
 
     private final EventHandler<MouseEvent> pickPoiHandler = this::onZoomGroupPressed;
     
@@ -40,12 +56,19 @@ public final class ExtremosOverlay {
 
     
     public ExtremosOverlay(Group zoomGroup) {
+        this(zoomGroup, null);
+    }
+
+    public ExtremosOverlay(Group zoomGroup, ObservableList<Poi> poiData) {
         if (zoomGroup == null) throw new IllegalArgumentException("zoomGroup cannot be null");
         this.zoomGroup = zoomGroup;
         this.overlay = new Group();
         this.overlay.setMouseTransparent(true);
         this.zoomGroup.getChildren().add(this.overlay);
+
+        setPoiData(poiData);
     }
+
 
     /** Enables/disables the overlay. When disabled, it clears current marks. */
     public void setEnabled(boolean enabled) {
@@ -179,34 +202,70 @@ public final class ExtremosOverlay {
     }
 
     private Poi findPoiAt(double px, double py) {
+        // 1) Hit-test real sobre el pin (si existe). Más preciso.
+        Poi hitByNode = findPoiByNodeHit(px, py);
+        if (hitByNode != null) return hitByNode;
+
+        // 2) Fallback: buscar por distancia usando la lista compartida (independiente del árbol de nodos)
         Poi bestPoi = null;
         double bestDist = Double.MAX_VALUE;
 
+        double scale = Math.max(zoomGroup.getScaleX(), 1e-6);
+        double tol = HIT_TOLERANCE / scale; // tolerancia constante en pantalla (px)
+
+        if (poiData != null) {
+            for (Poi poi : poiData) {
+                if (poi == null || poi.getPosition() == null) continue;
+                Point2D pos = poi.getPosition();
+                double d = Math.hypot(px - pos.getX(), py - pos.getY());
+                if (d <= tol && d < bestDist) {
+                    bestDist = d;
+                    bestPoi = poi;
+                }
+            }
+        }
+
+        return bestPoi;
+    }
+
+    /**
+     * Intenta detectar un POI clicando encima del pin (Region con styleClass "map-pin" y userData=Poi).
+     * Si no encuentra nada, devuelve null.
+     */
+    private Poi findPoiByNodeHit(double px, double py) {
         for (Node child : zoomGroup.getChildren()) {
             if (!(child instanceof Region region)) continue;
             if (!(region.getUserData() instanceof Poi poi)) continue;
 
-            // 1) Hit-test real: si el click cae dentro del marker (pin)
             Bounds bb = region.getBoundsInParent();
             if (bb != null && bb.contains(px, py)) {
-                return poi; // hit exacto
-            }
-
-            // 2) Fallback por distancia a la posición lógica (punta)
-            Point2D pos = poi.getPosition();
-            if (pos == null) continue;
-
-            double d = Math.hypot(px - pos.getX(), py - pos.getY());
-            if (d <= HIT_TOLERANCE && d < bestDist) {
-                bestDist = d;
-                bestPoi = poi;
+                // si estamos usando lista, validamos que pertenece a ella
+                if (poiData == null || poiData.contains(poi)) {
+                    return poi;
+                }
             }
         }
-        return bestPoi;
+        return null;
     }
+
 
     public void setOnPoiPicked(Consumer<Poi> handler) {
         this.onPoiPicked = handler;
     }
+    
+    /**
+    * Conecta el overlay con la lista compartida de POIs (la “nueva lista”).
+    * Si cambias la lista en runtime, vuelve a llamar a este método.
+    */
+   public void setPoiData(ObservableList<Poi> poiData) {
+       if (this.poiData == poiData) return;
 
+       if (this.poiData != null) {
+           this.poiData.removeListener(poiListListener);
+       }
+       this.poiData = poiData;
+       if (this.poiData != null) {
+           this.poiData.addListener(poiListListener);
+       }
+   }
 }
