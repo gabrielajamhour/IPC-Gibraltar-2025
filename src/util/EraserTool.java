@@ -27,7 +27,7 @@ import javafx.scene.text.Text;
 public class EraserTool implements MapTool {
 
     private final Group zoomGroup;
-    private final ListView<Poi> poiListView;
+    private final ObservableList<Poi> poiData;
     private final ObservableList<Line> lineData;
     private final ObservableList<Arc> arcData;
     private final ObservableList<Text> textList;
@@ -37,13 +37,13 @@ public class EraserTool implements MapTool {
     private static final double MAX_DISTANCE = 5.0;
 
     public EraserTool(Group zoomGroup,
-                      ListView<Poi> poiListView,
+                      ObservableList<Poi> poiData,
                       ObservableList<Line> lineData,
                       ObservableList<Arc> arcData,
                       ObservableList<Text> textList,
                       Node mapPin) {
         this.zoomGroup = zoomGroup;
-        this.poiListView = poiListView;
+        this.poiData = poiData;
         this.lineData = lineData;
         this.arcData = arcData;
         this.textList = textList;
@@ -85,7 +85,7 @@ public class EraserTool implements MapTool {
         // 1) Intentar borrar un POI cercano
         Poi poiToRemove = findPoiNear(localPoint);
         if (poiToRemove != null) {
-            poiListView.getItems().remove(poiToRemove);
+            poiData.remove(poiToRemove);
             removePoiMarkersFromMap(poiToRemove);
 
             if (mapPin != null && mapPin.isVisible()) {
@@ -144,7 +144,7 @@ public class EraserTool implements MapTool {
         Poi closest = null;
         double closestDist = Double.MAX_VALUE;
 
-        for (Poi poi : poiListView.getItems()) {
+        for (Poi poi : poiData) {
             Point2D poiPos = poi.getPosition();
             double dist = poiPos.distance(point);
 

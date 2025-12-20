@@ -1,6 +1,7 @@
 package util;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
@@ -29,10 +30,9 @@ import javafx.stage.Stage;
 public class PointTool implements MapTool {
 
     private final Group zoomGroup;               // Contenedor donde está el mapa (y se hace el zoom)
-    private final ListView<Poi> poiListView;     // Lista de POIs
+    private final ObservableList<Poi> poiData;
+    private final Consumer<Poi> onPoiClicked;     // Lista de POIs
     private final ObjectProperty<Color> currentColor;  // Color actual elegido por el usuario
-
-    private int unnamedPoiCounter = 1;
     
     // Tamaño dinámico
     private static boolean dynamicPoiSizeEnabled = false;
@@ -49,11 +49,13 @@ public class PointTool implements MapTool {
     private static PointTool lastInstance;  // última instancia creada
     
     public PointTool(Group zoomGroup,
-                    ListView<Poi> poiListView,
-                    ObjectProperty<Color> currentColor) {
+                    ObservableList<Poi> poiData,
+                    ObjectProperty<Color> currentColor,
+                    Consumer<Poi> onPoiClicked) {
         this.zoomGroup   = zoomGroup;
-        this.poiListView = poiListView;
+        this.poiData     = poiData;
         this.currentColor = currentColor;
+        this.onPoiClicked = onPoiClicked;
 
         // Guarda la última instancia creada para poder forzar un repintado
         lastInstance = this;
@@ -149,6 +151,19 @@ public class PointTool implements MapTool {
         // 3) Vincular el Node con el Poi, para que EraserTool/SelectTool lo puedan encontrar
         marker.setUserData(poi);
 
+        marker.setOnMouseClicked(e -> {
+            if (e.getButton() != MouseButton.PRIMARY) return;
+
+            // Avisamos al MainController de qué POI se ha clicado
+            if (onPoiClicked != null) {
+                onPoiClicked.accept(poi);
+            }
+
+            // Importantísimo: evita que el click “suba” y provoque cosas raras
+            e.consume();
+        });
+
+        
         // 5) Añadir al mapa
         zoomGroup.getChildren().add(marker);
         
@@ -245,82 +260,17 @@ public class PointTool implements MapTool {
 
         // Convertimos las coordenadas de escena a coordenadas del Group (carta)
         Point2D localPoint = zoomGroup.sceneToLocal(event.getSceneX(), event.getSceneY());
-        Color poiColor = currentColor.get();  // Capturamos el color actual en este momento
+        Color poiColor = currentColor.get();
 
-        // Creamos y configuramos el diálogo
-        Dialog<Poi> poiDialog = new Dialog<>();
-        poiDialog.setTitle("Nuevo POI");
-        poiDialog.setHeaderText("Introduce un nuevo POI");
+        // Crear POI directamente (sin título/descr)
+        Poi poi = new Poi(localPoint.getX(), localPoint.getY(), poiColor);
 
-        // Icono del diálogo (opcional, pero queda bonito)
-        // OJO: si tienes problemas aquí, puedes envolver esto en un try/catch
-        Stage dialogStage = (Stage) poiDialog.getDialogPane().getScene().getWindow();
-        dialogStage.getIcons().add(
-                new Image(getClass().getResourceAsStream("/resources/logo.png"))
-        );
+        // Añadirlo a la lista (initPoiDrawing lo pintará)
+        poiData.add(poi);
 
-        // Botones del diálogo
-        ButtonType okButton = new ButtonType("Aceptar", ButtonBar.ButtonData.OK_DONE);
-        poiDialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
+        // opcional pero recomendado: evita propagación rara del click
+        event.consume();
 
-        // Controles del formulario
-        TextField nameField = new TextField();
-        nameField.setPromptText("Nombre del POI");
-
-        TextArea descArea = new TextArea();
-        descArea.setPromptText("Descripción...");
-        descArea.setWrapText(true);
-        descArea.setPrefRowCount(5);
-
-        // Layout del contenido del diálogo
-        VBox vbox = new VBox(
-                10,
-                new Label("Nombre:"),      nameField,
-                new Label("Descripción:"), descArea
-        );
-        poiDialog.getDialogPane().setContent(vbox);
-
-        // Conversor de resultado:
-        // si el usuario pulsa Aceptar, devolvemos un Poi; si no, null.
-        poiDialog.setResultConverter(dialogButton -> {
-            if (dialogButton == okButton) {
-                String name = nameField.getText();
-                String desc = descArea.getText();
-
-                // La lógica del nombre por defecto
-                if (name != null) {
-                    name = name.trim();
-                }
-                if (desc != null) {
-                    desc = desc.trim();
-                }
-
-                // Si no hay nombre, ponemos "Punto i"
-                if (name == null || name.isEmpty()) {
-                    name = "Punto " + unnamedPoiCounter++;
-                }
-
-                return new Poi(
-                        name,
-                        desc,
-                        localPoint.getX(),
-                        localPoint.getY(),
-                        poiColor
-                );
-            }
-            return null;
-        });
-
-
-        // Mostramos el diálogo y esperamos la respuesta del usuario
-        Optional<Poi> result = poiDialog.showAndWait();
-
-        // Si el usuario aceptó y se creó un Poi, lo añadimos a la lista
-        result.ifPresent(poi -> {
-            poiListView.getItems().add(poi); // se añade a la lista
-            // NO hace falta llamar aquí a addPoiMarkerToMap(poi),
-            // porque initPoiDrawing ya escucha los añadidos y dibuja los markers.
-        });
     }
 
     @Override

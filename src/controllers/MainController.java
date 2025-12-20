@@ -21,7 +21,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.IOException;
 import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -40,11 +39,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.control.RadioButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Arc;
 import javafx.scene.text.Text;
@@ -73,7 +72,6 @@ import util.TextTool;
 public class MainController implements Initializable {
 
     // ======================================  
-    @FXML    private ListView<Poi> map_listview;
     @FXML    private Slider zoom_slider;
     @FXML    private MenuButton map_pin;
     @FXML    private MenuItem profileButton;
@@ -132,6 +130,8 @@ public class MainController implements Initializable {
     private final DoubleProperty currentLineWidth = new SimpleDoubleProperty(2.0);
 
     
+    private ListView<Poi> map_listview;
+    
     // Lista compartida de líneas para TODA la app (sobrevive a cambiar de escena)
     private static final ObservableList<Line> lineData =
         FXCollections.observableArrayList();
@@ -167,7 +167,7 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        initData();
+        data = sharedPoiData;
         
         zoomManager = new ZoomManager(scrollPane, zoom_slider);
         zoomGroup   = zoomManager.getZoomGroup();
@@ -191,9 +191,24 @@ public class MainController implements Initializable {
         currentLineWidth.bind(sliderGrosor.valueProperty());
         
         // Crear herramientas
-        pointTool = new PointTool(zoomGroup, map_listview, currentColor);
+        pointTool = new PointTool(
+            zoomGroup,
+            data,
+            currentColor,
+            (Poi poi) -> {
+                // SOLO centrar si no hay herramienta activa
+                if (currentTool == null) {
+                    centerOnPoi(poi);
+                }
+
+                // Si extremos está activo, también lo actualizamos
+                if (extremosOverlay != null && extremosOverlay.isEnabled()) {
+                    extremosOverlay.showFor(poi);
+                }
+            }
+        );
         lineTool  = new LineTool(zoomGroup, lineData, currentLineWidth, currentColor);
-        eraserTool = new EraserTool(zoomGroup, map_listview, lineData, arcData, sharedTextData, map_pin);
+        eraserTool = new EraserTool(zoomGroup, data, lineData, arcData, sharedTextData, map_pin);
         selectTool = new SelectTool(zoomGroup, currentColor, currentLineWidth);
         arcTool    = new ArcTool(zoomGroup, arcData, currentLineWidth, currentColor); 
         textTool   = new TextTool(zoomGroup, currentColor, currentLineWidth, sharedTextData);
@@ -235,9 +250,10 @@ public class MainController implements Initializable {
         extremosOverlay.setOnPoiPicked(poi -> {
             if (poi == null) return;
 
-            map_listview.getSelectionModel().select(poi); // mantiene coherencia con la UI
-            centerOnPoi(poi);                             // centra igual que listClicked
-            extremosOverlay.showFor(poi);                 // dibuja los extremos
+            if (currentTool == null) {
+                centerOnPoi(poi);
+            }
+            extremosOverlay.showFor(poi);
         });
         
         panelProblemas.setVisible(false);
@@ -280,19 +296,6 @@ public class MainController implements Initializable {
         avatarMain.setImage(u.getAvatar());
     }
     
-    private void initData() {        
-        // Usamos la lista compartida
-        data = sharedPoiData;
-        map_listview.setItems(data);
-        
-        /*
-        // Solo creamos el POI por defecto la primera vez
-        if (data.isEmpty()) {
-            Poi p1 = new Poi("Teste", "Test del POI", 1000, 1000, Color.RED);
-            data.add(p1);
-        }*/
-    }
-    
     @FXML
     void zoomIn(ActionEvent event) {
         zoom_slider.setValue(zoom_slider.getValue() + 0.1);
@@ -322,18 +325,21 @@ public class MainController implements Initializable {
         map_pin.setStyle("-fx-background-color: " + webColor + ";");
     }
     
-    @FXML
-    void listClicked(MouseEvent event) {
-        Poi itemSelected = map_listview.getSelectionModel().getSelectedItem();
-        if (itemSelected == null) return;
-
-        centerOnPoi(itemSelected);
-
-        if (extremosOverlay != null && extremosOverlay.isEnabled()) {
-            extremosOverlay.showFor(itemSelected);
-        }
-    }
     
+    // MainController.java
+    private Poi pickPoiFromEvent(MouseEvent event) {
+        Object t = event.getTarget();
+        if (!(t instanceof Node node)) return null;
+
+        // Subimos por la jerarquía hasta zoomGroup
+        while (node != null && node != zoomGroup) {
+            Object ud = node.getUserData();
+            if (ud instanceof Poi poi) return poi;
+            node = node.getParent();
+        }
+        return null;
+    }
+
     private void centerOnPoi(Poi poi) {
         if (poi == null || poi.getPosition() == null) return;
 
@@ -731,21 +737,33 @@ public class MainController implements Initializable {
 
     
     private void onMapPressed(MouseEvent event) {
-        // Si es RMB, desactivar herramienta actual y no delegar nada
+        // RMB: desactiva tool y deja que siga funcionando el contexto
         if (event.getButton() == MouseButton.SECONDARY) {
-            if (currentTool != null) {
-                setCurrentTool(null);   // desactiva la herramienta
-            }
-            // No hacemos consume(), así el contexto (menús de líneas, etc.) sigue funcionando
+            if (currentTool != null) setCurrentTool(null);
             return;
         }
 
-        // Solo delegamos el LMB (u otros botones que no sean RMB)
+        // ✅ Si NO hay herramienta activa, y has clicado un POI -> centrar
+        if (currentTool == null && event.getButton() == MouseButton.PRIMARY) {
+            Poi poi = pickPoiFromEvent(event);
+            if (poi != null) {
+                centerOnPoi(poi);
+                // Si quieres, aquí también podrías refrescar extremos si están activos
+                // if (extremosOverlay != null && extremosOverlay.isEnabled()) extremosOverlay.showFor(poi);
+                event.consume();
+                return;
+            }
+            // Si no has clicado un POI, no hacemos nada (y el ScrollPane puede panear)
+            return;
+        }
+
+        // Delegación normal a la herramienta activa
         if (currentTool != null) {
             currentTool.onMousePressed(event);
             event.consume();
         }
     }
+
 
     private void onMapDragged(MouseEvent event) {
         // Ignoramos el arrastre con RMB
