@@ -12,12 +12,18 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import model.NavDAOException;
 import model.Navigation;
 import model.User;
 import util.SessionManager;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.scene.control.TextFormatter;
 
 /**
  * @author Rafael Alonso
@@ -39,11 +45,65 @@ public class AuthController implements Initializable {
     @FXML    private TextField eUsername;
     @FXML    private TextField ePassword;
     @FXML    private Button bIniciar;
+    @FXML    private ToggleButton btnViewPassword;
     
+    // Guarda la contraseña REAL (el TextField mostrará ●●● si está oculto)
+    private final StringProperty realPassword = new SimpleStringProperty("");
+    private boolean internalPasswordUpdate = false;
+
+    
+    // para evitar bucles cuando actualizamos el textfield “desde dentro”
+    private boolean internalUpdate = false;
     
     // ===================== initialize =====================
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // Enter -> iniciar (lo mantienes)
+        ePassword.setOnAction(e -> bIniciar.fire());
+
+        // Intercepta TODO lo que el usuario hace en el TextField (teclear, borrar, pegar...)
+        ePassword.setTextFormatter(new TextFormatter<String>(change -> {
+            if (internalPasswordUpdate) return change;
+            if (!change.isContentChange()) return change;
+
+            String old = realPassword.get();
+            int start = change.getRangeStart();
+            int end = change.getRangeEnd();
+            String inserted = change.getText() == null ? "" : change.getText();
+
+            // Construye el nuevo texto REAL aplicando el cambio
+            String newReal = old.substring(0, start) + inserted + old.substring(end);
+            realPassword.set(newReal);
+
+            // caret lógico
+            int newCaret = start + inserted.length();
+
+            // Cancela el cambio normal y repinta nosotros
+            Platform.runLater(() -> {
+                internalPasswordUpdate = true;
+                refreshPasswordDisplay();
+                ePassword.positionCaret(Math.min(newCaret, ePassword.getText().length()));
+                internalPasswordUpdate = false;
+            });
+
+            return null; // cancela el cambio original
+        }));
+
+        // Toggle: ver/ocultar
+        if (btnViewPassword != null) {
+            btnViewPassword.selectedProperty().addListener((obs, was, is) -> {
+                internalPasswordUpdate = true;
+                refreshPasswordDisplay();
+                ePassword.positionCaret(ePassword.getText().length());
+                internalPasswordUpdate = false;
+            });
+        }
+
+        // Estado inicial
+        internalPasswordUpdate = true;
+        refreshPasswordDisplay();
+        internalPasswordUpdate = false;
+        
         ePassword.setOnAction(e -> bIniciar.fire());
         
         validPassword = new SimpleBooleanProperty(false);   
@@ -74,7 +134,7 @@ public class AuthController implements Initializable {
     @FXML
     private void pulsadoIniciar(ActionEvent event) throws IOException {
         String username = eUsername.getText();
-        String password = ePassword.getText();
+        String password = getPasswordReal();
         
         try {
             Navigation nav = Navigation.getInstance();
@@ -104,7 +164,7 @@ public class AuthController implements Initializable {
     // ===================== Validaciones =====================
 
     private void checkPassword() {
-        String password = ePassword.getText();
+        String password = getPasswordReal();
         if(!User.checkPassword(password)){
             lPasswordWrong.setText("Invalid Password");
             manageError(lPasswordWrong, ePassword, validPassword);
@@ -165,6 +225,18 @@ public class AuthController implements Initializable {
         });
     }
 
-    
-    
+    private void refreshPasswordDisplay() {
+        String real = realPassword.get();
+        boolean reveal = (btnViewPassword != null && btnViewPassword.isSelected());
+
+        if (reveal) {
+            ePassword.setText(real);
+        } else {
+            ePassword.setText("●".repeat(real.length()));
+        }
+    }
+
+    private String getPasswordReal() {
+        return realPassword.get();
+    }
 }
