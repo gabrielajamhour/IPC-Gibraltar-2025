@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import util.PointTool;
 import util.ReglaTool;
 import util.ProblemUtil;
+import util.ProtractorTool;
 import util.SessionManager;
 import util.SettingsUtil;
 
@@ -78,6 +79,7 @@ public class ConfigController implements Initializable {
         settings.setUsarColorSolido(valorOriginalColorFondo);
         PointTool.setDynamicPoiSizeEnabled(valorOriginalDynamicPoiSize);
         ReglaTool.setDefaultHandleScalingEnabled(valorOriginalReglaHandleScaling);
+        ProtractorTool.setDefaultHandleScalingEnabled(valorOriginalReglaHandleScaling);
         
         Stage stage = (Stage) btnResetProblem.getScene().getWindow();
         SessionManager.goToMain(stage);
@@ -86,7 +88,13 @@ public class ConfigController implements Initializable {
     @FXML
     private void activateGuardar(ActionEvent event) throws IOException {
         PointTool.setDynamicPoiSizeEnabled(chkDynamicPoiSize.isSelected());
-        if (chkSizeTool != null) ReglaTool.setDefaultHandleScalingEnabled(chkSizeTool.isSelected());
+        
+        if (chkSizeTool != null) {
+            boolean enabled = chkSizeTool.isSelected();
+            ReglaTool.setDefaultHandleScalingEnabled(enabled);
+            ProtractorTool.setDefaultHandleScalingEnabled(enabled);
+        }
+          
         Stage stage = (Stage) btnSave.getScene().getWindow();
         SessionManager.goToMain(stage);
     }

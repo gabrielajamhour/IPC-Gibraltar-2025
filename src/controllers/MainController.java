@@ -232,7 +232,7 @@ public class MainController implements Initializable {
         extremosOverlay = new ExtremosOverlay(zoomGroup, data);
         
         // Transportador (overlay auxiliar)
-        protractorTool = new ProtractorTool(zoomGroup, scrollPane);
+        protractorTool = new ProtractorTool(toolOverlay, scrollPane);
         reglaTool = new ReglaTool(toolOverlay, scrollPane);
         
         zoomManager.setBeforeZoomHook((oldS, newS) -> {
