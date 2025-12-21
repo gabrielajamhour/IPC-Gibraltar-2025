@@ -53,3 +53,7 @@
 .register-btn:hover {
     -fx-background-color: -fx-blue-light;
 }
+
+.password-btn {
+    -fx-background-color: tranparent;
+}

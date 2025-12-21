@@ -78,11 +78,11 @@
                               <Insets left="10.0" />
                            </padding>
                         </TextField>
-                        <ToggleButton fx:id="btnViewPassword" mnemonicParsing="false" prefHeight="20.0" prefWidth="20.0">
+                        <ToggleButton fx:id="btnViewPassword" mnemonicParsing="false" prefHeight="20.0" prefWidth="20.0" styleClass="password-btn">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="imageViewPasswordBtn" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../resources/eyePassword.png" />
+                                    <Image url="@../resources/closedEyePassword.png" />
                                  </image>
                               </ImageView>
                            </graphic>

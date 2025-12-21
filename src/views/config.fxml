@@ -40,7 +40,7 @@
             <Separator maxWidth="-Infinity" minWidth="-Infinity" prefWidth="310.0" />
             <GridPane>
               <columnConstraints>
-                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="174.4" />
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="174.4" />
                 <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="145.20001220703125" minWidth="10.0" prefWidth="86.4" />
               </columnConstraints>
               <rowConstraints>
@@ -55,7 +55,7 @@
                         <Font name="Segoe UI Semibold" size="13.0" />
                      </font>
                      <GridPane.margin>
-                        <Insets left="10.0" />
+                        <Insets />
                      </GridPane.margin>
                   </Label>
                   <Label text="Fondo de color sólido" GridPane.rowIndex="2">
@@ -63,12 +63,12 @@
                         <Font name="Segoe UI Semibold" size="13.0" />
                      </font>
                      <GridPane.margin>
-                        <Insets right="10.0" />
+                        <Insets />
                      </GridPane.margin>
                   </Label>
                   <CheckBox fx:id="chkDynamicPoiSize" mnemonicParsing="false" onAction="#alternateDinamicPOISize" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <CheckBox fx:id="chkColorSolido" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <Label layoutX="28.0" layoutY="52.0" minWidth="-Infinity" prefWidth="200.0" text="Cambiar tamaño herramientas" GridPane.rowIndex="3">
+                  <Label layoutX="28.0" layoutY="52.0" minWidth="-Infinity" text="Cambiar tamaño herramientas" GridPane.rowIndex="3">
                      <font>
                         <Font name="Segoe UI Semibold" size="13.0" />
                      </font>
@@ -94,7 +94,7 @@
             </Separator>
             <Button fx:id="btnResetProblem" mnemonicParsing="false" onAction="#activateResetProblem" styleClass="restart-btn" text="Reiniciar ejercicios disponibles">
                <VBox.margin>
-                  <Insets bottom="7.0" top="5.0" />
+                  <Insets bottom="9.0" top="5.0" />
                </VBox.margin>
                <font>
                   <Font name="Segoe UI" size="13.0" />

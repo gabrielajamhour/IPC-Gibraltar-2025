@@ -24,6 +24,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.image.Image;
 
 /**
  * @author Rafael Alonso
@@ -40,12 +41,16 @@ public class AuthController implements Initializable {
     private BooleanProperty validPassword;
     private BooleanProperty validUsername;
     
-    @FXML    private Label lUserInvalid;
-    @FXML    private Label lPasswordWrong;
     @FXML    private TextField eUsername;
     @FXML    private TextField ePassword;
-    @FXML    private Button bIniciar;
+    
+    @FXML    private Label lUserInvalid;
+    @FXML    private Label lPasswordWrong;
+    
     @FXML    private ToggleButton btnViewPassword;
+    @FXML    private ImageView imageViewPasswordBtn;
+    
+    @FXML    private Button bIniciar;
     
     // Guarda la contraseña REAL (el TextField mostrará ●●● si está oculto)
     private final StringProperty realPassword = new SimpleStringProperty("");
@@ -122,6 +127,7 @@ public class AuthController implements Initializable {
         
         initErrorLabel(lUserInvalid);
         initErrorLabel(lPasswordWrong);
+                
     }  
     
     private void initErrorLabel(Label lbl) {
@@ -231,8 +237,10 @@ public class AuthController implements Initializable {
 
         if (reveal) {
             ePassword.setText(real);
+            imageViewPasswordBtn.setImage(new Image(getClass().getResourceAsStream("/resources/openedEyePassword.png")));
         } else {
             ePassword.setText("●".repeat(real.length()));
+            imageViewPasswordBtn.setImage(new Image(getClass().getResourceAsStream("/resources/closedEyePassword.png")));
         }
     }
 
