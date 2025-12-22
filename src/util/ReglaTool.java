@@ -535,10 +535,6 @@ public class ReglaTool {
         e.consume();
     }
 
-    /**
-     * Tu método "MAGIA NEGRA" (lo mantenemos), pero usando el CENTRO VISUAL real.
-     */
-    // MAGIA NEGRA - NO DOT TOUCH
     public void centerOnViewport() {
         if (overlayPane == null) return;
 
@@ -613,14 +609,6 @@ public class ReglaTool {
     public boolean isVisible() {
         return visible;
     }
-
-    /**
-     * Mantener tamaño constante en pantalla al cambiar zoom SIN mover la regla.
-     * Anclaje en el CENTRO VISUAL.
-     */
-    public void onMapZoomChanged(double newMapScale) {
-        // Compatibilidad: ya no hace falta ajustar nada con el zoom.
-    }
     
     public void setHandleScalingEnabled(boolean enabled) {
         this.handleScalingEnabled = enabled;
@@ -628,17 +616,5 @@ public class ReglaTool {
 
     public boolean isHandleScalingEnabled() {
         return handleScalingEnabled;
-    }
-    
-    public void beforeMapZoomChange() {
-        // No-op: la regla está anclada a la pantalla, no al mapa.
-    }
-
-    public void afterMapZoomChange(double newScale) {
-        // No-op: la regla está anclada a la pantalla, no al mapa.
-    }
-
-    private void restoreWindowAnchor() {
-        // No-op (modo HUD).
     }
 }

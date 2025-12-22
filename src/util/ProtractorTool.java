@@ -191,7 +191,7 @@ public class ProtractorTool {
     }
 
     /**
-     * Cambia pivote de Scale/Rotate sin que se mueva en pantalla el punto fixedLocal.
+     * Cambia pivote de Scale/Rotate sin que se mueva en pantalla el punto fixedLocal
      */
     private void setPivotKeepingLocalPointFixed(Point2D newPivotLocal, Point2D fixedLocal) {
         Point2D before = protractorGroup.localToParent(fixedLocal);
@@ -295,7 +295,7 @@ public class ProtractorTool {
 
     /**
      * Detecta el bbox "visual" real (dibujada por CSS) y coloca los handles
-     * en los extremos reales, no en el centro del Region.
+     * en los extremos reales, no en el centro del Region
      */
     private void computeHandlesFromSnapshot() {
         try {
@@ -590,25 +590,12 @@ public class ProtractorTool {
         return visible;
     }
 
-    // Compatibilidad (igual que la regla en HUD): no hace falta ajustar con zoom
-    public void onMapZoomChanged(double newMapScale) {
-        // No-op: el transportador está anclado a la pantalla, no al mapa.
-    }
-
     public void setHandleScalingEnabled(boolean enabled) {
         this.handleScalingEnabled = enabled;
     }
 
     public boolean isHandleScalingEnabled() {
         return handleScalingEnabled;
-    }
-
-    public void beforeMapZoomChange() {
-        // No-op (modo HUD).
-    }
-
-    public void afterMapZoomChange(double newScale) {
-        // No-op (modo HUD).
     }
 
     // ====== helpers ======

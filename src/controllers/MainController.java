@@ -11,7 +11,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
@@ -71,7 +70,7 @@ import util.TextTool;
 
 public class MainController implements Initializable {
 
-    // ======================================  
+    // FXML
     @FXML    private Slider zoom_slider;
     @FXML    private MenuButton map_pin;
     @FXML    private MenuItem profileButton;
@@ -105,6 +104,11 @@ public class MainController implements Initializable {
     @FXML    private Label tituloProbActual;
     @FXML    private ImageView avatarMain;
     @FXML    private MenuItem resultsButton;
+    @FXML    private Button toggleDrawerButton;
+    @FXML    private VBox panelProblemas;
+    @FXML    private ImageView imageView;
+    @FXML    private ScrollPane scrollPane;
+    @FXML    private VBox problemContainer;
     
 
     // Tools
@@ -128,7 +132,6 @@ public class MainController implements Initializable {
     // Estados compartidos (color actual, grosor, etc)
     private final ObjectProperty<Color> currentColor = new SimpleObjectProperty<>(Color.RED);
     private final DoubleProperty currentLineWidth = new SimpleDoubleProperty(2.0);
-
     
     // Lista compartida de líneas para TODA la app (sobrevive a cambiar de escena)
     private static final ObservableList<Line> lineData =
@@ -149,18 +152,11 @@ public class MainController implements Initializable {
     private ObservableList<Poi> data;
     
     // la variable zoomGroup se utiliza para dar soporte al zoom
-    // el escalado se realiza sobre este nodo, al escalar el Group no mueve sus nodos
     private Group zoomGroup;
     private ZoomManager zoomManager;
     
     private ProblemUtil problemUtil;
     private SettingsUtil settings;
-    
-    @FXML    private Button toggleDrawerButton;
-    @FXML    private VBox panelProblemas;
-    @FXML    private ImageView imageView;
-    @FXML    private ScrollPane scrollPane;
-    @FXML    private VBox problemContainer;
     
 
     @Override
@@ -171,8 +167,8 @@ public class MainController implements Initializable {
         zoomGroup   = zoomManager.getZoomGroup();
 
 
-        // --- HUD overlay para herramientas (NO se escala con el zoom) ---
-        // Lo metemos en el StackPane del FXML (scrollPane + controles de zoom) para no perder el slider.
+        // HUD overlay para herramientas (NO se escala con el zoom)
+        // Se mete en el StackPane del FXML (scrollPane + controles de zoom) para no perder el slider
         javafx.scene.layout.Pane toolOverlay = new javafx.scene.layout.Pane();
         toolOverlay.setPickOnBounds(false); // clic en vacío pasa al ScrollPane
         toolOverlay.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -234,19 +230,7 @@ public class MainController implements Initializable {
         // Transportador (overlay auxiliar)
         protractorTool = new ProtractorTool(toolOverlay, scrollPane);
         reglaTool = new ReglaTool(toolOverlay, scrollPane);
-        
-        zoomManager.setBeforeZoomHook((oldS, newS) -> {
-            if (reglaTool != null && reglaTool.isVisible()) {
-                reglaTool.beforeMapZoomChange();
-            }
-        });
-
-        zoomManager.setAfterZoomHook((oldS, newS) -> {
-            if (reglaTool != null && reglaTool.isVisible()) {
-                reglaTool.afterMapZoomChange(newS);
-            }
-        });
-        
+                
         // Dibujar todos los elementos
         dibujar();
         
@@ -485,10 +469,9 @@ public class MainController implements Initializable {
     private void logout(ActionEvent event) {
         SessionManager.finalizeAndSaveSession();
 
-        // Resetear el “canvas” al cerrar sesión (sin diálogo)
+        // Resetear el dibujo al cerrar sesión
         ClearAll.clearAll(zoomGroup, data, lineData, arcData, sharedTextData, map_pin);
 
-        // opcional: dejar todo consistente
         setCurrentTool(null);
 
         Stage stage = (Stage) zoom_slider.getScene().getWindow();
@@ -556,7 +539,7 @@ public class MainController implements Initializable {
     @FXML
     private void activatePointTool() {
         if (currentTool == pointTool) {
-            // Si ya estaba activa, la apagamos
+            // Si ya estaba activa, la desactivamos
             setCurrentTool(null);
         } else {
             setCurrentTool(pointTool);
@@ -566,7 +549,7 @@ public class MainController implements Initializable {
     @FXML
     private void activateLineTool() {
         if (currentTool == lineTool) {
-            // Si ya estaba activa, la apagamos
+            // Si ya estaba activa, la desactivamos
             setCurrentTool(null);
         } else {
             setCurrentTool(lineTool);
@@ -636,8 +619,8 @@ public class MainController implements Initializable {
             btnTransportador.setStyle(visible ? activeStyle : inactiveStyle);
         }
 
-        // IMPORTANTE: NO tocamos currentTool
-        // El usuario puede tener LineTool, PointTool, etc. activos y seguir dibujando.
+        // IMPORTANTE: NO cambiar el currentTool
+        // El usuario puede tener LineTool, PointTool, etc. activos y seguir dibujando
     }
     
     @FXML
@@ -655,7 +638,7 @@ public class MainController implements Initializable {
         }
 
         // IMPORTANTE: NO tocamos currentTool
-        // El usuario puede tener LineTool, PointTool, etc. activos y seguir dibujando.
+        // El usuario puede tener LineTool, PointTool, etc. activos y seguir dibujando
     }
     
     
@@ -684,7 +667,7 @@ public class MainController implements Initializable {
     }
 
     private void onNoneToolClicked() {
-            setCurrentTool(null); // deja solo el pan del ScrollPane
+            setCurrentTool(null);
     }
     
     private void updateToolButtons() {
@@ -701,7 +684,7 @@ public class MainController implements Initializable {
             btnLine.setStyle(currentTool == lineTool ? activeStyle : inactiveStyle);
         }
         
-            // Botón de borrar
+        // Botón de borrar
         if (btnBorrar != null) {
             btnBorrar.setStyle(currentTool == eraserTool ? activeStyle : inactiveStyle);
         }
@@ -778,17 +761,16 @@ public class MainController implements Initializable {
             return;
         }
 
-        // ✅ Si NO hay herramienta activa, y has clicado un POI -> centrar
+        // Si NO hay herramienta activa, y has clicado un POI -> centrar
         if (currentTool == null && event.getButton() == MouseButton.PRIMARY) {
             Poi poi = pickPoiFromEvent(event);
             if (poi != null) {
                 centerOnPoi(poi);
-                // Si quieres, aquí también podrías refrescar extremos si están activos
                 // if (extremosOverlay != null && extremosOverlay.isEnabled()) extremosOverlay.showFor(poi);
                 event.consume();
                 return;
             }
-            // Si no has clicado un POI, no hacemos nada (y el ScrollPane puede panear)
+            // Si no has clicado un POI, no hacemos nada
             return;
         }
 

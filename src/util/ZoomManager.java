@@ -85,7 +85,6 @@ public class ZoomManager {
     }
 
 
-
     /**
      * Aplica el zoom manteniendo fijo el punto que está en el centro
      * del viewport (pantalla), no el centro del mapa completo.
@@ -114,9 +113,9 @@ public class ZoomManager {
             return;
         }
 
-        // --- 1) Punto actual en el centro del viewport (antes del zoom) ---
+        // 1) Punto actual en el centro del viewport (antes del zoom)
 
-        //double oldScale = currentScale; // escala anterior
+        // double oldScale = currentScale; // escala anterior
 
         double contentWOld = contentBounds.getWidth()  * oldScale;
         double contentHOld = contentBounds.getHeight() * oldScale;
@@ -135,7 +134,7 @@ public class ZoomManager {
         double centerXLocal = (visibleXOld + viewportW / 2.0) / oldScale;
         double centerYLocal = (visibleYOld + viewportH / 2.0) / oldScale;
 
-        // --- 2) Aplicar nueva escala ---
+        // 2) Aplicar nueva escala
 
         zoomGroup.setScaleX(newScale);
         zoomGroup.setScaleY(newScale);
@@ -167,5 +166,4 @@ public class ZoomManager {
         
         if (afterZoomHook != null) afterZoomHook.onZoom(oldScale, newScale);
     }
-
 }
