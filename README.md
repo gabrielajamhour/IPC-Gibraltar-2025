@@ -1,71 +1,58 @@
-# Herramienta Interactiva de Navegación — Cartas Náuticas del Estrecho de Gibraltar
+# Interactive Navigation Tool — Nautical Charts of the Strait of Gibraltar
 
-## Descripción general
+## Overview
 
-Este proyecto consiste en una aplicación de escritorio interactiva diseñada para apoyar el estudio de cartas náuticas del Estrecho de Gibraltar.
+A Java desktop application designed to support the study and practice of nautical-chart navigation in the Strait of Gibraltar.
 
-El objetivo fue trasladar los requisitos reales de los exámenes de navegación a herramientas interactivas, mejorando la comprensión y la usabilidad frente a materiales tradicionales estáticos.
+The project translates real exam-style navigation tasks into interactive tools, with an emphasis on usability, problem-based learning, and practical interaction with the chart.
 
----
+## Key Features
 
-## Funcionalidades principales
+- **Drawing tools**: points, lines and arcs
+- **Measurement tools**: distance measurement, ruler and protractor
+- **Map interaction**: zoom and navigation
+- **Problem-based learning**: navigation scenarios inspired by exam exercises
+- **User management**: authentication and profiles
+- **Session tracking**: usage history and completed sessions
 
-- **Herramientas de dibujo**: puntos, líneas y arcos  
-- **Herramientas de medición**: cálculo de distancias, uso de regla y transportador  
-- **Interacción con el mapa**: zoom y navegación sobre la carta  
-- **Sistema de aprendizaje basado en problemas**, simulando escenarios reales de examen  
-- **Gestión de usuarios**: autenticación y perfiles  
-- **Seguimiento de sesiones e historial de uso**
-
----
-
-## Enfoque
-
-Más allá de replicar funcionalidades de una carta náutica, el proyecto se centró en:
-
-- Traducir tareas reales de examen en flujos interactivos  
-- Priorizar la claridad y la usabilidad en la interacción con el mapa  
-- Diseñar la aplicación en torno a cómo los usuarios abordan problemas de navegación  
-
-Este enfoque combina implementación técnica con una perspectiva centrada en el usuario.
-
----
-
-## Tecnologías utilizadas
+## Technical Stack
 
 - **Java 21**
 - **JavaFX**
 - **SQLite**
-- SceneBuilder  
-- NetBeans  
+- **FXML / Scene Builder**
+- **NetBeans**
 
----
+## Architecture
 
-## Ejecución
+The application separates the main UI and application responsibilities into several areas:
 
-1. Clonar el repositorio  
-2. Abrir el proyecto en NetBeans  
-3. Configurar el SDK de JavaFX  
-4. Ejecutar la aplicación  
+```text
+src/
+├── controllers/   # Application and screen controllers
+├── views/         # FXML user interfaces
+├── util/          # Navigation, drawing, measurement and session utilities
+├── resources/     # Images and other application resources
+└── styles/        # CSS stylesheets
+```
 
----
+The project uses JavaFX controllers to connect the FXML views with application behavior, while utility classes encapsulate reusable interaction and navigation logic.
 
-## Estructura del proyecto
+## Running the Project
 
-- `controllers/` → lógica de la aplicación e interacción  
-- `resources/` → recursos gráficos y elementos de interfaz  
-- `lib/` → dependencias externas (SQLite, JavaFX)  
-- `data.db` → base de datos local  
+1. Clone the repository.
+2. Open the project in NetBeans.
+3. Configure a Java 21 JDK and the JavaFX libraries.
+4. Build and run the application.
 
----
+The project uses SQLite for local persistence. The local database file is intentionally **not tracked by Git**.
 
-## Contexto
+## Context
 
-Desarrollado en el marco de la asignatura *Interfaces Persona-Computador* en la Universitat Politècnica de València (UPV).
+Developed as a team project for *Interfaces Persona-Computador* at Universitat Politècnica de València (UPV).
 
----
+## Authors
 
-## Autores
-
-- Gabriela Rego Jamhour  
+- Gabriela Rego Jamhour
 - Rafael Alonso Pellizzari
+
